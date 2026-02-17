@@ -22,7 +22,7 @@ class TestAuthFieldBehavior:
     @allure.title("auth-11: Видимость placeholder полей")
     def test_auth_11_placeholder_visible(self, sign_in_page: SignInPage):
         sign_in_page.open_phone_form()
-        sign_in_page.login_form.check_visible()
+        sign_in_page.check_visible_login_form()
 
     @allure.title("auth-12: Маска форматирования телефона")
     def test_auth_12_phone_mask(self, sign_in_page: SignInPage):
