@@ -1,6 +1,10 @@
 import pytest
 from playwright.sync_api import Page
 
+from tests.pages.sign_in_page import SignInPage
+from tests.pages.campaigns_page import CampaignsPage
+from tests.flows.auth_flow import AuthFlow
+
 
 @pytest.fixture(scope="session")
 def browser_context_args():
@@ -11,14 +15,18 @@ def browser_context_args():
 
 
 @pytest.fixture()
-def authenticated_page(page: Page) -> Page:
-    """Авторизация через телефон+пароль, возвращает page на странице кампаний."""
-    page.goto("https://app.rizz.market/auth/sign-in")
-    page.get_by_role("button", name="Другие способы входа").click()
-    page.get_by_placeholder("+7").click()
-    page.get_by_placeholder("+7").type("+79087814701", delay=50)
-    page.get_by_label("Пароль").click()
-    page.get_by_label("Пароль").type("89087814701", delay=50)
-    page.get_by_role("button", name="Войти", exact=True).click()
-    page.wait_for_url("**/app/advertiser/campaigns", timeout=15000)
-    return page
+def sign_in_page(page: Page) -> SignInPage:
+    """POM: страница авторизации."""
+    return SignInPage(page)
+
+
+@pytest.fixture()
+def campaigns_page(page: Page) -> CampaignsPage:
+    """POM: страница кампаний."""
+    return CampaignsPage(page)
+
+
+@pytest.fixture()
+def auth_flow(page: Page) -> AuthFlow:
+    """PFA: флоу авторизации."""
+    return AuthFlow(page)
