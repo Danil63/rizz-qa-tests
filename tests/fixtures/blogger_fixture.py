@@ -16,16 +16,15 @@ BLOGGER_PASSWORD = "89087814701"
 # ── Фикстура ─────────────────────────────────────────────────
 
 @pytest.fixture()
+@allure.title("Авторизация как блогер (Данил СЗ)")
 def blogger_page(page: Page) -> Page:
     """Авторизоваться как блогер (Данил СЗ) и вернуть page."""
-    with allure.step("Авторизация как блогер (Данил СЗ)"):
-        auth = AuthFlow(page)
-        auth.login_with_phone(BLOGGER_PHONE, BLOGGER_PASSWORD)
-        MarketPage(page).expect_loaded()
+    auth = AuthFlow(page)
+    auth.login_with_phone(BLOGGER_PHONE, BLOGGER_PASSWORD)
+    MarketPage(page).expect_loaded()
 
-    with allure.step("Закрытие cookie-диалога"):
-        cookie_btn = page.get_by_role("button", name="Принять cookie")
-        if cookie_btn.is_visible(timeout=3000):
-            cookie_btn.click()
+    cookie_btn = page.get_by_role("button", name="Принять cookie")
+    if cookie_btn.is_visible(timeout=3000):
+        cookie_btn.click()
 
     return page
