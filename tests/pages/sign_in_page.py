@@ -1,6 +1,7 @@
 """POM: Страница авторизации (sign-in)."""
 import re
 
+import allure
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
@@ -28,6 +29,7 @@ class SignInPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
+    @allure.step('Opening phone login form')
     def open_phone_form(self) -> "SignInPage":
         """Открыть форму входа по телефону."""
         self.navigate()
@@ -35,15 +37,18 @@ class SignInPage(BasePage):
         self.login_form.phone_input.wait_for(state="visible")
         return self
 
+    @allure.step('Clicking "Войти" button')
     def click_login_button(self) -> None:
         """Нажать кнопку 'Войти'."""
         self.login_button.click()
 
+    @allure.step('Clicking "Создать аккаунт" link')
     def click_create_account_link(self) -> None:
         """Нажать 'Создать аккаунт'."""
         self.create_account_link.click()
         self.check_current_url(re.compile(r".*/auth/sign-up"))
 
+    @allure.step('Clicking "Забыли пароль?" link')
     def click_forgot_password_link(self) -> None:
         """Нажать 'Забыли пароль?'."""
         self.forgot_password_link.click()
@@ -51,11 +56,13 @@ class SignInPage(BasePage):
 
     # ── Методы проверок ───────────────────────────────────────
 
+    @allure.step('Checking sign-in page is displayed')
     def check_visible_sign_in_page(self) -> None:
         """Проверить что мы на странице входа."""
         self.expect_url_contains(r".*/auth/sign-in")
         self.expect_heading("Вход")
 
+    @allure.step('Checking "Пользователь не найден" error is visible')
     def check_visible_user_not_found_alert(self) -> None:
         """Проверить ошибку 'Пользователь не найден'."""
         self.notification.check_visible_error("Пользователь не найден")
