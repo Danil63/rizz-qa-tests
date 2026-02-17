@@ -17,9 +17,9 @@ class SignInPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        # Компоненты (внутренние, не используются в тестах напрямую)
-        self._login_form = LoginFormComponent(page)
-        self._notification = NotificationComponent(page)
+        # Компоненты
+        self.login_form = LoginFormComponent(page)
+        self.notification = NotificationComponent(page)
 
         # Локаторы элементов страницы
         self.other_methods_button = page.get_by_role("button", name="Другие способы входа")
@@ -29,18 +29,11 @@ class SignInPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step('Opening phone login form')
-    def open_phone_form(self) -> "SignInPage":
-        """Открыть форму входа по телефону."""
-        self.navigate()
+    @allure.step('Clicking "Другие способы входа" button')
+    def click_other_methods_button(self) -> None:
+        """Нажать 'Другие способы входа'."""
         self.other_methods_button.click()
-        self._login_form.phone_input.wait_for(state="visible")
-        return self
-
-    @allure.step('Filling login form')
-    def fill_login_form(self, phone: str, password: str) -> None:
-        """Заполнить форму авторизации."""
-        self._login_form.fill(phone, password)
+        self.login_form.phone_input.wait_for(state="visible")
 
     @allure.step('Clicking "Войти" button')
     def click_login_button(self) -> None:
@@ -51,40 +44,11 @@ class SignInPage(BasePage):
     def click_create_account_link(self) -> None:
         """Нажать 'Создать аккаунт'."""
         self.create_account_link.click()
-        self.check_current_url(re.compile(r".*/auth/sign-up"))
 
     @allure.step('Clicking "Забыли пароль?" link')
     def click_forgot_password_link(self) -> None:
         """Нажать 'Забыли пароль?'."""
         self.forgot_password_link.click()
-        self.check_current_url(re.compile(r".*/auth/recover-password"))
-
-    @allure.step('Filling form and clearing fields')
-    def fill_and_clear_fields(self, phone: str, password: str) -> None:
-        """Заполнить форму, очистить поля и проверить что пустые."""
-        self._login_form.fill(phone, password)
-        self._login_form.clear_phone()
-        self._login_form.clear_password()
-        self._login_form.check_empty_phone()
-        self._login_form.check_empty_password()
-
-    @allure.step('Filling phone and checking mask')
-    def fill_phone_and_check_mask(self, phone: str) -> None:
-        """Ввести телефон и проверить маску."""
-        self._login_form.fill_phone(phone)
-        self._login_form.check_phone_mask()
-
-    @allure.step('Filling password and checking it is masked')
-    def fill_password_and_check_masked(self, password: str) -> None:
-        """Ввести пароль и проверить что отображается точками."""
-        self._login_form.fill_password(password)
-        self._login_form.check_password_masked()
-
-    @allure.step('Filling phone with 8-prefix and checking auto-prefix +7')
-    def fill_phone_and_check_auto_prefix(self, phone: str) -> None:
-        """Ввести телефон с 8 и проверить автоподстановку +7."""
-        self._login_form.fill_phone(phone)
-        self._login_form.check_phone_auto_prefix()
 
     # ── Методы проверок ───────────────────────────────────────
 
@@ -94,12 +58,17 @@ class SignInPage(BasePage):
         self.expect_url_contains(r".*/auth/sign-in")
         self.expect_heading("Вход")
 
-    @allure.step('Checking login form is visible')
-    def check_visible_login_form(self) -> None:
-        """Проверить что форма логина отображается."""
-        self._login_form.check_visible()
+    @allure.step('Checking redirect to sign-up page')
+    def check_visible_sign_up_page(self) -> None:
+        """Проверить переход на регистрацию."""
+        self.expect_url_contains(r".*/auth/sign-up")
+
+    @allure.step('Checking redirect to recover-password page')
+    def check_visible_recover_password_page(self) -> None:
+        """Проверить переход на восстановление пароля."""
+        self.expect_url_contains(r".*/auth/recover-password")
 
     @allure.step('Checking "Пользователь не найден" error')
     def check_visible_user_not_found_alert(self) -> None:
         """Проверить ошибку 'Пользователь не найден'."""
-        self._notification.check_visible_error("Пользователь не найден")
+        self.notification.check_visible_error("Пользователь не найден")

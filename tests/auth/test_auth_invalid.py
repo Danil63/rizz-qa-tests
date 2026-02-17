@@ -2,7 +2,7 @@
 import allure
 import pytest
 
-from tests.flows.auth_flow import AuthFlow
+from tests.pages.sign_in_page import SignInPage
 
 PHONE_VALID = "+79087814701"
 PASSWORD_VALID = "89087814701"
@@ -18,13 +18,19 @@ PHONE_NONEXISTENT = "+79087810000"
 class TestAuthInvalidCredentials:
 
     @allure.title("auth-04: Ошибка при незарегистрированном пользователе")
-    def test_auth_04_unregistered_user(self, auth_flow: AuthFlow):
-        sign_in = auth_flow.login_expect_error(PHONE_UNREGISTERED, PASSWORD_UNREGISTERED)
-        sign_in.check_visible_user_not_found_alert()
-        sign_in.check_visible_sign_in_page()
+    def test_auth_04_unregistered_user(self, sign_in_page: SignInPage):
+        sign_in_page.visit("https://app.rizz.market/auth/sign-in")
+        sign_in_page.click_other_methods_button()
+        sign_in_page.login_form.fill(phone=PHONE_UNREGISTERED, password=PASSWORD_UNREGISTERED)
+        sign_in_page.click_login_button()
+        sign_in_page.check_visible_user_not_found_alert()
+        sign_in_page.check_visible_sign_in_page()
 
     @allure.title("auth-05: Ошибка при несуществующем номере")
-    def test_auth_05_nonexistent_phone(self, auth_flow: AuthFlow):
-        sign_in = auth_flow.login_expect_error(PHONE_NONEXISTENT, PASSWORD_VALID)
-        sign_in.check_visible_user_not_found_alert()
-        sign_in.check_visible_sign_in_page()
+    def test_auth_05_nonexistent_phone(self, sign_in_page: SignInPage):
+        sign_in_page.visit("https://app.rizz.market/auth/sign-in")
+        sign_in_page.click_other_methods_button()
+        sign_in_page.login_form.fill(phone=PHONE_NONEXISTENT, password=PASSWORD_VALID)
+        sign_in_page.click_login_button()
+        sign_in_page.check_visible_user_not_found_alert()
+        sign_in_page.check_visible_sign_in_page()
