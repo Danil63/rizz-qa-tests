@@ -4,12 +4,21 @@ import pytest
 from tests.pages.sign_in_page import SignInPage
 from tests.pages.campaigns_page import CampaignsPage
 
+
 @pytest.mark.regression
 @pytest.mark.authorization
-@allure.feature("Авторизация")
+@allure.epic("Авторизация")
+@allure.feature("Вход по телефону")
 @allure.story("Успешная авторизация")
+@allure.tag("Regression", "Authorization")
 class TestAuth02:
+
     @allure.title("auth-02: Повторная авторизация")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.description(
+        "Проверка повторного входа с теми же валидными данными. "
+        "Система должна авторизовать пользователя без ошибок."
+    )
     def test_auth_02_repeat_login(self, sign_in_page: SignInPage, campaigns_page: CampaignsPage):
         sign_in_page.visit("https://app.rizz.market/auth/sign-in")
         sign_in_page.click_other_methods_button()

@@ -1,4 +1,8 @@
 """Глобальные фикстуры проекта."""
+import platform
+import sys
+from pathlib import Path
+
 import allure
 import pytest
 from playwright.sync_api import Page
@@ -17,6 +21,21 @@ ADVERTISER_PASSWORD = "89087814701"
 
 
 # ── Хуки ──────────────────────────────────────────────────────
+
+def pytest_sessionfinish(session, exitstatus):
+    """Записать environment.properties для Allure-отчёта."""
+    allure_dir = session.config.getoption("--alluredir", default=None)
+    if allure_dir:
+        env_file = Path(allure_dir) / "environment.properties"
+        env_file.parent.mkdir(parents=True, exist_ok=True)
+        env_file.write_text(
+            f"URL=https://app.rizz.market\n"
+            f"Browser=Chromium\n"
+            f"Python={sys.version.split()[0]}\n"
+            f"OS={platform.system()} {platform.release()}\n"
+            f"Pytest={pytest.__version__}\n"
+        )
+
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
