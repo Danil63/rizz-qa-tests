@@ -25,6 +25,18 @@ class LoginFormComponent(BaseComponent):
         self.password_input.click()
         self.password_input.type(password, delay=delay)
 
+    @allure.step('Filling only phone field')
+    def fill_phone(self, phone: str, delay: int = 50) -> None:
+        """Заполнить только поле телефона."""
+        self.phone_input.click()
+        self.phone_input.type(phone, delay=delay)
+
+    @allure.step('Filling only password field')
+    def fill_password(self, password: str, delay: int = 50) -> None:
+        """Заполнить только поле пароля."""
+        self.password_input.click()
+        self.password_input.type(password, delay=delay)
+
     @allure.step('Clearing phone input')
     def clear_phone(self) -> None:
         """Очистить поле телефона."""
@@ -59,6 +71,21 @@ class LoginFormComponent(BaseComponent):
     def check_password_masked(self) -> None:
         """Проверить что пароль скрыт (type=password)."""
         expect(self.password_input).to_have_attribute("type", "password")
+
+    @allure.step('Checking phone mask contains country code')
+    def check_phone_mask(self) -> None:
+        """Проверить что маска телефона содержит код страны."""
+        value = self.phone_input.input_value()
+        assert len(value) > 0, "Поле телефона пустое после ввода"
+        assert "7" in value, "Маска не содержит код страны"
+
+    @allure.step('Checking phone auto-prefix +7')
+    def check_phone_auto_prefix(self) -> None:
+        """Проверить автоподстановку +7."""
+        value = self.phone_input.input_value()
+        assert value.startswith("+7") or value.startswith("7"), (
+            f"Автоподстановка +7 не сработала: '{value}'"
+        )
 
     def get_phone_value(self) -> str:
         """Получить значение поля телефона."""

@@ -54,6 +54,39 @@ class SignInPage(BasePage):
         self.forgot_password_link.click()
         self.check_current_url(re.compile(r".*/auth/recover-password"))
 
+    @allure.step('Filling login form and submitting')
+    def fill_and_submit(self, phone: str, password: str) -> None:
+        """Заполнить форму и нажать Войти."""
+        self.login_form.fill(phone, password)
+        self.click_login_button()
+
+    @allure.step('Filling phone and checking mask')
+    def fill_phone_and_check_mask(self, phone: str) -> None:
+        """Ввести телефон и проверить маску."""
+        self.login_form.fill_phone(phone)
+        self.login_form.check_phone_mask()
+
+    @allure.step('Filling password and checking it is masked')
+    def fill_password_and_check_masked(self, password: str) -> None:
+        """Ввести пароль и проверить что отображается точками."""
+        self.login_form.fill_password(password)
+        self.login_form.check_password_masked()
+
+    @allure.step('Filling phone starting with 8 and checking auto-prefix +7')
+    def fill_phone_and_check_auto_prefix(self, phone: str) -> None:
+        """Ввести телефон с 8 и проверить автоподстановку +7."""
+        self.login_form.fill_phone(phone)
+        self.login_form.check_phone_auto_prefix()
+
+    @allure.step('Filling form, clearing fields and checking they are empty')
+    def fill_and_clear_fields(self, phone: str, password: str) -> None:
+        """Заполнить форму, очистить поля и проверить что пустые."""
+        self.login_form.fill(phone, password)
+        self.login_form.clear_phone()
+        self.login_form.clear_password()
+        self.login_form.check_empty_phone()
+        self.login_form.check_empty_password()
+
     # ── Методы проверок ───────────────────────────────────────
 
     @allure.step('Checking sign-in page is displayed')
