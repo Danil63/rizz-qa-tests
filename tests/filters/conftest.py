@@ -5,7 +5,7 @@ from playwright.sync_api import Page
 
 from tests.flows.auth_flow import AuthFlow
 from tests.pages.market_page import MarketPage
-from tests.components.market.filter_component import FilterComponent
+from tests.components.market_components.filter_component import FilterComponent
 
 
 # ── Учётные данные блогера ────────────────────────────────────

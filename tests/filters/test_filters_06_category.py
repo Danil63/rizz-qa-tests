@@ -2,7 +2,7 @@
 import allure
 import pytest
 
-from tests.components.market.filter_component import FilterComponent
+from tests.components.market_components.filter_component import FilterComponent
 
 
 @pytest.mark.regression

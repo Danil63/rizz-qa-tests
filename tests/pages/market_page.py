@@ -3,7 +3,7 @@ import allure
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
-from tests.components.market.campaign_card_component import CampaignCardComponent
+from tests.components.market_components.campaign_card_component import CampaignCardComponent
 
 
 class MarketPage(BasePage):
