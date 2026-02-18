@@ -9,8 +9,15 @@ from tests.pages.campaigns_page import CampaignsPage
 @pytest.fixture(scope="session")
 def browser_context_args():
     return {
-        "viewport": None,  # fullscreen
+        "viewport": {"width": 1920, "height": 1080},
         "locale": "ru-RU",
+    }
+
+
+@pytest.fixture(scope="session")
+def browser_type_launch_args():
+    return {
+        "args": ["--start-maximized"],
     }
 
 
