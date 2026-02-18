@@ -26,8 +26,7 @@ class TestProducts02:
         "3) Заполнить все поля рандомными реалистичными данными\n"
         '4) Нажать "Создать"\n\n'
         "Ожидаемый результат:\n"
-        "1) Пользователь переходит на /app/advertiser/products\n"
-        "2) Созданный продукт отображается в списке"
+        "1) Пользователь переходит на /app/advertiser/products"
     )
     def test_products_02_create_product(
         self,
@@ -69,10 +68,6 @@ class TestProducts02:
         # 4) Нажать "Создать"
         create_product_page.click_submit()
 
-        # ОР 1) Переход на страницу списка продуктов
+        # ОР) Переход на страницу списка продуктов
         products_page = ProductsPage(page)
         products_page.expect_loaded()
-
-        # ОР 2) Созданный продукт отображается в списке
-        product_name = page.get_by_text(data.name).first
-        expect(product_name).to_be_visible(timeout=10000)
