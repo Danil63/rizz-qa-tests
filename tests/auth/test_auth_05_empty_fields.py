@@ -1,4 +1,4 @@
-"""auth-06: Отображение ошибки при игнорировании заполнения обязательных полей."""
+"""auth-05: Отображение ошибки при игнорировании заполнения обязательных полей."""
 import allure
 import pytest
 
@@ -11,10 +11,10 @@ from tests.pages.sign_in_page import SignInPage
 @allure.feature("Вход по телефону")
 @allure.story("Валидация полей")
 @allure.tag("Regression", "Authorization", "Validation")
-class TestAuth06:
-    """auth-06: Отображение ошибки при игнорировании заполнения обязательных полей."""
+class TestAuth05:
+    """auth-05: Отображение ошибки при игнорировании заполнения обязательных полей."""
 
-    @allure.title("auth-06: Ошибка при игнорировании заполнения обязательных полей")
+    @allure.title("auth-05: Ошибка при игнорировании заполнения обязательных полей")
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
         "Шаги:\n"
@@ -24,7 +24,7 @@ class TestAuth06:
         "2) Пользователь не авторизован\n"
         "3) Пользователь остается на url: https://app.rizz.market/auth/sign-in"
     )
-    def test_auth_06_empty_fields(self, sign_in_page: SignInPage):
+    def test_auth_05_empty_fields(self, sign_in_page: SignInPage):
         # Предусловие: открыть страницу авторизации и форму
         sign_in_page.visit()
         sign_in_page.click_other_methods_button()

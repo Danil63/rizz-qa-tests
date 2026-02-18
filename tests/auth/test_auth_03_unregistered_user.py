@@ -1,4 +1,4 @@
-"""auth-04: Отображение ошибки при авторизации по не зарегистрированным данным."""
+"""auth-03: Отображение ошибки при авторизации по не зарегистрированным данным."""
 import allure
 import pytest
 
@@ -11,15 +11,15 @@ from tests.pages.sign_in_page import SignInPage
 @allure.feature("Вход по телефону")
 @allure.story("Невалидные данные")
 @allure.tag("Regression", "Authorization")
-class TestAuth04:
-    """auth-04: Отображение ошибки при авторизации по не зарегистрированным данным.
+class TestAuth03:
+    """auth-03: Отображение ошибки при авторизации по не зарегистрированным данным.
 
     Предусловие:
         телефон: +7 908 777 0001
         Пароль: паролькин9876
     """
 
-    @allure.title("auth-04: Ошибка при авторизации по не зарегистрированным данным")
+    @allure.title("auth-03: Ошибка при авторизации по не зарегистрированным данным")
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
         "Шаги:\n"
@@ -31,7 +31,7 @@ class TestAuth04:
         "2) Пользователь не авторизован\n"
         "3) Пользователь остается на url: https://app.rizz.market/auth/sign-in"
     )
-    def test_auth_04_unregistered_user(self, sign_in_page: SignInPage):
+    def test_auth_03_unregistered_user(self, sign_in_page: SignInPage):
         # Предусловие: открыть страницу авторизации и форму
         sign_in_page.visit()
         sign_in_page.click_other_methods_button()
