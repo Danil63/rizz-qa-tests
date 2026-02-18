@@ -90,3 +90,19 @@ class LoginFormComponent(BaseComponent):
     def get_phone_value(self) -> str:
         """Получить значение поля телефона."""
         return self.phone_input.input_value()
+
+    @allure.step('Checking phone field has validation error (red border)')
+    def check_phone_has_error(self) -> None:
+        """Проверить что поле телефона подсвечено ошибкой."""
+        expect(self.phone_input).to_have_attribute("aria-invalid", "true")
+
+    @allure.step('Checking password field has validation error (red border)')
+    def check_password_has_error(self) -> None:
+        """Проверить что поле пароля подсвечено ошибкой."""
+        expect(self.password_input).to_have_attribute("aria-invalid", "true")
+
+    @allure.step('Checking validation errors are displayed under fields')
+    def check_fields_have_errors(self) -> None:
+        """Проверить что оба поля подсвечены ошибкой валидации."""
+        self.check_phone_has_error()
+        self.check_password_has_error()

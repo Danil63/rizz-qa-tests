@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page
 
+from tests.pages.landing_page import LandingPage
 from tests.pages.sign_in_page import SignInPage
 from tests.pages.campaigns_page import CampaignsPage
 
@@ -11,6 +12,12 @@ def browser_context_args():
         "viewport": {"width": 1280, "height": 720},
         "locale": "ru-RU",
     }
+
+
+@pytest.fixture()
+def landing_page(page: Page) -> LandingPage:
+    """POM: лендинг rizz.market."""
+    return LandingPage(page)
 
 
 @pytest.fixture()

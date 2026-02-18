@@ -72,3 +72,8 @@ class SignInPage(BasePage):
     def check_visible_user_not_found_alert(self) -> None:
         """Проверить ошибку 'Пользователь не найден'."""
         self.notification.check_visible_error("Пользователь не найден")
+
+    @allure.step('Checking "Неверный пароль или пользователь не найден" error')
+    def check_visible_wrong_password_or_user_not_found_alert(self) -> None:
+        """Проверить ошибку 'Неверный пароль или пользователь не найден'."""
+        self.notification.check_visible_error("Неверный пароль или пользователь не найден")

@@ -1,6 +1,7 @@
-"""auth-06: Пустые обязательные поля."""
+"""auth-06: Отображение ошибки при игнорировании заполнения обязательных полей."""
 import allure
 import pytest
+
 from tests.pages.sign_in_page import SignInPage
 
 
@@ -11,16 +12,28 @@ from tests.pages.sign_in_page import SignInPage
 @allure.story("Валидация полей")
 @allure.tag("Regression", "Authorization", "Validation")
 class TestAuth06:
+    """auth-06: Отображение ошибки при игнорировании заполнения обязательных полей."""
 
-    @allure.title("auth-06: Пустые обязательные поля")
+    @allure.title("auth-06: Ошибка при игнорировании заполнения обязательных полей")
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
-        "Проверка поведения при нажатии 'Войти' без заполнения полей. "
-        "Пользователь должен остаться на странице авторизации."
+        "Шаги:\n"
+        "1) Нажать на кнопку 'Войти' проигнорировав заполнение обязательных полей\n\n"
+        "Ожидаемый результат:\n"
+        "1) Названия полей телефон/пароль окрашиваются в красный, под полем отображается ошибка\n"
+        "2) Пользователь не авторизован\n"
+        "3) Пользователь остается на url: https://app.rizz.market/auth/sign-in"
     )
     def test_auth_06_empty_fields(self, sign_in_page: SignInPage):
-        sign_in_page.visit("https://app.rizz.market/auth/sign-in")
+        # Предусловие: открыть страницу авторизации и форму
+        sign_in_page.visit()
         sign_in_page.click_other_methods_button()
+
+        # 1) Нажать на кнопку "Войти" проигнорировав заполнение обязательных полей
         sign_in_page.click_login_button()
-        sign_in_page.wait()
+
+        # ОР 1) Названия полей телефон/пароль окрашиваются в красный
+        sign_in_page.login_form.check_fields_have_errors()
+
+        # ОР 3) Пользователь остается на url: .../auth/sign-in
         sign_in_page.check_visible_sign_in_page()
