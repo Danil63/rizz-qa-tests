@@ -42,7 +42,7 @@ class TestAuth02:
         campaigns_page: CampaignsPage,
     ):
         # 1) Перейти на url: https://rizz.market/
-        landing_page.visit("https://rizz.market/")
+        landing_page.open()
 
         # 2) Нажать на кнопку "Подключиться к платформе"
         landing_page.click_connect_button()

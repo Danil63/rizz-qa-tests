@@ -44,13 +44,16 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
 
     if report.when == "call" and report.failed:
-        page: Page | None = item.funcargs.get("page")
-        if page is not None:
-            allure.attach(
-                page.screenshot(),
-                name="screenshot_on_failure",
-                attachment_type=allure.attachment_type.PNG,
-            )
+        try:
+            page: Page | None = item.funcargs.get("page")
+            if page is not None and not page.is_closed():
+                allure.attach(
+                    page.screenshot(),
+                    name="screenshot_on_failure",
+                    attachment_type=allure.attachment_type.PNG,
+                )
+        except Exception:
+            pass  # не ломаем отчёт если скриншот не получился
 
 
 # ── Фикстуры авторизации ─────────────────────────────────────

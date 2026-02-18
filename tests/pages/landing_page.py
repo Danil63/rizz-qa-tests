@@ -18,6 +18,12 @@ class LandingPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
+    @allure.step('Opening landing page rizz.market')
+    def open(self) -> None:
+        """Открыть лендинг (тяжёлая страница, без networkidle)."""
+        self.page.goto(self.URL, wait_until="domcontentloaded")
+        self.connect_button.wait_for(state="visible", timeout=15000)
+
     @allure.step('Clicking "Подключиться к платформе" button')
     def click_connect_button(self) -> None:
         """Нажать 'Подключиться к платформе'."""
