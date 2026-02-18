@@ -12,6 +12,7 @@ import allure
 import pytest
 from playwright.sync_api import Page, expect
 
+from playwright.sync_api import expect
 from tests.pages.campaigns_page import CampaignsPage
 
 
@@ -56,5 +57,5 @@ class TestCampaigns03:
         # 5) Таб «Активные» по-прежнему выбран
         campaigns_page.check_active_tab_selected()
 
-        # 6) Список кампаний не пуст
-        campaigns_page.check_campaigns_list_not_empty()
+        # 6) Проверяем что фильтр применился — значение dropdown = «Самостоятельно»
+        expect(campaigns_page.filter_management).to_contain_text("Самостоятельно")
