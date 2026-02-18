@@ -115,6 +115,34 @@ class CreateCampaignPage(BasePage):
             "Подключите уведомления в Telegram"
         )
 
+        # ── Ошибки валидации (p.text-sm.text-red-700) ─────────
+        self.all_errors = page.locator("p.text-sm.text-red-700")
+
+        # Название → "Обязательное поле"
+        self.error_name = page.get_by_role("textbox", name="Название").locator(
+            ".. >> p.text-red-700"
+        )
+
+        # Предмет рекламы → "Обязательное поле"
+        self.error_product = page.locator(
+            "text=Выберите предмет рекламы >> .. >> p.text-red-700"
+        )
+
+        # Формат контента → "Необходимо выбрать социальную сеть"
+        self.error_content_format = page.locator(
+            "text=Формат контента >> .. >> p.text-red-700"
+        )
+
+        # Тематика → "Нужно выбрать хотя бы одну тематику."
+        self.error_thematic = page.locator(
+            "text=Тематика >> .. >> p.text-red-700"
+        )
+
+        # Задание → "Значение слишком маленькое. Минимум: 5"
+        self.error_task = page.get_by_role("textbox", name="Задание").locator(
+            ".. >> p.text-red-700"
+        )
+
     # ── Методы действий ───────────────────────────────────────
 
     @allure.step("Принять cookie")
@@ -275,3 +303,47 @@ class CreateCampaignPage(BasePage):
     def check_auto_approve_unchecked(self) -> None:
         """Проверить что switch Автоодобрение выключен."""
         expect(self.switch_auto_approve).not_to_be_checked()
+
+    # ── Проверки ошибок валидации ──────────────────────────────
+
+    @allure.step("Проверка: все ошибки валидации отображаются при пустой отправке")
+    def check_all_validation_errors_visible(self) -> None:
+        """Проверить что все 5 ошибок валидации отображаются."""
+        count = self.all_errors.count()
+        assert count >= 5, f"Ожидалось ≥5 ошибок валидации, получено {count}"
+
+    @allure.step('Проверка: ошибка названия — "Обязательное поле"')
+    def check_error_name(self) -> None:
+        """Проверить ошибку поля Название."""
+        expect(self.error_name).to_contain_text("Обязательное поле")
+
+    @allure.step('Проверка: ошибка предмета рекламы — "Обязательное поле"')
+    def check_error_product(self) -> None:
+        """Проверить ошибку поля Предмет рекламы."""
+        expect(self.error_product).to_contain_text("Обязательное поле")
+
+    @allure.step('Проверка: ошибка формата контента — "Необходимо выбрать социальную сеть"')
+    def check_error_content_format(self) -> None:
+        """Проверить ошибку поля Формат контента."""
+        expect(self.error_content_format).to_contain_text("Необходимо выбрать социальную сеть")
+
+    @allure.step('Проверка: ошибка тематики — "Нужно выбрать хотя бы одну тематику."')
+    def check_error_thematic(self) -> None:
+        """Проверить ошибку поля Тематика."""
+        expect(self.error_thematic).to_contain_text("Нужно выбрать хотя бы одну тематику")
+
+    @allure.step('Проверка: ошибка задания — "Значение слишком маленькое. Минимум: 5"')
+    def check_error_task(self) -> None:
+        """Проверить ошибку поля Задание."""
+        expect(self.error_task).to_contain_text("Значение слишком маленькое")
+
+    @allure.step("Проверка: URL остаётся на странице создания (нет редиректа)")
+    def check_still_on_create_page(self) -> None:
+        """Проверить что после ошибки валидации остаёмся на странице создания."""
+        self.expect_url_contains(r".*/app/advertiser/campaigns/create")
+
+    @allure.step("Проверка: ошибки валидации отсутствуют")
+    def check_no_errors(self) -> None:
+        """Проверить что ошибок валидации нет."""
+        count = self.all_errors.count()
+        assert count == 0, f"Найдено {count} ошибок валидации, ожидалось 0"
