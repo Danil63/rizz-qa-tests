@@ -1,5 +1,6 @@
 """Глобальные фикстуры проекта."""
 import platform
+import shutil
 import sys
 from pathlib import Path
 
@@ -23,7 +24,10 @@ ADVERTISER_PASSWORD = "89087814701"
 # ── Хуки ──────────────────────────────────────────────────────
 
 def pytest_sessionfinish(session, exitstatus):
-    """Записать environment.properties для Allure-отчёта."""
+    """Записать environment.properties + очистить кеш после прогона."""
+    root = Path(session.config.rootpath)
+
+    # ── Allure environment ────────────────────────────────────
     allure_dir = session.config.getoption("--alluredir", default=None)
     if allure_dir:
         env_file = Path(allure_dir) / "environment.properties"
@@ -35,6 +39,20 @@ def pytest_sessionfinish(session, exitstatus):
             f"OS={platform.system()} {platform.release()}\n"
             f"Pytest={pytest.__version__}\n"
         )
+
+    # ── Очистка кеша ──────────────────────────────────────────
+    # __pycache__
+    for cache_dir in root.rglob("__pycache__"):
+        shutil.rmtree(cache_dir, ignore_errors=True)
+
+    # .pytest_cache
+    pytest_cache = root / ".pytest_cache"
+    if pytest_cache.exists():
+        shutil.rmtree(pytest_cache, ignore_errors=True)
+
+    # *.pyc файлы (на всякий случай)
+    for pyc in root.rglob("*.pyc"):
+        pyc.unlink(missing_ok=True)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
