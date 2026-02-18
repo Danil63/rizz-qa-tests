@@ -73,23 +73,26 @@ class FilterComponent(BaseComponent):
     @allure.step('Проверка: первая карточка содержит текст "{text}"')
     def check_first_card_contains(self, text: str) -> None:
         """Проверить что заголовок первой карточки содержит текст."""
-        first_title = self.page.locator("h3").first
+        first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
+        first_title = first_card.locator("h3")
         expect(first_title).to_contain_text(text, ignore_case=True)
 
     @allure.step('Проверка: карточки отображаются после фильтрации')
     def check_cards_visible(self) -> None:
         """Проверить что хотя бы одна карточка видна."""
-        cards = self.page.locator("a:has(h3)")
-        expect(cards.first).to_be_visible(timeout=10000)
+        first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
+        expect(first_card).to_be_visible(timeout=10000)
 
     @allure.step('Проверка: в карточках отображается плашка "{badge_text}"')
     def check_badge_visible_in_cards(self, badge_text: str) -> None:
         """Проверить что хотя бы одна карточка содержит указанный бейдж."""
-        badge = self.page.locator(f"button:has-text('{badge_text}')").first
-        expect(badge).to_be_visible(timeout=10000)
+        card_with_badge = self.page.locator(
+            f".rounded-xl.bg-white.p-1:has-text('{badge_text}')"
+        ).first
+        expect(card_with_badge).to_be_visible(timeout=10000)
 
     @allure.step('Проверка: выдача не изменилась (карточки видны)')
     def check_results_unchanged(self) -> None:
         """Проверить что карточки по-прежнему видны (выдача не сбросилась)."""
-        cards = self.page.locator("a:has(h3)")
-        expect(cards.first).to_be_visible(timeout=10000)
+        first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
+        expect(first_card).to_be_visible(timeout=10000)

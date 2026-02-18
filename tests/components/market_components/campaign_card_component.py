@@ -11,17 +11,17 @@ class CampaignCardComponent(BaseComponent):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        # Первая карточка (ссылка с заголовком h3)
-        self.card_link = page.locator("a:has(h3)").first
-        self.card_title = page.locator("h3").first
-        self.card_price_button = self.card_link.locator("..").locator("button").first
+        # Первая карточка товара (по классу)
+        self.card = page.locator(".rounded-xl.bg-white.p-1").first
+        self.card_title = self.card.locator("h3")
+        self.card_price_button = self.card.locator("button").first
 
     # ── Методы проверок ───────────────────────────────────────
 
     @allure.step("Checking first campaign card is visible")
     def check_visible(self) -> None:
         """Проверить что первая карточка отображается."""
-        expect(self.card_link).to_be_visible()
+        expect(self.card).to_be_visible()
         expect(self.card_title).to_be_visible()
 
     @allure.step("Checking first campaign card has title text")
