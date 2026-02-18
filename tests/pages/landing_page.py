@@ -15,14 +15,15 @@ class LandingPage(BasePage):
 
         # Локаторы элементов
         self.connect_button = page.get_by_text("Подключиться к платформе").first
+        self.login_link = page.get_by_text("Вход").first
 
     # ── Методы действий ───────────────────────────────────────
 
     @allure.step('Opening landing page rizz.market')
     def open(self) -> None:
-        """Открыть лендинг (тяжёлая страница, без networkidle)."""
-        self.page.goto(self.URL, wait_until="domcontentloaded")
-        self.connect_button.wait_for(state="visible", timeout=15000)
+        """Открыть лендинг (тяжёлая страница)."""
+        self.page.goto(self.URL, wait_until="commit", timeout=60000)
+        self.connect_button.wait_for(state="visible", timeout=30000)
 
     @allure.step('Clicking "Подключиться к платформе" button')
     def click_connect_button(self) -> None:
