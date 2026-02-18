@@ -18,6 +18,7 @@ def browser_context_args():
 def browser_type_launch_args():
     return {
         "args": ["--start-maximized"],
+        "headless": False,
     }
 
 
