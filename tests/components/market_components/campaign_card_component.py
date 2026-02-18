@@ -16,6 +16,11 @@ class CampaignCardComponent(BaseComponent):
         self.card_title = self.card.locator("h3")
         self.card_price_button = self.card.locator("button").first
 
+        # ── Бейджи ────────────────────────────────────────────
+        self.badge_auto_approve = self.card.locator("span.bg-purple")
+        self.badge_tax_paid = self.card.locator("div.bg-lime", has_text="НАЛОГ ОПЛАЧЕН")
+        self.badge_marking = self.card.locator("div.bg-lime", has_text="С МАРКИРОВКОЙ")
+
     # ── Методы проверок ───────────────────────────────────────
 
     @allure.step("Checking first campaign card is visible")
@@ -34,3 +39,18 @@ class CampaignCardComponent(BaseComponent):
     def check_has_price(self) -> None:
         """Проверить что у карточки есть кнопка с ценой/бартером."""
         expect(self.card_price_button).to_be_visible()
+
+    @allure.step("Checking АВТООДОБРЕНИЕ badge in first card")
+    def check_has_auto_approve(self) -> None:
+        """Проверить что у карточки есть бейдж АВТООДОБРЕНИЕ."""
+        expect(self.badge_auto_approve).to_be_visible()
+
+    @allure.step("Checking НАЛОГ ОПЛАЧЕН badge in first card")
+    def check_has_tax_paid(self) -> None:
+        """Проверить что у карточки есть бейдж НАЛОГ ОПЛАЧЕН."""
+        expect(self.badge_tax_paid).to_be_visible()
+
+    @allure.step("Checking С МАРКИРОВКОЙ badge in first card")
+    def check_has_marking(self) -> None:
+        """Проверить что у карточки есть бейдж С МАРКИРОВКОЙ."""
+        expect(self.badge_marking).to_be_visible()

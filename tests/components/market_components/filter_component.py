@@ -86,10 +86,16 @@ class FilterComponent(BaseComponent):
     @allure.step('Проверка: в карточках отображается плашка "{badge_text}"')
     def check_badge_visible_in_cards(self, badge_text: str) -> None:
         """Проверить что хотя бы одна карточка содержит указанный бейдж."""
-        card_with_badge = self.page.locator(
-            f".rounded-xl.bg-white.p-1:has-text('{badge_text}')"
+        badge_map = {
+            "АВТООДОБРЕНИЕ": "span.bg-purple",
+            "НАЛОГ ОПЛАЧЕН": "div.bg-lime",
+            "С МАРКИРОВКОЙ": "div.bg-lime",
+        }
+        selector = badge_map.get(badge_text, f"*:has-text('{badge_text}')")
+        badge = self.page.locator(
+            f".rounded-xl.bg-white.p-1 {selector}", has_text=badge_text
         ).first
-        expect(card_with_badge).to_be_visible(timeout=10000)
+        expect(badge).to_be_visible(timeout=10000)
 
     @allure.step('Проверка: выдача не изменилась (карточки видны)')
     def check_results_unchanged(self) -> None:

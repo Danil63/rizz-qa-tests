@@ -58,6 +58,15 @@ class MarketPage(BasePage):
         self.footer_copyright = page.get_by_text('ООО "Трафик агрегатор"')
         self.footer_about_link = page.get_by_role("link", name="О нас")
 
+        # ── Карточки товаров ──────────────────────────────────
+        self.campaign_cards = page.locator(".rounded-xl.bg-white.p-1")
+        self.first_campaign_card = self.campaign_cards.first
+
+        # ── Бейджи карточек ───────────────────────────────────
+        self.badge_auto_approve = page.locator("span.bg-purple").first
+        self.badge_tax_paid = page.locator("div.bg-lime", has_text="НАЛОГ ОПЛАЧЕН").first
+        self.badge_with_marking = page.locator("div.bg-lime", has_text="С МАРКИРОВКОЙ").first
+
         # ── Cookie-диалог ─────────────────────────────────────
         self.cookie_dialog = page.get_by_role("dialog", name="Согласие на cookie")
         self.cookie_accept = page.get_by_role("button", name="Принять cookie")
@@ -143,3 +152,18 @@ class MarketPage(BasePage):
         """Проверить видимость футера."""
         expect(self.footer_copyright).to_be_visible()
         expect(self.footer_about_link).to_be_visible()
+
+    @allure.step('Checking "АВТООДОБРЕНИЕ" badge is visible')
+    def check_auto_approve_badge_visible(self) -> None:
+        """Проверить видимость бейджа АВТООДОБРЕНИЕ."""
+        expect(self.badge_auto_approve).to_be_visible()
+
+    @allure.step('Checking "НАЛОГ ОПЛАЧЕН" badge is visible')
+    def check_tax_paid_badge_visible(self) -> None:
+        """Проверить видимость бейджа НАЛОГ ОПЛАЧЕН."""
+        expect(self.badge_tax_paid).to_be_visible()
+
+    @allure.step('Checking "С МАРКИРОВКОЙ" badge is visible')
+    def check_marking_badge_visible(self) -> None:
+        """Проверить видимость бейджа С МАРКИРОВКОЙ."""
+        expect(self.badge_with_marking).to_be_visible()

@@ -63,3 +63,21 @@ class TestMarket01:
     def test_market_01_footer_visible(self, market_page: MarketPage):
         market_page.expect_loaded()
         market_page.check_footer_visible()
+
+    @allure.title("market-01: Бейдж АВТООДОБРЕНИЕ отображается")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_market_01_auto_approve_badge(self, market_page: MarketPage):
+        market_page.expect_loaded()
+        market_page.check_auto_approve_badge_visible()
+
+    @allure.title("market-01: Бейдж НАЛОГ ОПЛАЧЕН отображается")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_market_01_tax_paid_badge(self, market_page: MarketPage):
+        market_page.expect_loaded()
+        market_page.check_tax_paid_badge_visible()
+
+    @allure.title("market-01: Бейдж С МАРКИРОВКОЙ отображается")
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_market_01_marking_badge(self, market_page: MarketPage):
+        market_page.expect_loaded()
+        market_page.check_marking_badge_visible()
