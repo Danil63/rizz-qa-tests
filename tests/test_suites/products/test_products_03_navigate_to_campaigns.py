@@ -1,4 +1,4 @@
-"""campaigns-04: Навигация с /products на /campaigns по кнопке в навбаре.
+"""products-03: Навигация с /products на /campaigns по кнопке в навбаре.
 
 Сценарий:
     1) Открыть /app/advertiser/products
@@ -15,16 +15,16 @@ from tests.pages.campaigns_page import CampaignsPage
 
 
 @pytest.mark.regression
-@pytest.mark.campaigns
-@allure.epic("Кампании рекламодателя")
+@pytest.mark.products
+@allure.epic("Продукты рекламодателя")
 @allure.feature("Навигация")
 @allure.story("Переход с Продуктов на Кампании через навбар")
-@allure.tag("Regression", "Campaigns", "Navigation")
-class TestCampaigns04:
-    """campaigns-04: Навигация /products → /campaigns по навбару."""
+@allure.tag("Regression", "Products", "Navigation")
+class TestProducts03:
+    """products-03: Навигация /products → /campaigns по навбару."""
 
     @allure.title(
-        "campaigns-04: Продукты → клик «Кампании» в навбаре → страница кампаний"
+        "products-03: Продукты → клик «Кампании» в навбаре → страница кампаний"
     )
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
@@ -34,7 +34,7 @@ class TestCampaigns04:
         "3) Проверить URL /app/advertiser/campaigns\n"
         '4) Проверить заголовок «Кампании» виден'
     )
-    def test_campaigns_04_navigate_from_products(
+    def test_products_03_navigate_to_campaigns(
         self,
         _load_auth,
         page: Page,
