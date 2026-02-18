@@ -9,7 +9,7 @@ from tests.pages.campaigns_page import CampaignsPage
 @pytest.fixture(scope="session")
 def browser_context_args():
     return {
-        "viewport": {"width": 1920, "height": 1080},
+        "viewport": {"width": 2560, "height": 1600},
         "locale": "ru-RU",
     }
 
