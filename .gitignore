@@ -13,3 +13,4 @@ USER.md
 skills/
 .auth_state.json
 .auth_state_advertiser.json
+tests/stage/*_state.json
