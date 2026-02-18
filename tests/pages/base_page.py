@@ -16,10 +16,11 @@ class BasePage:
 
     # ── Навигация ─────────────────────────────────────────────
 
-    def visit(self, url: str) -> "BasePage":
-        """Открыть произвольный URL."""
-        with allure.step(f'Opening URL "{url}"'):
-            self.page.goto(url, wait_until="networkidle")
+    def visit(self, url: str | None = None) -> "BasePage":
+        """Открыть URL. Без аргументов — использует self.URL."""
+        target = url or self.URL
+        with allure.step(f'Opening URL "{target}"'):
+            self.page.goto(target, wait_until="networkidle")
         return self
 
     def navigate(self) -> "BasePage":

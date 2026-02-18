@@ -14,7 +14,7 @@ class LandingPage(BasePage):
         super().__init__(page)
 
         # Локаторы элементов
-        self.connect_button = page.get_by_role("link", name="Подключиться к платформе")
+        self.connect_button = page.get_by_text("Подключиться к платформе").first
 
     # ── Методы действий ───────────────────────────────────────
 
