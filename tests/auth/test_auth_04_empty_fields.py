@@ -20,7 +20,7 @@ class TestAuth04:
         "Шаги:\n"
         "1) Нажать на кнопку 'Войти' проигнорировав заполнение обязательных полей\n\n"
         "Ожидаемый результат:\n"
-        "1) Названия полей телефон/пароль окрашиваются в красный, под полем отображается ошибка\n"
+        "1) Название поля 'Пароль' окрашивается в красный, под полем отображается ошибка 'Обязательное поле'\n"
         "2) Пользователь не авторизован\n"
         "3) Пользователь остается на url: https://app.rizz.market/auth/sign-in"
     )
@@ -32,9 +32,9 @@ class TestAuth04:
         # 1) Нажать на кнопку "Войти" проигнорировав заполнение обязательных полей
         sign_in_page.click_login_button()
 
-        # ОР 1) Поля подсвечены ошибкой + текст ошибки под полем
-        sign_in_page.login_form.check_phone_has_error()
-        sign_in_page.login_form.check_phone_error_message("Невалидный номер телефона")
+        # ОР 1) Поле пароля подсвечено ошибкой + текст "Обязательное поле"
+        sign_in_page.login_form.check_password_has_error()
+        sign_in_page.login_form.check_password_error_message("Обязательное поле")
 
         # ОР 3) Пользователь остается на url: .../auth/sign-in
         sign_in_page.check_visible_sign_in_page()

@@ -112,3 +112,9 @@ class LoginFormComponent(BaseComponent):
         """Проверить текст ошибки валидации под полем телефона."""
         error_msg = self.page.locator(f'p:text-is("{text}")')
         expect(error_msg).to_be_visible(timeout=5000)
+
+    @allure.step('Checking password validation message "{text}"')
+    def check_password_error_message(self, text: str) -> None:
+        """Проверить текст ошибки валидации под полем пароля."""
+        error_msg = self.page.locator(f'p:text-is("{text}")')
+        expect(error_msg).to_be_visible(timeout=5000)
