@@ -106,3 +106,9 @@ class LoginFormComponent(BaseComponent):
         """Проверить что оба поля подсвечены ошибкой валидации."""
         self.check_phone_has_error()
         self.check_password_has_error()
+
+    @allure.step('Checking phone validation message "{text}"')
+    def check_phone_error_message(self, text: str) -> None:
+        """Проверить текст ошибки валидации под полем телефона."""
+        error_msg = self.page.locator(f'p:text-is("{text}")')
+        expect(error_msg).to_be_visible(timeout=5000)
