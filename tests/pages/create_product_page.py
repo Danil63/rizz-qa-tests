@@ -53,6 +53,36 @@ class CreateProductPage(BasePage):
         # ── Кнопка создания ───────────────────────────────────
         self.submit_button = page.get_by_role("button", name="Создать")
 
+        # ── Ошибки валидации (p.text-red-700) ─────────────────
+        self.all_errors = page.locator("p.text-red-700")
+        self.error_image = page.locator(
+            "button:has(img) + p.text-red-700"
+        )
+        self.error_article = page.get_by_role("textbox", name="Артикул").locator(
+            ".. >> p.text-red-700"
+        )
+        self.error_name = page.get_by_role("textbox", name="Название").locator(
+            ".. >> p.text-red-700"
+        )
+        self.error_description = page.get_by_role("textbox", name="Описание").locator(
+            ".. >> p.text-red-700"
+        )
+        self.error_category = page.locator(
+            "text=Категория >> .. >> p.text-red-700"
+        )
+        self.error_brand = page.get_by_role("textbox", name="Бренд").locator(
+            ".. >> p.text-red-700"
+        )
+        self.error_marketplace = page.locator(
+            "text=Маркетплейс >> .. >> p.text-red-700"
+        )
+        self.error_price = page.get_by_role("textbox", name="Цена").locator(
+            ".. >> p.text-red-700"
+        )
+        self.error_product_link = page.get_by_role("textbox", name="Ссылка на товар").locator(
+            ".. >> p.text-red-700"
+        )
+
         # ── Cookie-диалог ─────────────────────────────────────
         self.cookie_accept = page.get_by_role("button", name="Принять cookie")
 
@@ -190,3 +220,57 @@ class CreateProductPage(BasePage):
     def check_price_placeholder(self) -> None:
         """Проверить placeholder поля Цена."""
         expect(self.input_price).to_have_attribute("placeholder", "Цена в рублях")
+
+    # ── Проверки ошибок валидации ──────────────────────────────
+
+    @allure.step("Проверка: все ошибки валидации отображаются при пустой отправке")
+    def check_all_validation_errors_visible(self) -> None:
+        """Проверить что все 9 ошибок валидации отображаются."""
+        count = self.all_errors.count()
+        assert count >= 9, f"Ожидалось ≥9 ошибок валидации, получено {count}"
+
+    @allure.step('Проверка: ошибка артикула — "{expected_text}"')
+    def check_error_article(self, expected_text: str = "Значение слишком маленькое") -> None:
+        """Проверить ошибку поля Артикул."""
+        expect(self.error_article).to_contain_text(expected_text)
+
+    @allure.step("Проверка: ошибка названия — Обязательное поле")
+    def check_error_name(self) -> None:
+        """Проверить ошибку поля Название."""
+        expect(self.error_name).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка описания — Обязательное поле")
+    def check_error_description(self) -> None:
+        """Проверить ошибку поля Описание."""
+        expect(self.error_description).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка категории — Обязательное поле")
+    def check_error_category(self) -> None:
+        """Проверить ошибку поля Категория."""
+        expect(self.error_category).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка бренда — Обязательное поле")
+    def check_error_brand(self) -> None:
+        """Проверить ошибку поля Бренд."""
+        expect(self.error_brand).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка маркетплейса — Обязательное поле")
+    def check_error_marketplace(self) -> None:
+        """Проверить ошибку поля Маркетплейс."""
+        expect(self.error_marketplace).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка цены — Обязательное поле")
+    def check_error_price(self) -> None:
+        """Проверить ошибку поля Цена."""
+        expect(self.error_price).to_contain_text("Обязательное поле")
+
+    @allure.step("Проверка: ошибка ссылки — Неверный формат ссылки")
+    def check_error_product_link(self) -> None:
+        """Проверить ошибку поля Ссылка на товар."""
+        expect(self.error_product_link).to_contain_text("Неверный формат ссылки")
+
+    @allure.step("Проверка: ошибки отсутствуют")
+    def check_no_errors(self) -> None:
+        """Проверить что ошибок валидации нет."""
+        count = self.all_errors.count()
+        assert count == 0, f"Найдено {count} ошибок валидации, ожидалось 0"
