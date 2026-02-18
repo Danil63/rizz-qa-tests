@@ -2,7 +2,6 @@
 import allure
 import pytest
 
-from tests.pages.landing_page import LandingPage
 from tests.pages.sign_in_page import SignInPage
 from tests.pages.campaigns_page import CampaignsPage
 
@@ -37,17 +36,13 @@ class TestAuth01:
     )
     def test_auth_01_valid_login(
         self,
-        landing_page: LandingPage,
         sign_in_page: SignInPage,
         campaigns_page: CampaignsPage,
     ):
-        # 1) Перейти на url: https://rizz.market/
-        landing_page.open()
+        # 1) Перейти на страницу авторизации
+        sign_in_page.visit()
 
-        # 2) Нажать на кнопку "Подключиться к платформе"
-        landing_page.click_connect_button()
-
-        # 3) Нажать на кнопку "Другие способы входа"
+        # 2) Нажать на кнопку "Другие способы входа"
         sign_in_page.click_other_methods_button()
 
         # 4) В поле Телефон посимвольно ввести данные: +7 908 781 4701
