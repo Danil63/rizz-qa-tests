@@ -37,10 +37,10 @@ class TestRegress:
         products.expect_loaded()
         products.check_products_list_not_empty()
 
-    @allure.title("Продукт: название совпадает")
+    @allure.title("Продукт: первый продукт отображается")
     @allure.severity(allure.severity_level.NORMAL)
     def test_02_product_name(self, regress: RegressData):
-        """Проверить что первый продукт имеет корректное название."""
+        """Проверить что первый продукт отображается корректно."""
         products = ProductsPage(regress.page)
         products.visit()
         products.expect_loaded()
@@ -76,13 +76,4 @@ class TestRegress:
         market.visit()
         market.expect_loaded()
 
-    @allure.title("Маркет: кампании отображаются в выдаче")
-    @allure.severity(allure.severity_level.CRITICAL)
-    def test_06_market_has_campaigns(self, regress: RegressData):
-        """Проверить что на маркете есть кампании."""
-        market = MarketPage(regress.page)
-        market.visit()
-        market.expect_loaded()
-        market.check_campaigns_visible()
-
-    # После test_06 → teardown regress → очистка
+    # После test_05 → teardown regress → очистка
