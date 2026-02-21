@@ -13,6 +13,8 @@ from tests.pages.campaigns_page import CampaignsPage
 
 # Импорт фикстур из fixtures/
 from tests.fixtures.blogger_fixture import blogger_page  # noqa: F401
+from tests.fixtures.product_fixture import created_product  # noqa: F401
+from tests.fixtures.campaign_fixture import created_campaign  # noqa: F401
 
 
 # ── Учётные данные ────────────────────────────────────────────
