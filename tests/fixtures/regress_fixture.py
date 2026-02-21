@@ -1,7 +1,7 @@
 """Фикстура полного регрессионного сценария.
 
 scope="class" — один setup на весь тестовый класс:
-    1. Авторизация (внутри фикстуры)
+    1. Авторизация (advertiser_page, переопределён как class-scoped в scenarios/conftest.py)
     2. Создание продукта
     3. Создание кампании
     4. yield → все тесты класса работают с этими данными
@@ -12,19 +12,12 @@ import pytest
 from dataclasses import dataclass
 from playwright.sync_api import Page
 
-from tests.flows.auth_flow import AuthFlow
 from tests.pages.products_page import ProductsPage
 from tests.pages.create_product_page import CreateProductPage
 from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.product_generator import generate_product_data, ProductData
 from tests.test_data.campaign_generator import generate_campaign_data, CampaignData
-
-
-# ── Учётные данные ────────────────────────────────────────────
-
-ADVERTISER_PHONE = "9087814701"
-ADVERTISER_PASSWORD = "89087814701"
 
 
 @dataclass
@@ -37,11 +30,14 @@ class RegressData:
 
 @pytest.fixture(scope="class")
 @allure.title("Регресс: setup auth → product → campaign")
-def regress(class_page: Page) -> RegressData:
+def regress(advertiser_page: Page) -> RegressData:
     """Полный регрессионный сценарий.
 
+    Зависимости:
+        - advertiser_page (class-scoped, из scenarios/conftest.py)
+
     Setup (один раз на класс):
-        1. Авторизация как рекламодатель
+        1. Авторизация — через advertiser_page
         2. Создание продукта через UI
         3. Создание кампании через UI
 
@@ -51,18 +47,7 @@ def regress(class_page: Page) -> RegressData:
     Teardown (один раз после всех тестов класса):
         Очистка созданных сущностей
     """
-    page = class_page
-
-    # ── 0. Авторизация ────────────────────────────────────────
-
-    with allure.step("Авторизация как рекламодатель"):
-        auth = AuthFlow(page)
-        auth.login_with_phone(ADVERTISER_PHONE, ADVERTISER_PASSWORD)
-        CampaignsPage(page).expect_loaded()
-
-        cookie_btn = page.get_by_role("button", name="Принять cookie")
-        if cookie_btn.is_visible(timeout=3000):
-            cookie_btn.click()
+    page = advertiser_page
 
     # ── 1. Создание продукта ──────────────────────────────────
 
