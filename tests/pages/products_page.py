@@ -44,6 +44,7 @@ class ProductsPage(BasePage):
 
         # ── Список продуктов/услуг ───────────────────────────
         self.product_items = page.get_by_role("listitem")
+        self.service_cards = page.locator("li:has(a[href*='/app/advertiser/products/']):has(button)")
         self.product_titles = page.locator("li a img[alt]")
         self.first_product = page.get_by_role("listitem").first
         self.first_product_link = self.first_product.get_by_role("link")
@@ -78,13 +79,25 @@ class ProductsPage(BasePage):
             self.filter_service_button.click()
         self.page.get_by_role("option", name=option).click()
 
+    @allure.step("Получить количество карточек услуг")
+    def get_service_cards_count(self) -> int:
+        """Вернуть количество карточек в текущем списке услуг."""
+        return self.service_cards.count()
+
+    @allure.step("Получить заголовок услуги по индексу")
+    def get_service_title_by_index(self, index: int) -> str:
+        """Достаёт заголовок услуги из карточки (устойчиво, без img[alt])."""
+        card = self.service_cards.nth(index)
+        text = card.get_by_role("link").first.inner_text().strip()
+        return text.splitlines()[0].strip() if text else ""
+
     @allure.step("Найти услугу по названию циклом while")
     def find_service_index_by_title_while(self, target_title: str) -> int:
         """Вернуть индекс услуги по названию, используя явный while-цикл."""
-        total = self.product_titles.count()
+        total = self.get_service_cards_count()
         idx = 0
         while idx < total:
-            current_title = (self.product_titles.nth(idx).get_attribute("alt") or "").strip()
+            current_title = self.get_service_title_by_index(idx)
             if current_title == target_title:
                 return idx
             idx += 1
@@ -93,7 +106,7 @@ class ProductsPage(BasePage):
     @allure.step("Архивировать услугу по индексу")
     def archive_service_by_index(self, index: int) -> None:
         """Открыть меню троеточия у карточки и нажать 'Архивировать'."""
-        card = self.product_items.nth(index)
+        card = self.service_cards.nth(index)
         card.get_by_role("button").click()
         self.page.get_by_role("menuitem", name="Архивировать").click()
 

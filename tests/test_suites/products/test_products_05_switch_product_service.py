@@ -26,9 +26,10 @@ class TestProducts05:
         products_page.select_product_type("Услуга")
 
         # 3) Выбрать target-услугу (берём первую в отфильтрованном списке)
-        total_services = products_page.product_titles.count()
+        products_page.page.wait_for_timeout(1000)
+        total_services = products_page.get_service_cards_count()
         assert total_services > 0, "Список услуг пуст после фильтрации"
-        target_title = (products_page.product_titles.first.get_attribute("alt") or "").strip()
+        target_title = products_page.get_service_title_by_index(0)
         assert target_title, "Не удалось получить заголовок услуги из карточки"
 
         # 4) Циклом while пройти заголовки и найти нужный
