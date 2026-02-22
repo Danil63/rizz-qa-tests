@@ -34,10 +34,14 @@ class TestProducts05:
 
         # 4) Циклом while пройти заголовки и найти нужный
         found_index = products_page.find_service_index_by_title_while(target_title)
+        found_title = products_page.get_service_title_by_index(found_index)
+        assert found_title == target_title, (
+            f"Заголовок карточки не равен target_title: '{found_title}' != '{target_title}'"
+        )
 
         allure.attach(
-            f"Найденная услуга: {target_title}\nИндекс: {found_index}",
-            name="Выбранная услуга для архивации",
+            f"Target услуга: {target_title}\nНайденная услуга: {found_title}\nИндекс: {found_index}",
+            name="Проверка совпадения заголовка перед архивацией",
             attachment_type=allure.attachment_type.TEXT,
         )
 

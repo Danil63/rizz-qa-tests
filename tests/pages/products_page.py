@@ -93,24 +93,28 @@ class ProductsPage(BasePage):
 
     @allure.step("Найти услугу по названию циклом while")
     def find_service_index_by_title_while(self, target_title: str) -> int:
-        """Вернуть индекс услуги по тексту заголовка из переменной, используя while-цикл."""
+        """Вернуть индекс услуги по точному совпадению заголовка из переменной."""
         total = self.get_service_cards_count()
         idx = 0
         while idx < total:
-            card = self.service_cards.nth(idx)
-            # Поиск именно по тексту заголовка внутри карточки
-            title_match = card.locator("span.line-clamp-2", has_text=target_title)
-            if title_match.count() > 0:
+            current_title = self.get_service_title_by_index(idx)
+            if current_title == target_title:
                 return idx
             idx += 1
-        raise AssertionError(f"Услуга с названием '{target_title}' не найдена. total={total}")
+        raise AssertionError(
+            f"Услуга с названием '{target_title}' не найдена по точному совпадению. total={total}"
+        )
 
     @allure.step("Архивировать услугу по индексу")
     def archive_service_by_index(self, index: int) -> None:
-        """Открыть меню троеточия у карточки и нажать 'Архивировать'."""
+        """Открыть меню троеточия, нажать Архивировать и подтвердить в модальном окне."""
         card = self.service_cards.nth(index)
         card.get_by_role("button").click()
         self.page.get_by_role("menuitem", name="Архивировать").click()
+
+        # Подтверждение в модальном окне
+        confirm_dialog = self.page.get_by_role("dialog")
+        confirm_dialog.get_by_role("button", name="Архивировать").click()
 
     @allure.step("Клик по первому продукту")
     def click_first_product(self) -> None:
