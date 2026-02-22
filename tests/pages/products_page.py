@@ -93,16 +93,26 @@ class ProductsPage(BasePage):
 
     @allure.step("Найти услугу по названию циклом while")
     def find_service_index_by_title_while(self, target_title: str) -> int:
-        """Вернуть индекс услуги по точному совпадению заголовка из переменной."""
-        total = self.get_service_cards_count()
-        idx = 0
-        while idx < total:
-            current_title = self.get_service_title_by_index(idx)
-            if current_title == target_title:
-                return idx
-            idx += 1
+        """Найти услугу по точному названию с прокруткой вниз, если карточки не в зоне видимости."""
+        scroll_attempt = 0
+        max_scrolls = 12
+
+        while scroll_attempt <= max_scrolls:
+            total = self.get_service_cards_count()
+            idx = 0
+            while idx < total:
+                current_title = self.get_service_title_by_index(idx)
+                if current_title == target_title:
+                    return idx
+                idx += 1
+
+            # Если не нашли — скроллим вниз и пробуем снова
+            self.page.mouse.wheel(0, 1400)
+            self.page.wait_for_timeout(700)
+            scroll_attempt += 1
+
         raise AssertionError(
-            f"Услуга с названием '{target_title}' не найдена по точному совпадению. total={total}"
+            f"Услуга с названием '{target_title}' не найдена после скролла."
         )
 
     @allure.step("Архивировать услугу по индексу")

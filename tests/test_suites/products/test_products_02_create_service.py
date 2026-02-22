@@ -1,11 +1,14 @@
 """products-02: Успешное создание услуги с рандомными данными."""
 import random
+from pathlib import Path
 
 import allure
 import pytest
 from tests.pages.create_product_page import CreateProductPage
 from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
+
+LAST_SERVICE_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_service_name.txt"
 
 
 @pytest.mark.regression
@@ -43,6 +46,10 @@ class TestProducts02:
             name="Сгенерированные данные услуги",
             attachment_type=allure.attachment_type.TEXT,
         )
+
+        # Сохраняем название созданной услуги для следующего теста (switch/archive)
+        LAST_SERVICE_NAME_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LAST_SERVICE_NAME_PATH.write_text(name, encoding="utf-8")
 
         # 5) Заполнить service-поля
         create_page.check_service_mode_fields_visible()

@@ -2,8 +2,11 @@
 
 import allure
 import pytest
+from pathlib import Path
 
 from tests.pages.products_page import ProductsPage
+
+LAST_SERVICE_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_service_name.txt"
 
 
 @pytest.mark.regression
@@ -25,12 +28,13 @@ class TestProducts05:
         # 2) Dropdown "Товар" -> выбрать "Услуга"
         products_page.select_product_type("Услуга")
 
-        # 3) Выбрать target-услугу (берём первую в отфильтрованном списке)
-        products_page.page.wait_for_timeout(1000)
-        total_services = products_page.get_service_cards_count()
-        assert total_services > 0, "Список услуг пуст после фильтрации"
-        target_title = products_page.get_service_title_by_index(0)
-        assert target_title, "Не удалось получить заголовок услуги из карточки"
+        # 3) Берём target_title из предыдущего теста создания услуги
+        assert LAST_SERVICE_NAME_PATH.exists(), (
+            f"Не найден файл с названием услуги: {LAST_SERVICE_NAME_PATH}. "
+            "Сначала запусти test_products_02_create_service.py"
+        )
+        target_title = LAST_SERVICE_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert target_title, "Файл last_service_name.txt пуст"
 
         # 4) Циклом while пройти заголовки и найти нужный
         found_index = products_page.find_service_index_by_title_while(target_title)
