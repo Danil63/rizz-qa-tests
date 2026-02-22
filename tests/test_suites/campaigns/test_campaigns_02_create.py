@@ -22,6 +22,7 @@ from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
 LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
@@ -60,11 +61,15 @@ class TestCampaigns02:
         campaigns_page: CampaignsPage,
         page: Page,
     ):
-        # Генерируем рандомные данные
-        data = generate_campaign_data(
-            product_name="Гвозди",
-            product_price=75,
+        assert LAST_PRODUCT_NAME_PATH.exists(), (
+            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
+            "Сначала запусти тест создания продукта."
         )
+        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert product_name, "Файл last_product_name.txt пустой"
+
+        # Генерируем данные кампании с использованием сохраненного названия продукта
+        data = generate_campaign_data(product_name=product_name, product_price=75)
 
         # Сохраняем заголовок кампании в отдельный файл для последующих проверок
         LAST_CAMPAIGN_TITLE_PATH.parent.mkdir(parents=True, exist_ok=True)

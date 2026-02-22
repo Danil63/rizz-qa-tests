@@ -1,4 +1,6 @@
 """products-03: Успешное создание продукта с рандомными данными."""
+from pathlib import Path
+
 import allure
 import pytest
 from playwright.sync_api import Page, expect
@@ -6,6 +8,8 @@ from playwright.sync_api import Page, expect
 from tests.pages.create_product_page import CreateProductPage
 from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
+
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
@@ -67,6 +71,10 @@ class TestProducts03:
 
         # 4) Нажать "Создать"
         create_product_page.click_submit()
+
+        # Сохраняем название созданного продукта для использования в campaign tests
+        LAST_PRODUCT_NAME_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LAST_PRODUCT_NAME_PATH.write_text(data.name, encoding="utf-8")
 
         # ОР) Переход на страницу списка продуктов
         products_page = ProductsPage(page)
