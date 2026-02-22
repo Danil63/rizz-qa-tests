@@ -112,9 +112,11 @@ class ProductsPage(BasePage):
         card.get_by_role("button").click()
         self.page.get_by_role("menuitem", name="Архивировать").click()
 
-        # Подтверждение в модальном окне
-        confirm_dialog = self.page.get_by_role("dialog")
-        confirm_dialog.get_by_role("button", name="Архивировать").click()
+        # Подтверждение: в некоторых состояниях кнопка не вложена в role=dialog,
+        # поэтому ищем подтверждающую кнопку глобально по тексту.
+        confirm_button = self.page.get_by_role("button", name="Архивировать").last
+        expect(confirm_button).to_be_visible(timeout=10000)
+        confirm_button.click()
 
     @allure.step("Клик по первому продукту")
     def click_first_product(self) -> None:
