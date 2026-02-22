@@ -93,12 +93,14 @@ class ProductsPage(BasePage):
 
     @allure.step("Найти услугу по названию циклом while")
     def find_service_index_by_title_while(self, target_title: str) -> int:
-        """Вернуть индекс услуги по названию (по тексту из переменной), используя while-цикл."""
+        """Вернуть индекс услуги по тексту заголовка из переменной, используя while-цикл."""
         total = self.get_service_cards_count()
         idx = 0
         while idx < total:
-            current_title = self.get_service_title_by_index(idx)
-            if target_title in current_title:
+            card = self.service_cards.nth(idx)
+            # Поиск именно по тексту заголовка внутри карточки
+            title_match = card.locator("span.line-clamp-2", has_text=target_title)
+            if title_match.count() > 0:
                 return idx
             idx += 1
         raise AssertionError(f"Услуга с названием '{target_title}' не найдена. total={total}")
