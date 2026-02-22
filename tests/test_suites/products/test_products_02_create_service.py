@@ -1,6 +1,5 @@
 """products-02: Успешное создание услуги с рандомными данными."""
 import random
-import string
 
 import allure
 import pytest
@@ -34,29 +33,19 @@ class TestProducts02:
 
         # 4) Рандомные данные
         random_desc = generate_product_data().description
-        article = f"{''.join(random.choices(string.ascii_uppercase, k=3))}-{random.randint(10000, 99999)}"
         name = f"Мойка окон {random.randint(100, 999)}"
-        brand = f"ServiceBrand{random.randint(100, 999)}"
-        price = str(random.randint(50, 110))
-        product_link = f"https://www.avito.ru/item/{random.randint(10000000, 99999999)}"
 
         allure.attach(
             f"Тип: Услуга\n"
-            f"Артикул: {article}\n"
             f"Название: {name}\n"
             f"Описание: {random_desc}\n"
-            f"Категория: Бытовая химия\n"
-            f"Бренд: {brand}\n"
-            f"Маркетплейс: Авито\n"
-            f"Цена: {price} ₽\n"
-            f"Ссылка: {product_link}",
+            f"Категория: Бытовая химия",
             name="Сгенерированные данные услуги",
             attachment_type=allure.attachment_type.TEXT,
         )
 
-        # 5) Заполнить форму
-        create_page.upload_image()
-        create_page.fill_article(article)
+        # 5) Заполнить service-поля
+        create_page.check_service_mode_fields_visible()
         create_page.fill_name(name)
         create_page.fill_description(random_desc)
 
@@ -65,14 +54,6 @@ class TestProducts02:
         category_option = create_page.page.get_by_role("option", name="Бытовая химия", exact=True)
         category_option.scroll_into_view_if_needed()
         category_option.click()
-
-        create_page.fill_brand(brand)
-
-        # Маркетплейс: выбрать Авито
-        create_page.select_marketplace_option("Авито")
-
-        create_page.fill_price(price)
-        create_page.fill_product_link(product_link)
 
         # 6) Нажать создать
         create_page.click_submit()

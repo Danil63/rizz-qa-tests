@@ -38,6 +38,13 @@ class CreateProductPage(BasePage):
         self.tab_product = page.get_by_role("tab", name="Товар")
         self.tab_service = page.get_by_role("tab", name="Услуга")
 
+        # ── Режим "Услуга" (после выбора таба) ───────────────
+        # По факту UI в режиме услуги оставляет обязательными поля:
+        # Название, Описание, Категория
+        self.service_name = page.get_by_role("textbox", name="Название")
+        self.service_description = page.get_by_role("textbox", name="Описание")
+        self.service_category = page.get_by_role("combobox", name="Категория")
+
         # ── Поля формы ────────────────────────────────────────
         self.input_article = page.get_by_role("textbox", name="Артикул")
         self.input_name = page.get_by_role("textbox", name="Название")
@@ -181,6 +188,14 @@ class CreateProductPage(BasePage):
         self.fill_price(price)
         self.fill_product_link(product_link)
 
+    @allure.step("Заполнение полей формы для типа 'Услуга'")
+    def fill_service_fields(self, name: str, description: str, category: str) -> None:
+        """Заполнить поля для режима Услуга: Название, Описание, Категория."""
+        self.select_task_type("Услуга")
+        self.fill_name(name)
+        self.fill_description(description)
+        self.select_category_option(category)
+
     # ── Методы проверок ───────────────────────────────────────
 
     @allure.step("Проверка: страница создания продукта загружена")
@@ -215,6 +230,14 @@ class CreateProductPage(BasePage):
     def check_product_tab_selected(self) -> None:
         """Проверить что таб Товар выбран по умолчанию."""
         expect(self.tab_product).to_have_attribute("aria-selected", "true")
+
+    @allure.step("Проверка: в режиме 'Услуга' доступны только service-поля")
+    def check_service_mode_fields_visible(self) -> None:
+        """Проверить поля в режиме Услуга (по текущему UI)."""
+        expect(self.tab_service).to_have_attribute("aria-selected", "true")
+        expect(self.service_name).to_be_visible()
+        expect(self.service_description).to_be_visible()
+        expect(self.service_category).to_be_visible()
 
     @allure.step("Проверка: placeholder цены корректный")
     def check_price_placeholder(self) -> None:
