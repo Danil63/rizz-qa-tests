@@ -1,4 +1,4 @@
-"""products-04: Успешное создание услуги с рандомными данными."""
+"""products-02: Успешное создание услуги с рандомными данными."""
 import random
 import string
 
@@ -15,12 +15,12 @@ from tests.test_data.product_generator import generate_product_data
 @allure.feature("Создание услуги")
 @allure.story("Успешное создание")
 @allure.tag("Regression", "Products", "Positive")
-class TestProducts04:
-    """products-04: Создание услуги с заполнением полей."""
+class TestProducts02:
+    """products-02: Создание услуги с заполнением полей."""
 
-    @allure.title("products-04: Создать услугу (рандом) → возврат на список продуктов")
+    @allure.title("products-02: Создать услугу (рандом) → возврат на список продуктов")
     @allure.severity(allure.severity_level.CRITICAL)
-    def test_products_04_create_service(self, products_page: ProductsPage):
+    def test_products_02_create_service(self, products_page: ProductsPage):
         # 1) Тест стартует на странице списка продуктов
         products_page.expect_loaded()
 

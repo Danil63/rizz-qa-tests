@@ -1,4 +1,4 @@
-"""products-02: Успешное создание продукта с рандомными данными."""
+"""products-03: Успешное создание продукта с рандомными данными."""
 import allure
 import pytest
 from playwright.sync_api import Page, expect
@@ -14,10 +14,10 @@ from tests.test_data.product_generator import generate_product_data
 @allure.feature("Создание продукта")
 @allure.story("Успешное создание")
 @allure.tag("Regression", "Products", "Positive")
-class TestProducts02:
-    """products-02: Создание продукта с заполнением всех полей."""
+class TestProducts03:
+    """products-03: Создание продукта с заполнением всех полей."""
 
-    @allure.title("products-02: Заполнение всех полей (рандом) → продукт создан")
+    @allure.title("products-03: Заполнение всех полей (рандом) → продукт создан")
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.description(
         "Шаги:\n"
@@ -28,7 +28,7 @@ class TestProducts02:
         "Ожидаемый результат:\n"
         "1) Пользователь переходит на /app/advertiser/products"
     )
-    def test_products_02_create_product(
+    def test_products_03_create_product(
         self,
         create_product_page: CreateProductPage,
         page: Page,

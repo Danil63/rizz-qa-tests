@@ -1,4 +1,4 @@
-"""products-03: Навигация с /products на /campaigns по кнопке в навбаре.
+"""products-04: Навигация с /products на /campaigns по кнопке в навбаре.
 
 Сценарий:
     1) Открыть /app/advertiser/products
@@ -20,11 +20,11 @@ from tests.pages.campaigns_page import CampaignsPage
 @allure.feature("Навигация")
 @allure.story("Переход с Продуктов на Кампании через навбар")
 @allure.tag("Regression", "Products", "Navigation")
-class TestProducts03:
-    """products-03: Навигация /products → /campaigns по навбару."""
+class TestProducts04:
+    """products-04: Навигация /products → /campaigns по навбару."""
 
     @allure.title(
-        "products-03: Продукты → клик «Кампании» в навбаре → страница кампаний"
+        "products-04: Продукты → клик «Кампании» в навбаре → страница кампаний"
     )
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
@@ -34,7 +34,7 @@ class TestProducts03:
         "3) Проверить URL /app/advertiser/campaigns\n"
         '4) Проверить заголовок «Кампании» виден'
     )
-    def test_products_03_navigate_to_campaigns(
+    def test_products_04_navigate_to_campaigns(
         self,
         _load_auth,
         page: Page,
