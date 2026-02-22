@@ -46,6 +46,7 @@ class TestProducts02:
 
         # 5) Заполнить service-поля
         create_page.check_service_mode_fields_visible()
+        create_page.upload_image()
         create_page.fill_name(name)
         create_page.fill_description(random_desc)
 
