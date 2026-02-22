@@ -96,7 +96,7 @@ class ProductsPage(BasePage):
     def find_service_index_by_title_while(self, target_title: str) -> int:
         """Найти услугу по точному названию с прокруткой вниз, если карточки не в зоне видимости."""
         scroll_attempt = 0
-        max_scrolls = 12
+        max_scrolls = 77
 
         while scroll_attempt <= max_scrolls:
             total = self.get_service_cards_count()
