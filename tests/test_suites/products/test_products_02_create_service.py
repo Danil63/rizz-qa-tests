@@ -56,7 +56,8 @@ class TestProducts02:
         category_option.scroll_into_view_if_needed()
         category_option.click()
 
-        # 6) Нажать создать
+        # 6) Явное ожидание перед нажатием Создать
+        create_page.page.wait_for_timeout(3000)
         create_page.click_submit()
 
         # 7) Пользователь на экране списка продуктов
