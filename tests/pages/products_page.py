@@ -30,6 +30,7 @@ class ProductsPage(BasePage):
 
         # ── Заголовок и описание ──────────────────────────────
         self.heading = page.get_by_role("heading", name="Список продуктов")
+        self.archive_heading = page.get_by_role("heading", name="Aрхив продуктов")
         self.description = page.get_by_text("Список добавленных вручную продуктов и по API.")
         self.how_it_works_button = page.get_by_role("button", name="Как это работает?")
 
@@ -128,6 +129,17 @@ class ProductsPage(BasePage):
         expect(confirm_button).to_be_visible(timeout=10000)
         confirm_button.click()
 
+    @allure.step("Разархивировать услугу по индексу")
+    def unarchive_service_by_index(self, index: int) -> None:
+        """Открыть меню троеточия, нажать Разархивировать и подтвердить при необходимости."""
+        card = self.service_cards.nth(index)
+        card.get_by_role("button").click()
+        self.page.get_by_role("menuitem", name="Разархивировать").click()
+
+        confirm_unarchive = self.page.get_by_role("button", name="Разархивировать")
+        if confirm_unarchive.count() > 0 and confirm_unarchive.last.is_visible(timeout=3000):
+            confirm_unarchive.last.click()
+
     @allure.step("Клик по первому продукту")
     def click_first_product(self) -> None:
         """Перейти в первый продукт из списка."""
@@ -164,6 +176,12 @@ class ProductsPage(BasePage):
         """Проверить что страница продуктов рекламодателя загружена."""
         self.expect_url_contains(r".*/app/advertiser/products")
         expect(self.heading).to_be_visible()
+
+    @allure.step("Проверка: страница архива продуктов загружена")
+    def expect_archive_loaded(self) -> None:
+        """Проверить что страница архива продуктов загружена."""
+        self.expect_url_contains(r".*/app/advertiser/products/archive")
+        expect(self.archive_heading).to_be_visible()
 
     @allure.step("Проверка: навигация рекламодателя видна")
     def check_navigation_visible(self) -> None:
