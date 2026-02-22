@@ -40,9 +40,11 @@ class ProductsPage(BasePage):
 
         # ── Фильтр Товар/Услуга ──────────────────────────────
         self.filter_type_button = page.get_by_role("button", name="Товар")
+        self.filter_service_button = page.get_by_role("button", name="Услуга")
 
-        # ── Список продуктов ──────────────────────────────────
+        # ── Список продуктов/услуг ───────────────────────────
         self.product_items = page.get_by_role("listitem")
+        self.product_titles = page.locator("li a img[alt]")
         self.first_product = page.get_by_role("listitem").first
         self.first_product_link = self.first_product.get_by_role("link")
         self.first_product_image = self.first_product.locator("img").first
@@ -70,8 +72,30 @@ class ProductsPage(BasePage):
     @allure.step('Выбор типа продукта: "{option}"')
     def select_product_type(self, option: str) -> None:
         """Открыть dropdown Товар/Услуга и выбрать опцию."""
-        self.filter_type_button.click()
+        if self.filter_type_button.is_visible():
+            self.filter_type_button.click()
+        else:
+            self.filter_service_button.click()
         self.page.get_by_role("option", name=option).click()
+
+    @allure.step("Найти услугу по названию циклом while")
+    def find_service_index_by_title_while(self, target_title: str) -> int:
+        """Вернуть индекс услуги по названию, используя явный while-цикл."""
+        total = self.product_titles.count()
+        idx = 0
+        while idx < total:
+            current_title = (self.product_titles.nth(idx).get_attribute("alt") or "").strip()
+            if current_title == target_title:
+                return idx
+            idx += 1
+        raise AssertionError(f"Услуга с названием '{target_title}' не найдена. total={total}")
+
+    @allure.step("Архивировать услугу по индексу")
+    def archive_service_by_index(self, index: int) -> None:
+        """Открыть меню троеточия у карточки и нажать 'Архивировать'."""
+        card = self.product_items.nth(index)
+        card.get_by_role("button").click()
+        self.page.get_by_role("menuitem", name="Архивировать").click()
 
     @allure.step("Клик по первому продукту")
     def click_first_product(self) -> None:
