@@ -11,6 +11,7 @@
     8) Ожидание 3 секунды
 """
 import time
+from pathlib import Path
 
 import allure
 import pytest
@@ -19,6 +20,8 @@ from playwright.sync_api import Page
 from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
+
+LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
 
 
 @pytest.mark.regression
@@ -62,6 +65,10 @@ class TestCampaigns02:
             product_name="Гвозди",
             product_price=75,
         )
+
+        # Сохраняем заголовок кампании в отдельный файл для последующих проверок
+        LAST_CAMPAIGN_TITLE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        LAST_CAMPAIGN_TITLE_PATH.write_text(data.name, encoding="utf-8")
 
         # Логируем в Allure
         allure.attach(
