@@ -131,13 +131,20 @@ class ProductsPage(BasePage):
 
     @allure.step("Разархивировать услугу по индексу")
     def unarchive_service_by_index(self, index: int) -> None:
-        """Открыть меню троеточия, нажать Разархивировать и подтвердить при необходимости."""
+        """Открыть меню троеточия, нажать Разархивировать и подтвердить в модальном окне."""
         card = self.service_cards.nth(index)
         card.get_by_role("button").click()
         self.page.get_by_role("menuitem", name="Разархивировать").click()
 
-        confirm_unarchive = self.page.get_by_role("button", name="Разархивировать")
-        if confirm_unarchive.count() > 0 and confirm_unarchive.last.is_visible(timeout=3000):
+        # Подтверждение в модалке: сначала пробуем внутри dialog,
+        # затем fallback глобально (последняя кнопка).
+        dialog_confirm = self.page.get_by_role("dialog").get_by_role("button", name="Разархивировать")
+        if dialog_confirm.count() > 0:
+            expect(dialog_confirm.first).to_be_visible(timeout=10000)
+            dialog_confirm.first.click()
+        else:
+            confirm_unarchive = self.page.get_by_role("button", name="Разархивировать")
+            expect(confirm_unarchive.last).to_be_visible(timeout=10000)
             confirm_unarchive.last.click()
 
     @allure.step("Клик по первому продукту")
