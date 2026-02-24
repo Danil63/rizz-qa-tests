@@ -1,14 +1,21 @@
 """Фикстуры для тестов фильтрации на маркете блогера.
 
-Авторизация через blogger_fixture (логин/пароль).
+Cookie загружаются из tests/stage/blogger_state.json.
+Генерация: python tests/stage/generate_auth.py
 """
+import json
 import allure
 import pytest
+from pathlib import Path
 from playwright.sync_api import Page
 
-from tests.fixtures.blogger_fixture import blogger_page  # noqa: F401
 from tests.pages.market_page import MarketPage
 from tests.components.market_components.filter_component import FilterComponent
+
+
+STORAGE_STATE_PATH = Path(__file__).parent.parent.parent / "stage" / "blogger_state.json"
+
+MARKET_URL = "https://app.rizz.market/app/creator/market"
 
 
 # ── Browser config ────────────────────────────────────────────
@@ -32,14 +39,26 @@ def browser_type_launch_args():
 # ── Фикстуры ─────────────────────────────────────────────────
 
 @pytest.fixture()
-@allure.title("Открытие маркета блогера (через логин)")
-def blogger_market(blogger_page: Page) -> Page:
-    """Открыть маркет — авторизация через blogger_fixture, затем переход на маркет."""
-    market = MarketPage(blogger_page)
-    market.visit()
+def _load_auth(page: Page):
+    """Подгрузить cookie блогера из stage."""
+    assert STORAGE_STATE_PATH.exists(), (
+        f"Файл {STORAGE_STATE_PATH} не найден. "
+        "Запусти: python tests/stage/generate_auth.py"
+    )
+    state = json.loads(STORAGE_STATE_PATH.read_text())
+    for cookie in state.get("cookies", []):
+        page.context.add_cookies([cookie])
+
+
+@pytest.fixture()
+@allure.title("Открытие маркета блогера (через cookie)")
+def blogger_market(_load_auth, page: Page) -> Page:
+    """Загрузить cookie блогера и открыть маркет."""
+    page.goto(MARKET_URL)
+    market = MarketPage(page)
     market.expect_loaded()
     market.accept_cookies()
-    return blogger_page
+    return page
 
 
 @pytest.fixture()
