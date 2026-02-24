@@ -39,14 +39,30 @@ class FilterComponent(BaseComponent):
         """Нажать Enter в поле поиска."""
         self.search_input.press("Enter")
 
+    # Маппинг человекочитаемых названий → data-value атрибутов
+    OPTION_DATA_VALUES: dict[str, str] = {
+        # Маркетплейс
+        "Ozon": "ozon",
+        "Wildberries": "wildberries",
+        "Avito": "avito",
+        "Всеинструменты": "vseintrumenty",
+        "Золотое яблоко": "zolotoeaybloko",
+    }
+
     @allure.step('Выбор в dropdown "{dropdown_name}" значение "{option_name}"')
     def select_dropdown_option(self, dropdown_name: str, option_name: str) -> None:
         """Открыть dropdown по имени кнопки и выбрать опцию."""
         btn = self._get_dropdown_button(dropdown_name)
         btn.click()
         self.page.wait_for_timeout(1000)
-        # Опция внутри диалога (Radix popover)
-        option = self.page.get_by_role("option", name=option_name).first
+
+        # Пробуем найти по data-value, иначе — по role+name
+        data_value = self.OPTION_DATA_VALUES.get(option_name)
+        if data_value:
+            option = self.page.locator(f'div[role="option"][data-value="{data_value}"]').first
+        else:
+            option = self.page.get_by_role("option", name=option_name).first
+
         option.wait_for(state="visible", timeout=10000)
         option.click()
         self.page.wait_for_timeout(500)
