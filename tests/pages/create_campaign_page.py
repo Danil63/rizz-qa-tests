@@ -168,14 +168,16 @@ class CreateCampaignPage(BasePage):
 
     @allure.step('Выбор предмета рекламы по поиску: "{search_text}"')
     def select_product_by_search(self, search_text: str) -> None:
-        """Открыть combobox, ввести поиск, выбрать первый результат."""
+        """Открыть combobox, ввести поиск, выбрать option с точным названием."""
         self.select_product.click()
         self.page.wait_for_timeout(500)
         self.product_search_input.fill(search_text)
-        self.page.wait_for_timeout(1000)
-        # Выбираем первый option из результатов
-        first_option = self.product_suggestions.get_by_role("option").first
-        first_option.click()
+        self.page.wait_for_timeout(1500)
+        # Ищем option, содержащий точное название продукта
+        target_option = self.product_suggestions.get_by_role("option").filter(
+            has_text=search_text
+        ).first
+        target_option.click()
 
     @allure.step('Ввод ссылки с UTM: "{value}"')
     def fill_utm_link(self, value: str) -> None:
