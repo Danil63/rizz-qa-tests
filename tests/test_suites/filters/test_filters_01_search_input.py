@@ -18,14 +18,18 @@ LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "la
 class TestFilters01:
     """filters-01: Поиск товара с использованием input."""
 
-    @allure.title("filters-01: Поиск товара с использованием input")
+    @allure.title("filters-01: Поиск товара → проверка заголовков → очистка → повторный Enter")
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
         "Шаги:\n"
-        '1) Выбрать в input значение "Гвозди для пистолета"\n\n'
+        "1) Ввести в input название продукта из last_product_name.txt\n"
+        "2) Нажать Enter\n"
+        "3) Перебрать заголовки карточек и найти совпадение\n"
+        "4) Очистить поисковый запрос\n"
+        "5) Нажать Enter повторно\n\n"
         "Ожидаемый результат:\n"
-        "1) В поисковой выдаче на 1 месте отображается товар "
-        "с названием релевантным запросу"
+        "1) В выдаче найдена карточка с названием продукта\n"
+        "2) После очистки выдача сбрасывается (карточки видны)"
     )
     def test_filters_01_search_input(self, filters: FilterComponent):
         assert LAST_PRODUCT_NAME_PATH.exists(), (
@@ -37,9 +41,23 @@ class TestFilters01:
 
         # 1) Ввести в поле поиска название продукта из файла
         filters.fill_search(product_name)
-        filters.press_search_enter()
 
-        # ОР: Первая карточка содержит релевантный текст
-        # Берём первое слово из названия для проверки релевантности
-        search_keyword = product_name.split()[0]
-        filters.check_first_card_contains(search_keyword)
+        # 2) Нажать Enter
+        filters.press_search_enter()
+        filters.page.wait_for_timeout(2000)
+
+        # 3) Перебрать заголовки карточек и проверить совпадение
+        found = filters.find_card_with_title(product_name)
+        assert found, (
+            f"Ни одна карточка не содержит заголовок «{product_name}»"
+        )
+
+        # 4) Очистить поисковый запрос
+        filters.clear_search()
+
+        # 5) Нажать Enter повторно
+        filters.press_search_enter()
+        filters.page.wait_for_timeout(2000)
+
+        # ОР: Выдача сбросилась — карточки по-прежнему видны
+        filters.check_results_unchanged()

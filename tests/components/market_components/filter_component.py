@@ -102,3 +102,32 @@ class FilterComponent(BaseComponent):
         """Проверить что карточки по-прежнему видны (выдача не сбросилась)."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
         expect(first_card).to_be_visible(timeout=10000)
+
+    @allure.step('Поиск карточки с заголовком, содержащим "{expected_title}"')
+    def find_card_with_title(self, expected_title: str) -> bool:
+        """Перебрать все карточки и найти ту, заголовок которой совпадает с ожидаемым.
+
+        Returns:
+            True если карточка найдена, False иначе.
+        """
+        cards = self.page.locator(".rounded-xl.bg-white.p-1")
+        count = cards.count()
+        for i in range(count):
+            title_el = cards.nth(i).locator("h3")
+            if title_el.count() == 0:
+                continue
+            title_text = title_el.first.text_content() or ""
+            if expected_title.lower() in title_text.lower():
+                allure.attach(
+                    f"Найдена карточка #{i + 1}: «{title_text}»",
+                    name="Совпадение заголовка",
+                    attachment_type=allure.attachment_type.TEXT,
+                )
+                return True
+        allure.attach(
+            f"Ожидалось: «{expected_title}»\n"
+            f"Проверено карточек: {count}",
+            name="Заголовок не найден",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+        return False
