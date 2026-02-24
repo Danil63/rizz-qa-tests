@@ -43,5 +43,10 @@ class TestFilters03:
         # 5) Сортировка → Сначала новые
         filters.select_dropdown_option("Сортировка", "Сначала новые")
 
-        # ОР: Карточки отображаются после фильтрации
-        filters.check_cards_visible()
+        # ОР: Дожидаемся загрузки карточек и проверяем наличие через find_card_with_title
+        first_card = filters.page.locator(".rounded-xl.bg-white.p-1").first
+        first_card.wait_for(state="visible", timeout=20000)
+        title_text = first_card.locator("h3").first.text_content() or ""
+        assert title_text, "Не удалось получить заголовок первой карточки"
+        found = filters.find_card_with_title(title_text)
+        assert found, f"Карточка с заголовком «{title_text}» не найдена в выдаче"
