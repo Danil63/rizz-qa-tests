@@ -9,7 +9,7 @@
     6) Нажать «Откликнуться на бартер»
     7) Проверить баннер «Отклик отправлен»
     8) Проверить текст «Отклик на бартер отправлен»
-    9) Проверить кнопку «Отменить отклик"
+    9) Проверить кнопку «Отменить отклик»
 """
 from pathlib import Path
 
@@ -51,10 +51,20 @@ class TestResponses01:
 
         allure.attach(campaign_title, name="Заголовок кампании", attachment_type=allure.attachment_type.TEXT)
 
-        # Стартовая страница уже открыта в fixture: tests/test_suites/responses/conftest.py
+        # Сужаем выдачу по точному заголовку кампании через поле поиска
+        with allure.step(f'Поиск кампании через поле "Поиск": "{campaign_title}"'):
+            market_page.search(campaign_title)
+            page.wait_for_timeout(1200)
 
         with allure.step(f'Поиск карточки с заголовком "{campaign_title}"'):
-            card = page.locator(".rounded-xl.bg-white.p-1", has=page.locator("h3", has_text=campaign_title))
+            card = page.locator(".rounded-xl.bg-white.p-1", has=page.locator("h3", has_text=campaign_title)).first
+            if card.count() == 0:
+                visible_titles = page.locator(".rounded-xl.bg-white.p-1 h3").all_text_contents()
+                allure.attach(
+                    "\n".join(t.strip() for t in visible_titles if t and t.strip()) or "<пусто>",
+                    name="Заголовки карточек на странице",
+                    attachment_type=allure.attachment_type.TEXT,
+                )
             expect(card).to_be_visible(timeout=15000)
 
         with allure.step('Нажатие кнопки «Бартер» на карточке'):
