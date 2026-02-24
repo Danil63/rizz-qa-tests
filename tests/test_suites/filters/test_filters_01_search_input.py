@@ -1,8 +1,12 @@
 """filters-01: Поиск товара с использованием input."""
+from pathlib import Path
+
 import allure
 import pytest
 
 from tests.components.market_components.filter_component import FilterComponent
+
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
@@ -24,9 +28,18 @@ class TestFilters01:
         "с названием релевантным запросу"
     )
     def test_filters_01_search_input(self, filters: FilterComponent):
-        # 1) Ввести в поле поиска "Гвозди для пистолета"
-        filters.fill_search("Гвозди для пистолета")
+        assert LAST_PRODUCT_NAME_PATH.exists(), (
+            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
+            "Сначала запусти тест создания продукта."
+        )
+        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert product_name, "Файл last_product_name.txt пустой"
+
+        # 1) Ввести в поле поиска название продукта из файла
+        filters.fill_search(product_name)
         filters.press_search_enter()
 
         # ОР: Первая карточка содержит релевантный текст
-        filters.check_first_card_contains("Гвозди")
+        # Берём первое слово из названия для проверки релевантности
+        search_keyword = product_name.split()[0]
+        filters.check_first_card_contains(search_keyword)
