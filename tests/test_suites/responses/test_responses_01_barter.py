@@ -2,7 +2,7 @@
 
 Сценарий:
     1) Старт с маркета на URL с фильтрами (через fixture)
-    2) Найти карточку по заголовку из last_campaign_title.txt
+    2) Найти карточку по заголовку из last_product_name.txt
     3) Нажать кнопку «Бартер» на карточке
     4) Нажать «Выполнить за бартер»
     5) В dropdown «Социальная сеть» выбрать «danil23319»
@@ -20,7 +20,7 @@ from playwright.sync_api import Page, expect
 from tests.components.market_components.barter_response_component import BarterResponseComponent
 from tests.pages.market_page import MarketPage
 
-LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
@@ -42,22 +42,22 @@ class TestResponses01:
         market_page: MarketPage,
         page: Page,
     ):
-        assert LAST_CAMPAIGN_TITLE_PATH.exists(), (
-            f"Файл {LAST_CAMPAIGN_TITLE_PATH} не найден. "
+        assert LAST_PRODUCT_NAME_PATH.exists(), (
+            f"Файл {LAST_PRODUCT_NAME_PATH} не найден. "
             "Сначала запусти тест создания кампании (campaigns-02)."
         )
-        campaign_title = LAST_CAMPAIGN_TITLE_PATH.read_text(encoding="utf-8").strip()
-        assert campaign_title, "Файл last_campaign_title.txt пустой"
+        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert product_name, "Файл last_product_name.txt пустой"
 
-        allure.attach(campaign_title, name="Заголовок кампании", attachment_type=allure.attachment_type.TEXT)
+        allure.attach(product_name, name="Название продукта", attachment_type=allure.attachment_type.TEXT)
 
         # Сужаем выдачу по точному заголовку кампании через поле поиска
-        with allure.step(f'Поиск кампании через поле "Поиск": "{campaign_title}"'):
-            market_page.search(campaign_title)
+        with allure.step(f'Поиск продукта через поле "Поиск": "{product_name}"'):
+            market_page.search(product_name)
             page.wait_for_timeout(1200)
 
-        with allure.step(f'Поиск карточки с заголовком "{campaign_title}"'):
-            card = page.locator(".rounded-xl.bg-white.p-1", has=page.locator("h3", has_text=campaign_title)).first
+        with allure.step(f'Поиск карточки с заголовком "{product_name}"'):
+            card = page.locator(".rounded-xl.bg-white.p-1", has=page.locator("h3", has_text=product_name)).first
             if card.count() == 0:
                 visible_titles = page.locator(".rounded-xl.bg-white.p-1 h3").all_text_contents()
                 allure.attach(
