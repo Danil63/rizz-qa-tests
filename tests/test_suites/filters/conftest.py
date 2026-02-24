@@ -34,9 +34,11 @@ def browser_type_launch_args():
 @pytest.fixture()
 @allure.title("Открытие маркета блогера (через логин)")
 def blogger_market(blogger_page: Page) -> Page:
-    """Открыть маркет — авторизация через blogger_fixture."""
+    """Открыть маркет — авторизация через blogger_fixture, затем переход на маркет."""
     market = MarketPage(blogger_page)
+    market.visit()
     market.expect_loaded()
+    market.accept_cookies()
     return blogger_page
 
 
