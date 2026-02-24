@@ -1,4 +1,6 @@
 """PCO: Компонент модалки отклика на бартер."""
+import re
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -14,8 +16,9 @@ class BarterResponseComponent(BaseComponent):
         # ── Кнопка «Выполнить за бартер» ──────────────────────
         self.execute_barter_button = page.get_by_role("button", name="Выполнить за бартер")
 
-        # ── Dropdown «Социальная сеть» ────────────────────────
-        self.social_network_dropdown = page.get_by_role("combobox", name="Социальная сеть")
+        # ── Dropdown «Социальная сеть» (в разных сборках может быть button или combobox) ──
+        self.social_network_button = page.get_by_role("button", name=re.compile("Социальная сеть", re.I))
+        self.social_network_combobox = page.get_by_role("combobox", name=re.compile("Социальная сеть", re.I))
 
         # ── Кнопка «Откликнуться на бартер» ───────────────────
         self.respond_barter_button = page.get_by_role("button", name="Откликнуться на бартер")
@@ -29,15 +32,30 @@ class BarterResponseComponent(BaseComponent):
 
     @allure.step('Clicking "Выполнить за бартер"')
     def click_execute_barter(self) -> None:
+        expect(self.execute_barter_button).to_be_visible(timeout=15000)
         self.execute_barter_button.click()
 
     @allure.step('Selecting social network account "{account_name}"')
     def select_social_network(self, account_name: str) -> None:
-        self.social_network_dropdown.click()
-        self.page.get_by_role("option", name=account_name).click()
+        # 1) Открыть dropdown
+        if self.social_network_button.first.is_visible(timeout=5000):
+            self.social_network_button.first.click()
+        elif self.social_network_combobox.first.is_visible(timeout=5000):
+            self.social_network_combobox.first.click()
+        else:
+            # fallback: кликаем по тексту лейбла
+            self.page.get_by_text("Социальная сеть", exact=False).first.click()
+
+        # 2) Выбрать аккаунт из выпадающего списка
+        option = self.page.get_by_role("option", name=account_name)
+        if option.count() > 0:
+            option.first.click()
+        else:
+            self.page.get_by_text(account_name, exact=False).first.click()
 
     @allure.step('Clicking "Откликнуться на бартер"')
     def click_respond_barter(self) -> None:
+        expect(self.respond_barter_button).to_be_visible(timeout=10000)
         self.respond_barter_button.click()
 
     # ── Проверки ──────────────────────────────────────────────
