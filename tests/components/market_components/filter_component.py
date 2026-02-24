@@ -44,9 +44,12 @@ class FilterComponent(BaseComponent):
         """Открыть dropdown по имени кнопки и выбрать опцию."""
         btn = self._get_dropdown_button(dropdown_name)
         btn.click()
+        self.page.wait_for_timeout(1000)
         # Опция внутри диалога (Radix popover)
-        option = self.page.get_by_role("option", name=option_name)
+        option = self.page.get_by_role("option", name=option_name).first
+        option.wait_for(state="visible", timeout=10000)
         option.click()
+        self.page.wait_for_timeout(500)
 
     @allure.step('Закрытие dropdown "{dropdown_name}"')
     def close_dropdown(self, dropdown_name: str) -> None:
