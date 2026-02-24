@@ -18,30 +18,30 @@ class TestFilters03:
     @allure.severity(allure.severity_level.CRITICAL)
     @allure.description(
         "Шаги:\n"
-        '1) Выбрать в dropdown "Социальная сеть" значение "Ig"\n'
-        '2) Выбрать в dropdown "Маркетплейс" значение "ВсеИнструменты"\n'
-        '3) Выбрать в dropdown "Категория" значение "Строительство и ремонт"\n'
+        '1) Выбрать в dropdown "Социальная сеть" значение "Instagram"\n'
+        '2) Выбрать в dropdown "Маркетплейс" значение "Ozon"\n'
+        '3) Выбрать в dropdown "Категория" значение "Спорт и отдых"\n'
         '4) Выбрать в dropdown "Вознаграждение" значение "Бартер"\n'
-        '5) Выбрать в dropdown "Опции кампании" значение "Без маркировки"\n\n'
+        '5) Выбрать в dropdown "Сортировка" значение "Сначала новые"\n\n'
         "Ожидаемый результат:\n"
-        "1) В поисковой выдаче на 1 месте отображается товар "
-        "с названием релевантным запросу"
+        "1) В поисковой выдаче отображаются карточки "
+        "соответствующие выбранным фильтрам"
     )
     def test_filters_03_all_dropdowns(self, filters: FilterComponent):
-        # 1) Социальная сеть → Ig
-        filters.select_dropdown_option("Социальная сеть", "Ig")
+        # 1) Социальная сеть → Instagram
+        filters.select_dropdown_option("Социальная сеть", "Instagram")
 
-        # 2) Маркетплейс → ВсеИнструменты
-        filters.select_dropdown_option("Маркетплейс", "ВсеИнструменты")
+        # 2) Маркетплейс → Ozon
+        filters.select_dropdown_option("Маркетплейс", "Ozon")
 
-        # 3) Категория → Строительство и ремонт
-        filters.select_dropdown_option("Категория", "Строительство и ремонт")
+        # 3) Категория → Спорт и отдых
+        filters.select_dropdown_option("Категория", "Спорт и отдых")
 
         # 4) Вознаграждение → Бартер
         filters.select_dropdown_option("Вознаграждение", "Бартер")
 
-        # 5) Опции кампании → Без маркировки
-        filters.select_dropdown_option("Опции кампании", "Без маркировки")
+        # 5) Сортировка → Сначала новые
+        filters.select_dropdown_option("Сортировка", "Сначала новые")
 
         # ОР: Карточки отображаются после фильтрации
         filters.check_cards_visible()
