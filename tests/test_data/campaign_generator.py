@@ -132,7 +132,7 @@ REVIEW_TEMPLATES = [
 
 
 def generate_campaign_data(
-    product_name: str = "Гвозди",
+    product_name: str,
     product_price: int = 75,
 ) -> CampaignData:
     """Сгенерировать реалистичные рандомные данные кампании.
