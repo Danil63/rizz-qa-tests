@@ -2,7 +2,7 @@
 import re
 
 import allure
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, Locator, expect
 
 from tests.components.base_component import BaseComponent
 
@@ -13,18 +13,21 @@ class BarterResponseComponent(BaseComponent):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        # ── Кнопка «Выполнить за бартер» ──────────────────────
-        self.execute_barter_button = page.get_by_role("button", name="Выполнить за бартер")
+        # Основной контейнер модалки (строго ограничиваем область поиска)
+        self.modal: Locator = page.locator(
+            "div[role='dialog']:has(button:has-text('Выполнить за бартер')), "
+            "div[role='dialog']:has(button:has-text('Откликнуться на бартер')), "
+            "div:has(button:has-text('Откликнуться на бартер'))"
+        ).first
 
-        # ── Кнопка «Откликнуться на бартер» ───────────────────
-        self.respond_barter_button = page.get_by_role("button", name="Откликнуться на бартер")
+        # ── Кнопки внутри модалки ─────────────────────────────
+        self.execute_barter_button = self.modal.get_by_role("button", name="Выполнить за бартер").first
+        self.respond_barter_button = self.modal.get_by_role("button", name="Откликнуться на бартер").first
 
-        # ── Баннер успеха ─────────────────────────────────────
+        # ── Баннер успеха (вне модалки) ──────────────────────
         self.success_banner_title = page.get_by_text("Отклик отправлен")
         self.success_banner_text = page.get_by_text("Отклик на бартер отправлен")
         self.cancel_response_button = page.get_by_role("button", name="Отменить отклик")
-
-    # ── Действия ──────────────────────────────────────────────
 
     @allure.step('Clicking "Выполнить за бартер"')
     def click_execute_barter(self) -> None:
@@ -33,21 +36,19 @@ class BarterResponseComponent(BaseComponent):
 
     @allure.step('Selecting social network account "{account_name}"')
     def select_social_network(self, account_name: str) -> None:
-        # Модалка может рендерить селектор как button/combobox/input.
-        # Сначала ждём появления кнопки подтверждения внутри модалки.
-        expect(self.respond_barter_button).to_be_visible(timeout=15000)
+        expect(self.modal).to_be_visible(timeout=10000)
 
         trigger_candidates = [
-            self.page.get_by_role("button", name=re.compile("Социальная сеть", re.I)).first,
-            self.page.get_by_role("combobox", name=re.compile("Социальная сеть", re.I)).first,
-            self.page.locator("input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']").first,
-            self.page.get_by_text("Социальная сеть", exact=False).first,
+            self.modal.get_by_role("button", name=re.compile("Социальная сеть", re.I)).first,
+            self.modal.get_by_role("combobox", name=re.compile("Социальная сеть", re.I)).first,
+            self.modal.locator("input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']").first,
+            self.modal.get_by_text("Социальная сеть", exact=False).first,
         ]
 
         opened = False
         for trigger in trigger_candidates:
             try:
-                if trigger.count() > 0 and trigger.is_visible(timeout=1500):
+                if trigger.count() > 0 and trigger.is_visible(timeout=1200):
                     trigger.click()
                     opened = True
                     break
@@ -55,18 +56,19 @@ class BarterResponseComponent(BaseComponent):
                 continue
 
         if not opened:
-            raise AssertionError("Не удалось открыть dropdown 'Социальная сеть' в модалке отклика")
+            raise AssertionError("Не удалось открыть dropdown 'Социальная сеть' внутри модалки отклика")
 
-        # Варианты элементов списка
         option_candidates = [
+            self.modal.get_by_role("option", name=account_name).first,
+            self.modal.get_by_role("button", name=account_name).first,
+            self.modal.get_by_text(account_name, exact=False).first,
             self.page.get_by_role("option", name=account_name).first,
-            self.page.get_by_role("button", name=account_name).first,
             self.page.get_by_text(account_name, exact=False).first,
         ]
 
         for option in option_candidates:
             try:
-                if option.count() > 0 and option.is_visible(timeout=3000):
+                if option.count() > 0 and option.is_visible(timeout=2000):
                     option.click()
                     return
             except Exception:
@@ -78,8 +80,6 @@ class BarterResponseComponent(BaseComponent):
     def click_respond_barter(self) -> None:
         expect(self.respond_barter_button).to_be_visible(timeout=10000)
         self.respond_barter_button.click()
-
-    # ── Проверки ──────────────────────────────────────────────
 
     @allure.step('Checking success banner "Отклик отправлен" is visible')
     def check_success_banner_visible(self) -> None:
