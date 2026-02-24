@@ -7,11 +7,11 @@ from tests.pages.market_page import MarketPage
 
 MARKET_URL_WITH_FILTERS = (
     "https://app.rizz.market/app/creator/market"
-    "?socialNetworkTypes=%5B%22Instagram%22%5D"
+    "?sortingMode=NEWEST_FIRST"
+    "&socialNetworkTypes=%5B%22Instagram%22%5D"
     "&marketplaceId=%5B%22wildberries%22%5D"
     "&categoryId=%5B17%5D"
     "&rewardStrategy=%5B%22Barter%22%5D"
-    "&sortingMode=NEWEST_FIRST"
 )
 
 
