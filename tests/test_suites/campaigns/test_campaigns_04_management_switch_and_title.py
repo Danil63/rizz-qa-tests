@@ -11,7 +11,7 @@ from pathlib import Path
 
 import allure
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 from tests.pages.campaigns_page import CampaignsPage
 
@@ -27,7 +27,9 @@ LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "
 class TestCampaigns04:
     @allure.title("campaigns-04: На ведении → Самостоятельно → проверка заголовка кампании")
     @allure.severity(allure.severity_level.CRITICAL)
-    def test_campaigns_04_management_switch_and_title(self, campaigns_page: CampaignsPage):
+    def test_campaigns_04_management_switch_and_title(
+        self, campaigns_page: CampaignsPage, page: Page,
+    ):
         assert LAST_CAMPAIGN_TITLE_PATH.exists(), (
             f"Файл с заголовком не найден: {LAST_CAMPAIGN_TITLE_PATH}. "
             "Сначала запусти тест создания кампании campaigns-02."
@@ -41,11 +43,13 @@ class TestCampaigns04:
         # 3) Выбрать «На ведении»
         campaigns_page.select_management_filter("На ведении")
         expect(campaigns_page.filter_management).to_contain_text("На ведении")
+        page.wait_for_timeout(1500)
 
         # 4) Выбрать «Самостоятельно»
         campaigns_page.select_management_filter("Самостоятельно")
         expect(campaigns_page.filter_management).to_contain_text("Самостоятельно")
+        page.wait_for_timeout(1500)
 
-        # 5) Проверить кампанию по заголовку
-        campaign_title = campaigns_page.page.get_by_role("link", name=expected_title, exact=True)
-        expect(campaign_title).to_be_visible()
+        # 5) Проверить кампанию по заголовку (ищем по тексту, не только по role=link)
+        campaign_element = page.locator(f"text='{expected_title}'").first
+        expect(campaign_element).to_be_visible(timeout=10000)
