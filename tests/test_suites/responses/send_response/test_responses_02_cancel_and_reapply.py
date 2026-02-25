@@ -1,4 +1,4 @@
-"""responses-02: Отмена отклика и повторный отклик на бартер."""
+"""responses-02: Отмена отклика и повторный отклик на бартер (старт с creator market)."""
 from pathlib import Path
 
 import allure
@@ -8,7 +8,7 @@ from playwright.sync_api import Page, expect
 from tests.components.market_components.barter_response_component import BarterResponseComponent
 from tests.pages.market_page import MarketPage
 
-LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression

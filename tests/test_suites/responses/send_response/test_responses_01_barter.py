@@ -1,7 +1,7 @@
 """responses-01: Отклик на бартер — полный флоу.
 
 Сценарий:
-    1) Старт с маркета на URL с фильтрами (через fixture)
+    1) Старт со страницы https://app.rizz.market/app/creator/market (через fixture)
     2) Найти карточку по заголовку из last_product_name.txt
     3) Нажать кнопку «Бартер» на карточке
     4) Нажать «Выполнить за бартер»
@@ -20,7 +20,7 @@ from playwright.sync_api import Page, expect
 from tests.components.market_components.barter_response_component import BarterResponseComponent
 from tests.pages.market_page import MarketPage
 
-LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
