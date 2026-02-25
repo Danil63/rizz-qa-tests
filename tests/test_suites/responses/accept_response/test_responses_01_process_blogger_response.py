@@ -50,15 +50,20 @@ class TestResponsesAccept01:
 
         # Явное ожидание текста danil23319 с retry-логикой:
         # если отклик ещё не подгрузился — обновляем страницу каждые 5 секунд
-        danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
-        retries = 0
         max_retries = 12  # до 60 секунд ожидания
+        danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
+        found = False
 
-        while retries < max_retries:
+        for attempt in range(max_retries + 1):
+            danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
             if danil_text.count() > 0 and danil_text.is_visible(timeout=1000):
+                found = True
                 break
 
-            retries += 1
+            # Если это последняя попытка — выходим из цикла без reload
+            if attempt == max_retries:
+                break
+
             advertiser_page.wait_for_timeout(5000)
             advertiser_page.reload(wait_until="networkidle")
 
@@ -68,15 +73,14 @@ class TestResponsesAccept01:
             campaign_title_el.click()
 
             advertiser_page.wait_for_timeout(3000)
+            details_heading = advertiser_page.get_by_role("heading", name="Детали кампании")
             expect(details_heading).to_be_visible(timeout=10000)
 
             responders_count = advertiser_page.get_by_text("количество откликнувшихся блогеров", exact=False).first
             expect(responders_count).to_be_visible(timeout=10000)
             responders_count.click()
 
-            danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
-
-        expect(danil_text).to_be_visible(timeout=10000)
+        assert found, "Текст 'danil23319' не появился в списке откликов за отведённое время"
 
         # Поставить focus на тексте danil23319
         danil_text.scroll_into_view_if_needed()
