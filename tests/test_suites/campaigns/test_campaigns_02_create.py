@@ -22,9 +22,7 @@ from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
-LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
 LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
-LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
 LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
 
 
@@ -64,19 +62,19 @@ class TestCampaigns02:
         campaigns_page: CampaignsPage,
         page: Page,
     ):
-        assert LAST_PRODUCT_NAME_PATH.exists(), (
-            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
+        assert LAST_PRODUCT_META_PATH.exists(), (
+            f"Файл с метаданными продукта не найден: {LAST_PRODUCT_META_PATH}. "
             "Сначала запусти тест создания продукта."
         )
-        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
-        assert product_name, "Файл last_product_name.txt пустой"
+        product_meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
+        product_name = (product_meta.get("name") or "").strip()
+        assert product_name, "Поле name в last_product_meta.json пустое"
 
         # Генерируем данные кампании с использованием сохраненного названия продукта
         data = generate_campaign_data(product_name=product_name, product_price=75)
 
-        # Сохраняем заголовок и контекст кампании в файлы для последующих проверок
-        LAST_CAMPAIGN_TITLE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        LAST_CAMPAIGN_TITLE_PATH.write_text(data.name, encoding="utf-8")
+        # Сохраняем контекст кампании в JSON для последующих проверок
+        LAST_CAMPAIGN_CONTEXT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
         marketplace = "Ozon"
         category = "Спорт и отдых"

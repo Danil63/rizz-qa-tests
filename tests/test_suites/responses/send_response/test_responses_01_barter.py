@@ -1,4 +1,5 @@
 """responses-send-01: Отправка отклика на бартер (переписан с нуля)."""
+import json
 from pathlib import Path
 
 import allure
@@ -7,7 +8,7 @@ from playwright.sync_api import Page
 
 from tests.pages.send_response_page import SendResponsePage
 
-LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
+LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_meta.json"
 
 
 @pytest.mark.regression
@@ -21,12 +22,13 @@ class TestResponsesSend01:
     @allure.title("responses-send-01: creator market → поиск → отклик на бартер")
     @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_barter(self, blogger_page: Page):
-        assert LAST_PRODUCT_NAME_PATH.exists(), (
-            f"Файл {LAST_PRODUCT_NAME_PATH} не найден. "
+        assert LAST_PRODUCT_META_PATH.exists(), (
+            f"Файл {LAST_PRODUCT_META_PATH} не найден. "
             "Сначала запусти тест создания продукта."
         )
-        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
-        assert product_name, "Файл last_product_name.txt пустой"
+        product_meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
+        product_name = (product_meta.get("name") or "").strip()
+        assert product_name, "Поле name в last_product_meta.json пустое"
 
         page = SendResponsePage(blogger_page)
         page.open()

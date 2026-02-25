@@ -7,6 +7,7 @@
     4) Затем выбрать «Самостоятельно»
     5) Проверить, что в списке есть кампания с заголовком из отдельного файла
 """
+import json
 from pathlib import Path
 
 import allure
@@ -15,7 +16,7 @@ from playwright.sync_api import Page, expect
 
 from tests.pages.campaigns_page import CampaignsPage
 
-LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
+LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
 
 
 @pytest.mark.regression
@@ -30,12 +31,13 @@ class TestCampaigns04:
     def test_campaigns_04_management_switch_and_title(
         self, campaigns_page: CampaignsPage, page: Page,
     ):
-        assert LAST_CAMPAIGN_TITLE_PATH.exists(), (
-            f"Файл с заголовком не найден: {LAST_CAMPAIGN_TITLE_PATH}. "
+        assert LAST_CAMPAIGN_CONTEXT_PATH.exists(), (
+            f"Файл с контекстом кампании не найден: {LAST_CAMPAIGN_CONTEXT_PATH}. "
             "Сначала запусти тест создания кампании campaigns-02."
         )
-        expected_title = LAST_CAMPAIGN_TITLE_PATH.read_text(encoding="utf-8").strip()
-        assert expected_title, "Файл last_campaign_title.txt пустой"
+        ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
+        expected_title = (ctx.get("campaign_title") or "").strip()
+        assert expected_title, "Поле campaign_title в last_campaign_context.json пустое"
 
         # 1-2) Страница открыта, таб «Активные» выбран
         campaigns_page.check_active_tab_selected()

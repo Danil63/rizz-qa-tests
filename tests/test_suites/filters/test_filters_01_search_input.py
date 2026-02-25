@@ -8,7 +8,6 @@ import pytest
 from tests.components.market_components.filter_component import FilterComponent
 
 TEST_DATA_DIR = Path(__file__).resolve().parents[2] / "test_data"
-LAST_PRODUCT_NAME_PATH = TEST_DATA_DIR / "last_product_name.txt"
 LAST_PRODUCT_META_PATH = TEST_DATA_DIR / "last_product_meta.json"
 
 
@@ -25,7 +24,7 @@ class TestFilters01:
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
         "Шаги:\n"
-        "1) Ввести в input название продукта из last_product_name.txt\n"
+        "1) Ввести в input название продукта из last_product_meta.json\n"
         "2) Нажать Enter\n"
         "3) Перебрать заголовки карточек и найти совпадение\n"
         "4) Очистить поисковый запрос\n"
@@ -45,14 +44,10 @@ class TestFilters01:
             except Exception:
                 pass
 
-        if not search_query:
-            assert LAST_PRODUCT_NAME_PATH.exists(), (
-                f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
-                "Сначала запусти тест создания продукта."
-            )
-            search_query = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
-
-        assert search_query, "Источник имени продукта пустой"
+        assert search_query, (
+            "Не найдено название продукта в last_product_meta.json (поле name). "
+            "Сначала запусти тест создания продукта."
+        )
         assert "тестовая кампания" not in search_query.lower(), (
             f"Вместо названия продукта получено название кампании: {search_query}"
         )
