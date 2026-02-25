@@ -7,10 +7,7 @@ from playwright.sync_api import Page
 
 from tests.pages.send_response_page import SendResponsePage
 
-TEST_DATA_DIR = Path(__file__).resolve().parents[3] / "test_data"
-LAST_PRODUCT_NAME_PATH = TEST_DATA_DIR / "last_product_name.txt"
-LAST_CAMPAIGN_NAME_PATH = TEST_DATA_DIR / "last_campaign_name.txt"
-LAST_CAMPAIGN_TITLE_PATH = TEST_DATA_DIR / "last_campaign_title.txt"
+LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
 
 
 @pytest.mark.regression
@@ -24,18 +21,12 @@ class TestResponsesSend01:
     @allure.title("responses-send-01: creator market → поиск → отклик на бартер")
     @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_barter(self, blogger_page: Page):
-        source_file = None
-        for candidate in [LAST_PRODUCT_NAME_PATH, LAST_CAMPAIGN_NAME_PATH, LAST_CAMPAIGN_TITLE_PATH]:
-            if candidate.exists() and candidate.read_text(encoding="utf-8").strip():
-                source_file = candidate
-                break
-
-        assert source_file is not None, (
-            "Не найден источник названия для поиска карточки: "
-            "ожидался один из файлов last_product_name.txt / last_campaign_name.txt / last_campaign_title.txt"
+        assert LAST_PRODUCT_NAME_PATH.exists(), (
+            f"Файл {LAST_PRODUCT_NAME_PATH} не найден. "
+            "Сначала запусти тест создания продукта."
         )
-
-        product_name = source_file.read_text(encoding="utf-8").strip()
+        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert product_name, "Файл last_product_name.txt пустой"
 
         page = SendResponsePage(blogger_page)
         page.open()

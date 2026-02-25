@@ -1,5 +1,4 @@
 """filters-01: Поиск по input (с актуальными данными из test_data)."""
-import json
 from pathlib import Path
 
 import allure
@@ -9,9 +8,6 @@ from tests.components.market_components.filter_component import FilterComponent
 
 TEST_DATA_DIR = Path(__file__).resolve().parents[2] / "test_data"
 LAST_PRODUCT_NAME_PATH = TEST_DATA_DIR / "last_product_name.txt"
-LAST_CAMPAIGN_NAME_PATH = TEST_DATA_DIR / "last_campaign_name.txt"
-LAST_CAMPAIGN_TITLE_PATH = TEST_DATA_DIR / "last_campaign_title.txt"
-LAST_CAMPAIGN_CONTEXT_PATH = TEST_DATA_DIR / "last_campaign_context.json"
 
 
 @pytest.mark.regression
@@ -37,31 +33,14 @@ class TestFilters01:
         "2) После очистки выдача сбрасывается (карточки видны)"
     )
     def test_filters_01_search_input(self, filters: FilterComponent):
-        # Берём максимально актуальный query для creator market.
-        # Приоритет: campaign_context.campaign_title -> last_campaign_name -> last_campaign_title -> last_product_name
-        search_query = None
-
-        if LAST_CAMPAIGN_CONTEXT_PATH.exists():
-            try:
-                ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
-                search_query = (ctx.get("campaign_title") or "").strip() or None
-            except Exception:
-                pass
-
-        if not search_query:
-            for candidate in [LAST_CAMPAIGN_NAME_PATH, LAST_CAMPAIGN_TITLE_PATH, LAST_PRODUCT_NAME_PATH]:
-                if candidate.exists():
-                    value = candidate.read_text(encoding="utf-8").strip()
-                    if value:
-                        search_query = value
-                        break
-
-        assert search_query, (
-            "Не найдено значение для поиска: ожидался один из файлов "
-            "last_campaign_context.json / last_campaign_name.txt / last_campaign_title.txt / last_product_name.txt"
+        assert LAST_PRODUCT_NAME_PATH.exists(), (
+            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
+            "Сначала запусти тест создания продукта."
         )
+        search_query = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+        assert search_query, "Файл last_product_name.txt пустой"
 
-        # 1) Ввести в поле поиска актуальное значение из test_data
+        # 1) Ввести в поле поиска название продукта из файла
         filters.fill_search(search_query)
 
         # 2) Нажать Enter
