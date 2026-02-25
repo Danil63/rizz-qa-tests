@@ -6,7 +6,7 @@ import allure
 import pytest
 from playwright.sync_api import Page, expect
 
-WORKS_URL = "https://app.rizz.market/app/advertiser/works"
+CAMPAIGNS_URL = "https://app.rizz.market/app/advertiser/campaigns"
 LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_campaign_context.json"
 
 
@@ -31,7 +31,7 @@ class TestResponsesAccept01:
         assert campaign_title, "Поле campaign_title в last_campaign_context.json пустое"
 
         # Старт с авторизованным рекламодателем
-        advertiser_page.goto(WORKS_URL, wait_until="networkidle")
+        advertiser_page.goto(CAMPAIGNS_URL, wait_until="networkidle")
 
         # Нажать на заголовок рекламной кампании из JSON
         campaign_title_el = advertiser_page.get_by_text(campaign_title, exact=True).first
