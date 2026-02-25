@@ -13,6 +13,28 @@ from tests.fixtures.blogger_fixture import blogger_page  # noqa: F401
 from tests.fixtures.advertiser_fixture import advertiser_page  # noqa: F401
 
 
+@pytest.fixture(autouse=True)
+def ensure_page_ready_before_test(request):
+    """Гарантировать, что страница догружена перед стартом каждого теста.
+
+    Работает для тестов, где используется стандартная playwright-фикстура `page`
+    (включая проксирующие фикстуры blogger_page / advertiser_page).
+    """
+    try:
+        page: Page = request.getfixturevalue("page")
+    except Exception:
+        # Тесты без page пропускаем
+        return
+
+    try:
+        # Если страница уже открыта фикстурами — дожидаемся стабильного состояния.
+        page.wait_for_load_state("domcontentloaded", timeout=15000)
+        page.wait_for_load_state("networkidle", timeout=15000)
+    except Exception:
+        # Не валим тест на системном ожидании; целевые ожидания остаются в сценариях.
+        pass
+
+
 # ── Хуки ──────────────────────────────────────────────────────
 
 def pytest_sessionfinish(session, exitstatus):
