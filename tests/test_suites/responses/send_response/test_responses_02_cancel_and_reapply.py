@@ -45,24 +45,31 @@ class TestResponses02:
 
         barter_response = BarterResponseComponent(page)
 
-        with allure.step('Нажать на кнопку "Отменить отклик"'):
-            cancel_button = page.get_by_role("button", name="Отменить отклик").first
-            expect(cancel_button).to_be_visible(timeout=10000)
-            cancel_button.click()
+        # Если отклик уже отправлен — отменяем сразу.
+        # Если нет (кнопка "Отменить отклик" отсутствует) — сначала отправляем отклик, затем отменяем.
+        cancel_button = page.get_by_role("button", name="Отменить отклик").first
+        if cancel_button.count() > 0 and cancel_button.is_visible(timeout=3000):
+            with allure.step('Нажать на кнопку "Отменить отклик"'):
+                cancel_button.click()
+        else:
+            with allure.step('Кнопки "Отменить отклик" нет — сначала отправить отклик'):
+                barter_response.prepare_barter_form()
+                barter_response.select_social_network("danil23319")
+                barter_response.click_respond_barter()
+                barter_response.check_cancel_button_visible()
+                barter_response.cancel_response_button.click()
 
         with allure.step('Явное ожидание 10 сек: кнопка "Выполнить за бартер"'):
             expect(page.get_by_role("button", name="Выполнить за бартер").first).to_be_visible(timeout=10000)
 
         with allure.step('Нажать на кнопку "Выполнить за бартер"'):
-            barter_response.click_execute_barter()
+            barter_response.prepare_barter_form()
 
         with allure.step('Выбрать соцсеть "danil23319" в dropdown'):
             barter_response.select_social_network("danil23319")
 
-        with allure.step('Нажать на кнопку "Выполнить за бартер" в модалке'):
-            submit_button = page.get_by_role("button", name="Выполнить за бартер").first
-            expect(submit_button).to_be_visible(timeout=10000)
-            submit_button.click()
+        with allure.step('Нажать на кнопку "Откликнуться на бартер"'):
+            barter_response.click_respond_barter()
 
         with allure.step('Явное ожидание появления кнопки "Отменить отклик"'):
             expect(page.get_by_role("button", name="Отменить отклик").first).to_be_visible(timeout=10000)

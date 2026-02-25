@@ -73,7 +73,7 @@ class TestResponses01:
             barter_button.click()
 
         barter_response = BarterResponseComponent(page)
-        barter_response.click_execute_barter()
+        barter_response.prepare_barter_form()
         barter_response.select_social_network("danil23319")
         barter_response.click_respond_barter()
 
