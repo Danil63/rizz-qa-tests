@@ -1,4 +1,5 @@
 """filters-01: Поиск по input (с актуальными данными из test_data)."""
+import json
 from pathlib import Path
 
 import allure
@@ -8,6 +9,7 @@ from tests.components.market_components.filter_component import FilterComponent
 
 TEST_DATA_DIR = Path(__file__).resolve().parents[2] / "test_data"
 LAST_PRODUCT_NAME_PATH = TEST_DATA_DIR / "last_product_name.txt"
+LAST_PRODUCT_META_PATH = TEST_DATA_DIR / "last_product_meta.json"
 
 
 @pytest.mark.regression
@@ -33,12 +35,27 @@ class TestFilters01:
         "2) После очистки выдача сбрасывается (карточки видны)"
     )
     def test_filters_01_search_input(self, filters: FilterComponent):
-        assert LAST_PRODUCT_NAME_PATH.exists(), (
-            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
-            "Сначала запусти тест создания продукта."
+        search_query = ""
+
+        # Приоритет: meta.json (как более надёжный источник), затем txt
+        if LAST_PRODUCT_META_PATH.exists():
+            try:
+                meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
+                search_query = (meta.get("name") or "").strip()
+            except Exception:
+                pass
+
+        if not search_query:
+            assert LAST_PRODUCT_NAME_PATH.exists(), (
+                f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
+                "Сначала запусти тест создания продукта."
+            )
+            search_query = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
+
+        assert search_query, "Источник имени продукта пустой"
+        assert "тестовая кампания" not in search_query.lower(), (
+            f"Вместо названия продукта получено название кампании: {search_query}"
         )
-        search_query = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
-        assert search_query, "Файл last_product_name.txt пустой"
 
         # 1) Ввести в поле поиска название продукта из файла
         filters.fill_search(search_query)
