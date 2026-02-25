@@ -24,6 +24,7 @@ from tests.pages.edit_campaign_page import EditCampaignPage
 fake = Faker("ru_RU")
 
 LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
+LAST_CAMPAIGN_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_name.txt"
 
 
 @pytest.mark.regression
@@ -100,8 +101,9 @@ class TestCampaigns05:
         # 7) Сохранить
         edit_page.click_save()
 
-        # Обновляем файл с названием кампании
+        # Обновляем файлы с названием кампании
         LAST_CAMPAIGN_TITLE_PATH.write_text(new_title, encoding="utf-8")
+        LAST_CAMPAIGN_NAME_PATH.write_text(new_title, encoding="utf-8")
 
         # 8) Задержка 2 секунды
         time.sleep(2)
