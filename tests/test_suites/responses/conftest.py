@@ -1,4 +1,6 @@
 """Фикстуры для тестов откликов на бартер."""
+import os
+
 import pytest
 from playwright.sync_api import Page
 
@@ -20,7 +22,7 @@ def browser_context_args():
 def browser_type_launch_args():
     return {
         "args": ["--start-maximized"],
-        "headless": False,
+        "headless": os.getenv("PW_HEADLESS", "0") == "1",
     }
 
 
