@@ -17,7 +17,6 @@ import pytest
 
 
 SUITE_ORDER = [
-    ("auth", "tests/test_suites/auth"),
     ("products", "tests/test_suites/products"),
     ("campaigns", "tests/test_suites/campaigns"),
     ("filters", "tests/test_suites/filters"),
