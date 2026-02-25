@@ -48,8 +48,34 @@ class TestResponsesAccept01:
         expect(responders_count).to_be_visible(timeout=10000)
         responders_count.click()
 
-        # Явное ожидание текста danil23319
+        # Явное ожидание текста danil23319 с retry-логикой:
+        # если отклик ещё не подгрузился — обновляем страницу каждые 5 секунд
         danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
+        retries = 0
+        max_retries = 12  # до 60 секунд ожидания
+
+        while retries < max_retries:
+            if danil_text.count() > 0 and danil_text.is_visible(timeout=1000):
+                break
+
+            retries += 1
+            advertiser_page.wait_for_timeout(5000)
+            advertiser_page.reload(wait_until="networkidle")
+
+            # После reload заново открываем карточку кампании и блок откликов
+            campaign_title_el = advertiser_page.get_by_text(campaign_title, exact=True).first
+            expect(campaign_title_el).to_be_visible(timeout=10000)
+            campaign_title_el.click()
+
+            advertiser_page.wait_for_timeout(3000)
+            expect(details_heading).to_be_visible(timeout=10000)
+
+            responders_count = advertiser_page.get_by_text("количество откликнувшихся блогеров", exact=False).first
+            expect(responders_count).to_be_visible(timeout=10000)
+            responders_count.click()
+
+            danil_text = advertiser_page.get_by_text("danil23319", exact=False).first
+
         expect(danil_text).to_be_visible(timeout=10000)
 
         # Поставить focus на тексте danil23319
