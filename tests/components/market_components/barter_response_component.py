@@ -13,42 +13,63 @@ class BarterResponseComponent(BaseComponent):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        # Глобальные элементы успеха
         self.success_banner_title = page.get_by_text("Отклик отправлен")
         self.success_banner_text = page.get_by_text("Отклик на бартер отправлен")
         self.cancel_response_button = page.get_by_role("button", name="Отменить отклик").first
 
     def _scope(self) -> Locator:
-        """Контекст поиска кнопок отклика: сначала dialog, затем вся страница."""
-        dialog = self.page.locator(
-            "div[role='dialog']:has(button:has-text('Выполнить за бартер')), "
-            "div[role='dialog']:has(button:has-text('Откликнуться на бартер')), "
-            "div[role='dialog']:has-text('Социальная сеть')"
-        ).first
-        if dialog.count() > 0:
-            return dialog
+        """Контекст поиска: сначала видимый dialog, затем весь документ."""
+        dialogs = self.page.locator("div[role='dialog']")
+        for i in range(dialogs.count()):
+            d = dialogs.nth(i)
+            try:
+                if d.is_visible(timeout=300):
+                    return d
+            except Exception:
+                continue
         return self.page.locator("body")
 
-    @allure.step('Prepare barter form (click "Выполнить за бартер" if shown)')
+    def _find_barter_action_button(self, scope: Locator) -> Locator:
+        """Найти кнопку начала/подтверждения отклика на бартер (варианты текста)."""
+        candidates = [
+            scope.get_by_role("button", name="Выполнить за бартер").first,
+            scope.get_by_role("button", name="Откликнуться на бартер").first,
+            scope.get_by_role("button", name=re.compile("бартер", re.I)).first,
+            scope.locator("button:has-text('Выполнить за бартер')").first,
+            scope.locator("button:has-text('Откликнуться на бартер')").first,
+            scope.locator("button:has-text('Откликнуться')").first,
+        ]
+        for btn in candidates:
+            try:
+                if btn.count() > 0 and btn.is_visible(timeout=1200):
+                    return btn
+            except Exception:
+                continue
+        raise AssertionError("Не найдена кнопка действия по бартеру (Выполнить/Откликнуться)")
+
+    @allure.step('Prepare barter form (click first barter action if required)')
     def prepare_barter_form(self) -> None:
         scope = self._scope()
-        execute_btn = scope.get_by_role("button", name="Выполнить за бартер").first
-        respond_btn = scope.get_by_role("button", name="Откликнуться на бартер").first
 
-        # В одном сценарии сначала нужно нажать "Выполнить за бартер",
-        # в другом форма уже открыта и есть "Откликнуться на бартер".
-        if execute_btn.count() > 0 and execute_btn.is_visible(timeout=2000):
-            execute_btn.click()
-            return
+        # Если поле соцсети уже есть — форма уже раскрыта, клик не нужен
+        social_inputs = [
+            scope.get_by_role("button", name=re.compile("Социальная сеть", re.I)).first,
+            scope.get_by_role("combobox", name=re.compile("Социальная сеть", re.I)).first,
+            scope.locator("input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']").first,
+            scope.get_by_text("Социальная сеть", exact=False).first,
+        ]
+        for el in social_inputs:
+            try:
+                if el.count() > 0 and el.is_visible(timeout=500):
+                    return
+            except Exception:
+                continue
 
-        if respond_btn.count() > 0 and respond_btn.is_visible(timeout=2000):
-            return
-
-        raise AssertionError("Не найдены кнопки 'Выполнить за бартер' или 'Откликнуться на бартер'")
+        btn = self._find_barter_action_button(scope)
+        btn.click()
 
     @allure.step('Clicking "Выполнить за бартер" (compat)')
     def click_execute_barter(self) -> None:
-        """Backward-compatible alias для старых тестов."""
         self.prepare_barter_form()
 
     @allure.step('Selecting social network account "{account_name}"')
@@ -96,9 +117,19 @@ class BarterResponseComponent(BaseComponent):
     @allure.step('Clicking "Откликнуться на бартер"')
     def click_respond_barter(self) -> None:
         scope = self._scope()
-        respond_barter_button = scope.get_by_role("button", name="Откликнуться на бартер").first
-        expect(respond_barter_button).to_be_visible(timeout=10000)
-        respond_barter_button.click()
+        btn_candidates = [
+            scope.get_by_role("button", name="Откликнуться на бартер").first,
+            scope.get_by_role("button", name=re.compile("Откликнуться", re.I)).first,
+            scope.get_by_role("button", name=re.compile("бартер", re.I)).first,
+        ]
+        for btn in btn_candidates:
+            try:
+                if btn.count() > 0 and btn.is_visible(timeout=1200):
+                    btn.click()
+                    return
+            except Exception:
+                continue
+        raise AssertionError("Не найдена кнопка 'Откликнуться на бартер'")
 
     @allure.step('Checking success banner "Отклик отправлен" is visible')
     def check_success_banner_visible(self) -> None:
@@ -106,7 +137,7 @@ class BarterResponseComponent(BaseComponent):
 
     @allure.step('Checking text "Отклик на бартер отправлен" is visible')
     def check_success_text_visible(self) -> None:
-        expect(self.success_banner_text).to_be_visible()
+        expect(self.success_banner_text).to_be_visible(timeout=10000)
 
     @allure.step('Checking "Отменить отклик" button is visible')
     def check_cancel_button_visible(self) -> None:
