@@ -15,12 +15,13 @@ class ProductsPage(BasePage):
 
         # ── Хедер (навигация рекламодателя) ───────────────────
         self.logo_link = page.get_by_role("banner").get_by_role("link").first
-        self.nav_market = page.get_by_role("navigation").get_by_role("link", name="Маркет")
-        self.nav_campaigns = page.get_by_role("navigation").get_by_role("link", name="Кампании")
-        self.nav_products = page.get_by_role("navigation").get_by_role("link", name="Продукты")
-        self.nav_integrations = page.get_by_role("navigation").get_by_role("link", name="Интеграции")
-        self.nav_statistics = page.get_by_role("navigation").get_by_role("link", name="Статистика")
-        self.nav_faq = page.get_by_role("navigation").get_by_role("link", name="FAQ")
+        header_nav = page.get_by_role("banner").get_by_role("navigation")
+        self.nav_market = header_nav.get_by_role("link", name="Маркет")
+        self.nav_campaigns = header_nav.get_by_role("link", name="Кампании")
+        self.nav_products = header_nav.get_by_role("link", name="Продукты")
+        self.nav_integrations = header_nav.get_by_role("link", name="Интеграции")
+        self.nav_statistics = header_nav.get_by_role("link", name="Статистика")
+        self.nav_faq = header_nav.get_by_role("link", name="FAQ")
         self.user_avatar_button = page.get_by_role("button", name="user avatar")
 
         # ── Уведомление Telegram ──────────────────────────────
