@@ -5,7 +5,7 @@ import allure
 import pytest
 from playwright.sync_api import Page
 
-from tests.pages.respons.send_response_page import SendResponsePage
+from tests.pages.send_response_page import SendResponsePage
 
 LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
 
