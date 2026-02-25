@@ -71,6 +71,9 @@ class TestProducts02:
         create_page.page.wait_for_timeout(3000)
         create_page.click_submit()
 
+        # Важно для prod: дать бэкенду зафиксировать создание сущности
+        create_page.page.wait_for_timeout(2000)
+
         # 7) Пользователь на экране списка продуктов
         result_products_page = ProductsPage(create_page.page)
         result_products_page.expect_url_contains(r".*/app/advertiser/products", timeout=15000)

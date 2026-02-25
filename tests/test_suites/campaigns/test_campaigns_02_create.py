@@ -152,6 +152,9 @@ class TestCampaigns02:
         # 13) Создать кампанию
         create_page.click_create_campaign()
 
+        # Важно для prod: дать бэкенду зафиксировать создание сущности
+        page.wait_for_timeout(2000)
+
         # ОР) Редирект на страницу списка кампаний
         result_page = CampaignsPage(page)
         result_page.expect_loaded()

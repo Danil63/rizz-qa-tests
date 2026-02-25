@@ -73,6 +73,9 @@ class TestProducts03:
         # 4) Нажать "Создать"
         create_product_page.click_submit()
 
+        # Важно для prod: дать бэкенду зафиксировать создание сущности
+        create_product_page.page.wait_for_timeout(2000)
+
         # Сохраняем данные созданного продукта для использования в campaign/filters tests
         LAST_PRODUCT_META_PATH.parent.mkdir(parents=True, exist_ok=True)
         LAST_PRODUCT_META_PATH.write_text(
