@@ -20,7 +20,9 @@ class SendResponsePage(BasePage):
         self.barter_button = page.get_by_role("button", name="Бартер").first
         self.execute_barter_button = page.get_by_role("button", name="Выполнить за бартер").first
         self.social_network_dropdown = page.locator("span", has_text="Социальная сеть").first
-        self.social_network_danil = page.get_by_role("button", name="danil23319").first
+        self.social_network_danil_button = page.get_by_role("button", name="danil23319").first
+        self.social_network_danil_option = page.get_by_role("option", name="danil23319").first
+        self.social_network_danil_text = page.get_by_text("danil23319", exact=False).first
         self.respond_barter_button = page.get_by_role("button", name="Откликнуться на бартер").first
 
         # Финальные проверки
@@ -68,8 +70,22 @@ class SendResponsePage(BasePage):
     @allure.step('Подождать 5 секунд и выбрать "danil23319"')
     def wait_and_select_danil_account(self) -> None:
         self.page.wait_for_timeout(5000)
-        expect(self.social_network_danil).to_be_visible(timeout=10000)
-        self.social_network_danil.click()
+
+        candidates = [
+            self.social_network_danil_option,
+            self.social_network_danil_button,
+            self.social_network_danil_text,
+        ]
+
+        for candidate in candidates:
+            try:
+                if candidate.count() > 0 and candidate.is_visible(timeout=2000):
+                    candidate.click()
+                    return
+            except Exception:
+                continue
+
+        raise AssertionError('Не найден элемент выбора соцсети "danil23319" (option/button/text)')
 
     @allure.step('Подождать 5 секунд и нажать "Откликнуться на бартер"')
     def wait_and_click_respond_barter(self) -> None:
