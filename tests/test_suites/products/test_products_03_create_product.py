@@ -1,4 +1,5 @@
 """products-03: Успешное создание продукта с рандомными данными."""
+import json
 from pathlib import Path
 
 import allure
@@ -10,6 +11,7 @@ from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
 
 LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
+LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
 
 
 @pytest.mark.regression
@@ -72,9 +74,21 @@ class TestProducts03:
         # 4) Нажать "Создать"
         create_product_page.click_submit()
 
-        # Сохраняем название созданного продукта для использования в campaign tests
+        # Сохраняем данные созданного продукта для использования в campaign/filters tests
         LAST_PRODUCT_NAME_PATH.parent.mkdir(parents=True, exist_ok=True)
         LAST_PRODUCT_NAME_PATH.write_text(data.name, encoding="utf-8")
+        LAST_PRODUCT_META_PATH.write_text(
+            json.dumps(
+                {
+                    "name": data.name,
+                    "marketplace": data.marketplace,
+                    "category": data.category,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
 
         # ОР) Переход на страницу списка продуктов
         products_page = ProductsPage(page)

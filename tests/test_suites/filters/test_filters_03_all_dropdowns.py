@@ -1,8 +1,13 @@
 """filters-03: Поиск товара с использованием всех dropdown."""
+import json
+from pathlib import Path
+
 import allure
 import pytest
 
 from tests.components.market_components.filter_component import FilterComponent
+
+LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
 
 
 @pytest.mark.regression
@@ -28,17 +33,32 @@ class TestFilters03:
         "соответствующие выбранным фильтрам"
     )
     def test_filters_03_all_dropdowns(self, filters: FilterComponent):
-        # 1) Социальная сеть → Ig (в UI отображается как "Ig")
-        filters.select_dropdown_option("Социальная сеть", "Ig")
+        social_network = "Ig"
+        marketplace = "Ozon"
+        category = "Спорт и отдых"
+        reward = "Бартер"
 
-        # 2) Маркетплейс → Ozon
-        filters.select_dropdown_option("Маркетплейс", "Ozon")
+        if LAST_CAMPAIGN_CONTEXT_PATH.exists():
+            try:
+                ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
+                social_network = ctx.get("social_network") or social_network
+                marketplace = ctx.get("marketplace") or marketplace
+                category = ctx.get("category") or category
+                reward = ctx.get("reward") or reward
+            except Exception:
+                pass
 
-        # 3) Категория → Спорт и отдых
-        filters.select_dropdown_option("Категория", "Спорт и отдых")
+        # 1) Социальная сеть
+        filters.select_dropdown_option("Социальная сеть", social_network)
 
-        # 4) Вознаграждение → Бартер
-        filters.select_dropdown_option("Вознаграждение", "Бартер")
+        # 2) Маркетплейс
+        filters.select_dropdown_option("Маркетплейс", marketplace)
+
+        # 3) Категория
+        filters.select_dropdown_option("Категория", category)
+
+        # 4) Вознаграждение
+        filters.select_dropdown_option("Вознаграждение", reward)
 
         # 5) Сортировка → Сначала новые
         filters.select_dropdown_option("Сортировка", "Сначала новые")

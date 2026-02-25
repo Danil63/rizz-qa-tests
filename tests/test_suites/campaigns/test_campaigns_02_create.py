@@ -10,6 +10,7 @@
     7) Редирект на /app/advertiser/campaigns
     8) Ожидание 3 секунды
 """
+import json
 import time
 from pathlib import Path
 
@@ -22,7 +23,9 @@ from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
 LAST_CAMPAIGN_TITLE_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_title.txt"
+LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
 LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
+LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
 
 
 @pytest.mark.regression
@@ -71,9 +74,34 @@ class TestCampaigns02:
         # Генерируем данные кампании с использованием сохраненного названия продукта
         data = generate_campaign_data(product_name=product_name, product_price=75)
 
-        # Сохраняем заголовок кампании в отдельный файл для последующих проверок
+        # Сохраняем заголовок и контекст кампании в файлы для последующих проверок
         LAST_CAMPAIGN_TITLE_PATH.parent.mkdir(parents=True, exist_ok=True)
         LAST_CAMPAIGN_TITLE_PATH.write_text(data.name, encoding="utf-8")
+
+        marketplace = "Ozon"
+        category = "Спорт и отдых"
+        if LAST_PRODUCT_META_PATH.exists():
+            try:
+                meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
+                marketplace = meta.get("marketplace") or marketplace
+                category = meta.get("category") or category
+            except Exception:
+                pass
+
+        LAST_CAMPAIGN_CONTEXT_PATH.write_text(
+            json.dumps(
+                {
+                    "campaign_title": data.name,
+                    "marketplace": marketplace,
+                    "category": category,
+                    "reward": "Бартер",
+                    "social_network": "Ig",
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
 
         # Логируем в Allure
         allure.attach(
