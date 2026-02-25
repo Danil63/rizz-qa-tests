@@ -1,4 +1,5 @@
-"""filters-01: Поиск товара с использованием input."""
+"""filters-01: Поиск по input (с актуальными данными из test_data)."""
+import json
 from pathlib import Path
 
 import allure
@@ -6,7 +7,11 @@ import pytest
 
 from tests.components.market_components.filter_component import FilterComponent
 
-LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_name.txt"
+TEST_DATA_DIR = Path(__file__).resolve().parents[2] / "test_data"
+LAST_PRODUCT_NAME_PATH = TEST_DATA_DIR / "last_product_name.txt"
+LAST_CAMPAIGN_NAME_PATH = TEST_DATA_DIR / "last_campaign_name.txt"
+LAST_CAMPAIGN_TITLE_PATH = TEST_DATA_DIR / "last_campaign_title.txt"
+LAST_CAMPAIGN_CONTEXT_PATH = TEST_DATA_DIR / "last_campaign_context.json"
 
 
 @pytest.mark.regression
@@ -32,24 +37,41 @@ class TestFilters01:
         "2) После очистки выдача сбрасывается (карточки видны)"
     )
     def test_filters_01_search_input(self, filters: FilterComponent):
-        assert LAST_PRODUCT_NAME_PATH.exists(), (
-            f"Файл с названием продукта не найден: {LAST_PRODUCT_NAME_PATH}. "
-            "Сначала запусти тест создания продукта."
-        )
-        product_name = LAST_PRODUCT_NAME_PATH.read_text(encoding="utf-8").strip()
-        assert product_name, "Файл last_product_name.txt пустой"
+        # Берём максимально актуальный query для creator market.
+        # Приоритет: campaign_context.campaign_title -> last_campaign_name -> last_campaign_title -> last_product_name
+        search_query = None
 
-        # 1) Ввести в поле поиска название продукта из файла
-        filters.fill_search(product_name)
+        if LAST_CAMPAIGN_CONTEXT_PATH.exists():
+            try:
+                ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
+                search_query = (ctx.get("campaign_title") or "").strip() or None
+            except Exception:
+                pass
+
+        if not search_query:
+            for candidate in [LAST_CAMPAIGN_NAME_PATH, LAST_CAMPAIGN_TITLE_PATH, LAST_PRODUCT_NAME_PATH]:
+                if candidate.exists():
+                    value = candidate.read_text(encoding="utf-8").strip()
+                    if value:
+                        search_query = value
+                        break
+
+        assert search_query, (
+            "Не найдено значение для поиска: ожидался один из файлов "
+            "last_campaign_context.json / last_campaign_name.txt / last_campaign_title.txt / last_product_name.txt"
+        )
+
+        # 1) Ввести в поле поиска актуальное значение из test_data
+        filters.fill_search(search_query)
 
         # 2) Нажать Enter
         filters.press_search_enter()
         filters.page.wait_for_timeout(2000)
 
         # 3) Перебрать заголовки карточек и проверить совпадение
-        found = filters.find_card_with_title(product_name)
+        found = filters.find_card_with_title(search_query)
         assert found, (
-            f"Ни одна карточка не содержит заголовок «{product_name}»"
+            f"Ни одна карточка не содержит заголовок «{search_query}»"
         )
 
         # 4) Очистить поисковый запрос
