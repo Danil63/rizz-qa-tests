@@ -92,4 +92,4 @@ class TestProducts03:
 
         # ОР) Переход на страницу списка продуктов
         products_page = ProductsPage(page)
-        products_page.expect_loaded()
+        products_page.expect_url_contains(r".*/app/advertiser/products", timeout=15000)

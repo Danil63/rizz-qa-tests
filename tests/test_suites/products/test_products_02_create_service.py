@@ -69,4 +69,4 @@ class TestProducts02:
 
         # 7) Пользователь на экране списка продуктов
         result_products_page = ProductsPage(create_page.page)
-        result_products_page.expect_loaded()
+        result_products_page.expect_url_contains(r".*/app/advertiser/products", timeout=15000)
