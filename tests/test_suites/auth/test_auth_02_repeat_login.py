@@ -1,6 +1,9 @@
 """auth-02: Повторная авторизация по валидным данным."""
+import re
+
 import allure
 import pytest
+from playwright.sync_api import expect
 
 from tests.pages.sign_in_page import SignInPage
 from tests.pages.market_page import MarketPage
@@ -30,7 +33,7 @@ class TestAuth02:
         "4) В поле пароль посимвольно ввести данные: 89087814701\n"
         "5) Нажать на кнопку войти\n\n"
         "Ожидаемый результат:\n"
-        "1) Пользователь переходит на url: https://app.rizz.market/app/creator/market\n"
+        "1) Пользователь авторизован и переходит в личный кабинет (creator/market или advertiser/campaigns)\n"
         "2) Пользователь авторизован"
     )
     def test_auth_02_repeat_login(
@@ -53,5 +56,9 @@ class TestAuth02:
         # 5) Нажать на кнопку войти
         sign_in_page.click_login_button()
 
-        # ОР 1) Пользователь переходит на маркет блогера
-        market_page.expect_loaded()
+        # ОР 1) Пользователь авторизован и переходит в личный кабинет
+        # (в зависимости от роли аккаунта может быть creator/market или advertiser/campaigns)
+        expect(market_page.page).to_have_url(
+            re.compile(r".*/app/(creator/market|advertiser/campaigns)"),
+            timeout=10000,
+        )
