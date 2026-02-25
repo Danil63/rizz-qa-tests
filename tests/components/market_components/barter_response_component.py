@@ -46,6 +46,11 @@ class BarterResponseComponent(BaseComponent):
 
         raise AssertionError("Не найдены кнопки 'Выполнить за бартер' или 'Откликнуться на бартер'")
 
+    @allure.step('Clicking "Выполнить за бартер" (compat)')
+    def click_execute_barter(self) -> None:
+        """Backward-compatible alias для старых тестов."""
+        self.prepare_barter_form()
+
     @allure.step('Selecting social network account "{account_name}"')
     def select_social_network(self, account_name: str) -> None:
         scope = self._scope()
