@@ -21,6 +21,7 @@ SUITE_ORDER = [
     ("products", "tests/test_suites/products"),
     ("campaigns", "tests/test_suites/campaigns"),
     ("filters", "tests/test_suites/filters"),
+    ("responses", "tests/test_suites/responses"),
 ]
 
 
