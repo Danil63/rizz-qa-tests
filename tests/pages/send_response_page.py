@@ -50,6 +50,7 @@ class SendResponsePage(BasePage):
     @allure.step('Подождать 5 секунд и нажать кнопку "Бартер"')
     def wait_and_click_barter(self) -> None:
         self.page.wait_for_timeout(5000)
+        self.barter_button.scroll_into_view_if_needed()
         expect(self.barter_button).to_be_visible(timeout=10000)
         expect(self.barter_button).to_be_enabled(timeout=10000)
         self.barter_button.click()
