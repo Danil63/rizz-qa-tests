@@ -5,7 +5,7 @@ import allure
 import pytest
 from playwright.sync_api import Page
 
-from tests.pages.respons.cancel_and_reapply_page import CancelAndReapplyPage
+from tests.pages.cancel_and_reapply_page import CancelAndReapplyPage
 
 LAST_PRODUCT_NAME_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_name.txt"
 
