@@ -86,7 +86,16 @@ class IntegrationPage(BasePage):
         expect(self.start_work_button).to_be_enabled(timeout=10000)
         self.start_work_button.click()
 
+        # ── Поле суммы (шаг "Подтверждение выкупа товара") ──────
+        self.amount_input = page.locator("input[name='amount']")
+
     # ── Загрузка медиа (шаги интеграции) ──────────────────────
+
+    @allure.step('Заполнить поле суммы значением "{amount}"')
+    def fill_amount(self, amount: str) -> None:
+        """Заполнить поле 'Введите сумму в рублях' в шаге подтверждения выкупа."""
+        expect(self.amount_input).to_be_visible(timeout=10000)
+        self.amount_input.fill(amount)
 
     @allure.step('Загрузить медиа и отправить')
     def upload_media_and_submit(self, file_path: str = TEST_IMAGE_PATH) -> None:
@@ -129,9 +138,52 @@ class IntegrationPage(BasePage):
             f"(было {submit_count_before}, стало {submit_count_after})"
         )
 
-    @allure.step('Выполнить загрузку медиа для всех {count} шагов')
+    @allure.step('Загрузить медиа, заполнить сумму и отправить (шаг подтверждения выкупа)')
+    def upload_media_fill_amount_and_submit(
+        self, amount: str = "100", file_path: str = TEST_IMAGE_PATH
+    ) -> None:
+        """Шаг 3: загрузить чек, заполнить сумму, отправить."""
+        file_input = self.file_inputs.first
+        file_input.set_input_files(file_path)
+
+        self.page.wait_for_timeout(2000)
+
+        self.fill_amount(amount)
+
+        submit_btn = self.page.locator(
+            "button[type='submit']:not([disabled])", has_text="Отправить"
+        ).first
+
+        expect(submit_btn).to_be_visible(timeout=10000)
+        expect(submit_btn).to_be_enabled(timeout=10000)
+
+        submit_count_before = self.page.locator(
+            "button[type='submit']", has_text="Отправить"
+        ).count()
+
+        submit_btn.click()
+
+        self.page.wait_for_timeout(3000)
+
+        submit_count_after = self.page.locator(
+            "button[type='submit']", has_text="Отправить"
+        ).count()
+
+        assert submit_count_after < submit_count_before or submit_count_after == 0, (
+            f"Кнопка 'Отправить' не пропала после отправки шага "
+            f"(было {submit_count_before}, стало {submit_count_after})"
+        )
+
+    @allure.step('Выполнить загрузку медиа для всех 4 шагов')
     def upload_all_media_steps(self, count: int = 4, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Последовательно загрузить медиа и отправить для каждого шага."""
-        for _ in range(count):
-            self.upload_media_and_submit(file_path)
+        """Последовательно загрузить медиа и отправить для каждого шага.
+
+        Шаг 3 (подтверждение выкупа) дополнительно требует заполнения суммы.
+        """
+        for step in range(count):
+            if step == 2:
+                # Шаг 3: загрузка чека + сумма
+                self.upload_media_fill_amount_and_submit("100", file_path)
+            else:
+                self.upload_media_and_submit(file_path)
             self.page.wait_for_timeout(2000)
