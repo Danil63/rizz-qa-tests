@@ -8,6 +8,7 @@ from playwright.sync_api import Page
 
 from tests.pages.campaign_details_page import CampaignDetailsPage
 
+BLOGGER_USERNAME = "danil23319"
 LAST_CAMPAIGN_CONTEXT_PATH = (
     Path(__file__).resolve().parents[3] / "test_data" / "last_campaign_context.json"
 )
@@ -39,7 +40,7 @@ class TestResponsesAccept01:
         page.click_campaign_title(campaign_title)
         page.wait_for_details_heading()
         page.click_responders_count()
-        page.wait_for_blogger_danil()
-        page.focus_blogger_danil()
-        page.click_accept()
-        page.wait_for_blogger_danil_hidden()
+        page.wait_for_blogger(BLOGGER_USERNAME)
+        page.focus_blogger(BLOGGER_USERNAME)
+        page.click_accept_for_blogger(BLOGGER_USERNAME)
+        page.wait_for_blogger_hidden(BLOGGER_USERNAME)

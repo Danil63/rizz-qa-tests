@@ -14,27 +14,17 @@ class CampaignDetailsPage(BasePage):
         super().__init__(page)
 
         # ── Заголовок деталей ─────────────────────────────────
-        self.details_heading = page.locator(
-            "h3.text-xl.font-semibold.leading-none.tracking-tight",
-            has_text="Детали кампании",
-        )
+        self.details_heading = page.get_by_role("heading", name="Детали кампании")
 
-        # ── Блок откликов ─────────────────────────────────────
-        self.responders_count = page.locator(
-            "div.text-xs.text-muted-foreground",
-            has_text="количество откликнувшихся блогеров",
-        )
+        # ── Блок откликов (ссылка-карточка) ───────────────────
+        self.responders_link = page.get_by_role("link", name="Отклики").first
 
-        # ── Карточка блогера danil23319 (родительский контейнер) ─
-        self.blogger_danil = page.locator(
-            "p.flex.items-center.gap-2.truncate.text-slate-500",
-            has_text="danil23319",
-        )
-        # Карточка — ближайший общий контейнер с кнопкой "Принять"
-        self.blogger_danil_card = self.blogger_danil.locator("xpath=ancestor::div[.//button[contains(.,'Принять')]]").first
+        # ── Заголовок страницы откликов ───────────────────────
+        self.offers_heading = page.get_by_role("heading", name="Отклики")
 
-        # ── Кнопка Принять внутри карточки danil23319 ─────────
-        self.accept_button = self.blogger_danil_card.get_by_role("button", name="Принять")
+    def _blogger_card(self, username: str):
+        """Найти listitem-карточку блогера по username."""
+        return self.page.locator("li", has=self.page.locator("p", has_text=username))
 
     # ── Методы действий ───────────────────────────────────────
 
@@ -55,23 +45,33 @@ class CampaignDetailsPage(BasePage):
 
     @allure.step('Нажать на "количество откликнувшихся блогеров"')
     def click_responders_count(self) -> None:
-        expect(self.responders_count).to_be_visible(timeout=10000)
-        self.responders_count.click()
+        responders = self.page.locator(
+            "div.text-xs.text-muted-foreground",
+            has_text="количество откликнувшихся блогеров",
+        )
+        expect(responders).to_be_visible(timeout=10000)
+        responders.click()
 
-    @allure.step('Ожидание появления блогера "danil23319"')
-    def wait_for_blogger_danil(self) -> None:
-        expect(self.blogger_danil).to_be_visible(timeout=5000)
+    @allure.step('Ожидание появления блогера "{username}" в списке откликов')
+    def wait_for_blogger(self, username: str) -> None:
+        blogger_username = self._blogger_card(username).locator("p", has_text=username)
+        expect(blogger_username).to_be_visible(timeout=5000)
 
-    @allure.step('Установить фокус на "danil23319"')
-    def focus_blogger_danil(self) -> None:
-        self.blogger_danil.focus()
+    @allure.step('Установить фокус на блогере "{username}"')
+    def focus_blogger(self, username: str) -> None:
+        self._blogger_card(username).locator(
+            "p.flex.items-center.gap-2.truncate.text-slate-500", has_text=username
+        ).focus()
 
-    @allure.step('Нажать кнопку "Принять"')
-    def click_accept(self) -> None:
-        expect(self.accept_button).to_be_visible(timeout=10000)
-        expect(self.accept_button).to_be_enabled(timeout=10000)
-        self.accept_button.click()
+    @allure.step('Нажать кнопку "Принять" у блогера "{username}"')
+    def click_accept_for_blogger(self, username: str) -> None:
+        card = self._blogger_card(username)
+        accept_btn = card.get_by_role("button", name="Принять")
+        expect(accept_btn).to_be_visible(timeout=10000)
+        expect(accept_btn).to_be_enabled(timeout=10000)
+        accept_btn.click()
 
-    @allure.step('Ожидание исчезновения "danil23319"')
-    def wait_for_blogger_danil_hidden(self) -> None:
-        expect(self.blogger_danil).not_to_be_visible(timeout=15000)
+    @allure.step('Ожидание исчезновения блогера "{username}" из списка')
+    def wait_for_blogger_hidden(self, username: str) -> None:
+        blogger_username = self._blogger_card(username).locator("p", has_text=username)
+        expect(blogger_username).not_to_be_visible(timeout=15000)
