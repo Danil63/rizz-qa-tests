@@ -91,7 +91,7 @@ class IntegrationPage(BasePage):
 
     # ── Загрузка медиа (шаги интеграции) ──────────────────────
 
-    @allure.step('Загрузить медиа для шага {step_index + 1} и отправить')
+    @allure.step('Загрузить медиа и отправить')
     def upload_media_and_submit(self, step_index: int, file_path: str = TEST_IMAGE_PATH) -> None:
         """Загрузить файл в input[type=file] по индексу и нажать Отправить."""
         file_input = self.file_inputs.nth(step_index)
