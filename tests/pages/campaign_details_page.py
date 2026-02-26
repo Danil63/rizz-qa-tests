@@ -25,14 +25,16 @@ class CampaignDetailsPage(BasePage):
             has_text="количество откликнувшихся блогеров",
         )
 
-        # ── Блогер danil23319 ─────────────────────────────────
+        # ── Карточка блогера danil23319 (родительский контейнер) ─
         self.blogger_danil = page.locator(
             "p.flex.items-center.gap-2.truncate.text-slate-500",
             has_text="danil23319",
         )
+        # Карточка — ближайший общий контейнер с кнопкой "Принять"
+        self.blogger_danil_card = self.blogger_danil.locator("xpath=ancestor::div[.//button[contains(.,'Принять')]]").first
 
-        # ── Кнопка Принять ────────────────────────────────────
-        self.accept_button = page.get_by_role("button", name="Принять").first
+        # ── Кнопка Принять внутри карточки danil23319 ─────────
+        self.accept_button = self.blogger_danil_card.get_by_role("button", name="Принять")
 
     # ── Методы действий ───────────────────────────────────────
 
