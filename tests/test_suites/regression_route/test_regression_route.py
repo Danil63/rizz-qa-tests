@@ -5,6 +5,8 @@
     2) products
     3) campaigns
     4) filters
+    5) responses
+    6) integrations
 """
 
 from __future__ import annotations
@@ -21,6 +23,7 @@ SUITE_ORDER = [
     ("campaigns", "tests/test_suites/campaigns"),
     ("filters", "tests/test_suites/filters"),
     ("responses", "tests/test_suites/responses"),
+    ("integrations", "tests/test_suites/integrations"),
 ]
 
 
