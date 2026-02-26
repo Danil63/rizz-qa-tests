@@ -59,16 +59,19 @@ class TestFilters01:
         filters.press_search_enter()
         filters.page.wait_for_timeout(2000)
 
-        # 3) Перебрать заголовки карточек и проверить совпадение
+        # 3) Скролл до заголовка карточки продукта
+        filters.scroll_to_card_title(search_query)
+
+        # 4) Перебрать заголовки карточек и проверить совпадение
         found = filters.find_card_with_title(search_query)
         assert found, (
             f"Ни одна карточка не содержит заголовок «{search_query}»"
         )
 
-        # 4) Очистить поисковый запрос
+        # 5) Очистить поисковый запрос
         filters.clear_search()
 
-        # 5) Нажать Enter повторно
+        # 6) Нажать Enter повторно
         filters.press_search_enter()
         filters.page.wait_for_timeout(2000)
 

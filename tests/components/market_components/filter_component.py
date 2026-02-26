@@ -122,6 +122,13 @@ class FilterComponent(BaseComponent):
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
         expect(first_card).to_be_visible(timeout=10000)
 
+    @allure.step('Скролл до заголовка карточки "{title}"')
+    def scroll_to_card_title(self, title: str) -> None:
+        """Проскроллить до заголовка h3, содержащего указанный текст."""
+        heading = self.page.locator("h3", has_text=title).first
+        expect(heading).to_be_visible(timeout=10000)
+        heading.scroll_into_view_if_needed()
+
     @allure.step('Поиск карточки с заголовком, содержащим "{expected_title}"')
     def find_card_with_title(self, expected_title: str) -> bool:
         """Перебрать все карточки и найти ту, заголовок которой совпадает с ожидаемым.
