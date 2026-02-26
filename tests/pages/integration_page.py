@@ -89,29 +89,49 @@ class IntegrationPage(BasePage):
     # ── Загрузка медиа (шаги интеграции) ──────────────────────
 
     @allure.step('Загрузить медиа и отправить')
-    def upload_media_and_submit(self, step_index: int, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Загрузить файл в input[type=file] по индексу и нажать Отправить."""
-        file_input = self.file_inputs.nth(step_index)
+    def upload_media_and_submit(self, file_path: str = TEST_IMAGE_PATH) -> None:
+        """Загрузить файл в первый доступный input[type=file] и нажать первый enabled Отправить.
+
+        После отправки шаг переходит в статус 'Обработан': input и кнопка пропадают из DOM.
+        Поэтому всегда берём first — это следующий незаполненный шаг.
+        """
+        file_input = self.file_inputs.first
         file_input.set_input_files(file_path)
 
         # Ожидание загрузки превью
         self.page.wait_for_timeout(2000)
 
-        # Находим enabled кнопку "Отправить" (disabled кнопки уже отправленных шагов пропускаются)
+        # Первая enabled кнопка "Отправить"
         submit_btn = self.page.locator(
             "button[type='submit']:not([disabled])", has_text="Отправить"
         ).first
 
         expect(submit_btn).to_be_visible(timeout=10000)
         expect(submit_btn).to_be_enabled(timeout=10000)
+
+        # Запоминаем количество кнопок до клика
+        submit_count_before = self.page.locator(
+            "button[type='submit']", has_text="Отправить"
+        ).count()
+
         submit_btn.click()
 
-        # Проверка: кнопка стала disabled (шаг обработан)
-        expect(submit_btn).to_be_disabled(timeout=15000)
+        # Ожидание: кнопка либо пропала (шаг ушёл из DOM), либо их стало меньше
+        self.page.wait_for_timeout(3000)
 
-    @allure.step('Выполнить загрузку медиа для всех шагов')
+        # Если кнопок стало меньше — шаг отправлен успешно
+        submit_count_after = self.page.locator(
+            "button[type='submit']", has_text="Отправить"
+        ).count()
+
+        assert submit_count_after < submit_count_before or submit_count_after == 0, (
+            f"Кнопка 'Отправить' не пропала после отправки шага "
+            f"(было {submit_count_before}, стало {submit_count_after})"
+        )
+
+    @allure.step('Выполнить загрузку медиа для всех {count} шагов')
     def upload_all_media_steps(self, count: int = 4, file_path: str = TEST_IMAGE_PATH) -> None:
         """Последовательно загрузить медиа и отправить для каждого шага."""
-        for i in range(count):
-            self.upload_media_and_submit(i, file_path)
+        for _ in range(count):
+            self.upload_media_and_submit(file_path)
             self.page.wait_for_timeout(2000)
