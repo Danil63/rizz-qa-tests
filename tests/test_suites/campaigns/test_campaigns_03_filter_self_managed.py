@@ -48,6 +48,10 @@ class TestCampaigns03:
         # 2) Таб «Активные» выбран по умолчанию
         campaigns_page.check_active_tab_selected()
 
+        # 2.5) Сбросить фильтр ведения на «Все» (может сохраняться с прошлого прогона)
+        campaigns_page.select_management_filter("Все")
+        page.wait_for_timeout(1500)
+
         # 3-4) Выбрать фильтр «Самостоятельно»
         campaigns_page.select_management_filter("Самостоятельно")
 
