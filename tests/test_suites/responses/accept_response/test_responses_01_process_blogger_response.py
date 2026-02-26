@@ -43,4 +43,5 @@ class TestResponsesAccept01:
         page.wait_for_blogger(BLOGGER_USERNAME)
         page.focus_blogger(BLOGGER_USERNAME)
         page.click_accept_for_blogger(BLOGGER_USERNAME)
+        page.wait(2000)
         page.wait_for_blogger_hidden(BLOGGER_USERNAME)
