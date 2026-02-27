@@ -4,7 +4,7 @@ from pathlib import Path
 
 import allure
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 from tests.pages.integration_page import IntegrationPage
 
@@ -26,13 +26,15 @@ class TestIntegration01Execute:
     @allure.title("integration-01: works → начать работу → чат → загрузка медиа")
     @allure.severity(allure.severity_level.CRITICAL)
     def test_execute_integration(self, blogger_page: Page):
-        # Определяем название продукта
-        product_name = self._resolve_product_name()
-
         page = IntegrationPage(blogger_page)
 
         # Переходим на страницу интеграций (filter=New)
-        blogger_page.goto(WORKS_URL, wait_until="networkidle")
+        with allure.step(f"Открыть {WORKS_URL}"):
+            blogger_page.goto(WORKS_URL, wait_until="networkidle")
+            blogger_page.wait_for_timeout(3000)
+
+        # Определяем название продукта (из json если есть, иначе первая карточка)
+        product_name = self._resolve_product_name(blogger_page)
 
         # Клик по карточке продукта (с retry)
         page.click_product_card(product_name)
@@ -50,13 +52,19 @@ class TestIntegration01Execute:
         page.upload_all_media_steps(count=4)
 
     @staticmethod
-    def _resolve_product_name() -> str:
-        """Получить название продукта из last_product_meta.json."""
-        assert LAST_PRODUCT_META_PATH.exists(), (
-            f"Файл {LAST_PRODUCT_META_PATH} не найден. "
-            "Сначала запусти тест создания продукта."
-        )
-        meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
-        product_name = (meta.get("name") or "").strip()
-        assert product_name, "Поле name в last_product_meta.json пустое"
-        return product_name
+    def _resolve_product_name(browser_page: Page) -> str:
+        """Получить название продукта.
+
+        1) Из last_product_meta.json если файл существует.
+        2) Иначе — берём заголовок первой карточки на странице.
+        """
+        if LAST_PRODUCT_META_PATH.exists():
+            meta = json.loads(LAST_PRODUCT_META_PATH.read_text(encoding="utf-8"))
+            name = (meta.get("name") or "").strip()
+            if name:
+                return name
+
+        # Fallback: первая карточка на странице
+        first_card = browser_page.locator("span.line-clamp-2").first
+        expect(first_card).to_be_visible(timeout=15000)
+        return first_card.inner_text().strip()
