@@ -32,6 +32,12 @@ class IntegrationPage(BasePage):
         # ── Шаги загрузки медиа (4 input[type=file]) ─────────
         self.file_inputs = page.locator("input[type='file']")
 
+        # ── Кнопки рекламодателя (принятие шагов) ────────────
+        self.advertiser_chat_button = page.get_by_role("button", name="Чат с блогером")
+        self.advertiser_message_input = page.locator(
+            "textarea[placeholder='Наберите текст вашего сообщения']"
+        )
+
     # ── Навигация ─────────────────────────────────────────────
 
     @allure.step('Открыть страницу интеграций (filter=New)')
@@ -187,3 +193,79 @@ class IntegrationPage(BasePage):
             else:
                 self.upload_media_and_submit(file_path)
             self.page.wait_for_timeout(2000)
+
+    # ══════════════════════════════════════════════════════════
+    # Методы рекламодателя — принятие шагов интеграции
+    # ══════════════════════════════════════════════════════════
+
+    @allure.step('Открыть страницу интеграций рекламодателя')
+    def open_advertiser_works(self) -> None:
+        self.page.goto(
+            "https://app.rizz.market/app/advertiser/works",
+            wait_until="networkidle",
+        )
+
+    @allure.step('Нажать на ник блогера "danil23319" в карточке')
+    def click_blogger_nick_danil(self) -> None:
+        nick = self.page.locator(
+            "p.flex.items-center.gap-2.truncate.text-slate-500",
+            has_text="danil23319",
+        ).first
+        expect(nick).to_be_visible(timeout=15_000)
+        nick.click()
+        self.page.wait_for_timeout(3_000)
+
+    @allure.step("Принять все 4 шага интеграции с retry-логикой")
+    def accept_all_steps(self, max_retries: int = 5) -> None:
+        """Последовательно нажимает кнопку «Принять» 4 раза.
+
+        После каждого нажатия проверяет что кнопка исчезла.
+        Если нет — повторяет (retry). Кнопки перенумеровываются
+        после каждого принятия, поэтому всегда берём .first.
+        """
+        for step_index in range(4):
+            self._accept_single_step(step_index, max_retries)
+
+    def _accept_single_step(self, step_index: int, max_retries: int) -> None:
+        expected_remaining = 3 - step_index
+
+        for attempt in range(1, max_retries + 1):
+            accept_btn = self.page.get_by_role(
+                "button", name="Принять", exact=True
+            ).first
+
+            try:
+                expect(accept_btn).to_be_visible(timeout=10_000)
+                expect(accept_btn).to_be_enabled(timeout=5_000)
+            except Exception:
+                return  # кнопка уже пропала — шаг принят
+
+            with allure.step(
+                f"Шаг {step_index + 1}: нажатие «Принять» (попытка {attempt})"
+            ):
+                accept_btn.click()
+                self.page.wait_for_timeout(2_000)
+
+            remaining = self.page.get_by_role(
+                "button", name="Принять", exact=True
+            ).count()
+
+            if remaining <= expected_remaining:
+                return
+
+        raise AssertionError(
+            f"Не удалось принять шаг {step_index + 1} за {max_retries} попыток"
+        )
+
+    @allure.step('Открыть чат с блогером (сторона рекламодателя)')
+    def open_advertiser_chat(self) -> None:
+        expect(self.advertiser_chat_button).to_be_visible(timeout=10_000)
+        self.advertiser_chat_button.click()
+        self.page.wait_for_timeout(3_000)
+
+    @allure.step('Отправить сообщение от рекламодателя: "{text}"')
+    def send_advertiser_message(self, text: str) -> None:
+        expect(self.advertiser_message_input).to_be_visible(timeout=10_000)
+        self.advertiser_message_input.click()
+        self.advertiser_message_input.fill(text)
+        self.advertiser_message_input.press("Enter")
