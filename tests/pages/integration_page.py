@@ -93,7 +93,7 @@ class IntegrationPage(BasePage):
         self.start_work_button.click()
 
         # ── Поле суммы (шаг "Подтверждение выкупа товара") ──────
-        self.amount_input = page.locator("input[name='amount']")
+        self.amount_input = self.page.locator("input[name='amount']")
 
     # ── Загрузка медиа (шаги интеграции) ──────────────────────
 
