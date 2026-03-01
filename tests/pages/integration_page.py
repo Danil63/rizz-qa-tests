@@ -126,17 +126,14 @@ class IntegrationPage(BasePage):
 
         self.page.wait_for_function(
             """
-            ([allSelector, enabledSelector, beforeCount]) => {
-              const all = document.querySelectorAll(allSelector).length;
-              const enabled = document.querySelectorAll(enabledSelector).length;
-              return all < beforeCount || enabled === 0;
+            ({ beforeCount }) => {
+              const submitButtons = Array.from(document.querySelectorAll('button'))
+                .filter((btn) => (btn.textContent || '').includes('Отправить'));
+              const enabledSubmitButtons = submitButtons.filter((btn) => !btn.disabled);
+              return submitButtons.length < beforeCount || enabledSubmitButtons.length === 0;
             }
             """,
-            [
-                "button:has-text('Отправить')",
-                "button:has-text('Отправить'):not([disabled])",
-                submit_count_before,
-            ],
+            arg={"beforeCount": submit_count_before},
             timeout=15000,
         )
 
