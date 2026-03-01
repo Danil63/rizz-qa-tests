@@ -104,41 +104,53 @@ class IntegrationPage(BasePage):
         self.amount_input.fill(amount)
 
     def _get_submit_button(self):
-        """Найти первую enabled кнопку 'Отправить' (любой type)."""
-        # Пробуем оба варианта: type='submit' и type='button'
-        btn = self.page.get_by_role("button", name="Отправить", exact=True).first
-        return btn
+        """Найти первую доступную кнопку "Отправить"."""
+        return self.page.get_by_role("button", name="Отправить", exact=True).first
 
-    @allure.step('Загрузить медиа и отправить')
-    def upload_media_and_submit(self, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Загрузить файл в первый доступный input[type=file] и нажать 'Отправить'.
+    def _click_submit_and_wait_processed(self) -> None:
+        """Нажать первую доступную кнопку "Отправить" и дождаться обработки шага.
 
-        После отправки шаг переходит в статус 'Обработан': input и кнопка пропадают из DOM.
+        Успех:
+        - число кнопок "Отправить" уменьшилось, или
+        - не осталось enabled-кнопок "Отправить".
         """
-        # Ждём появления file input
-        file_input = self.file_inputs.first
-        expect(file_input).to_be_attached(timeout=15000)
-        file_input.set_input_files(file_path)
-
-        # Ожидание загрузки превью
-        self.page.wait_for_timeout(3000)
-
-        # Кнопка "Отправить"
         submit_btn = self._get_submit_button()
         expect(submit_btn).to_be_visible(timeout=10000)
         expect(submit_btn).to_be_enabled(timeout=10000)
 
-        # Запоминаем количество file inputs до клика
-        inputs_before = self.file_inputs.count()
+        submit_count_before = self.page.get_by_role(
+            "button", name="Отправить", exact=True
+        ).count()
 
         submit_btn.click()
-        self.page.wait_for_timeout(5000)
 
-        # Проверяем что шаг отправлен (inputs стало меньше)
-        inputs_after = self.file_inputs.count()
-        assert inputs_after < inputs_before or inputs_after == 0, (
-            f"Шаг не отправлен: file inputs до={inputs_before}, после={inputs_after}"
+        self.page.wait_for_function(
+            """
+            ([allSelector, enabledSelector, beforeCount]) => {
+              const all = document.querySelectorAll(allSelector).length;
+              const enabled = document.querySelectorAll(enabledSelector).length;
+              return all < beforeCount || enabled === 0;
+            }
+            """,
+            [
+                "button:has-text('Отправить')",
+                "button:has-text('Отправить'):not([disabled])",
+                submit_count_before,
+            ],
+            timeout=15000,
         )
+
+    @allure.step('Загрузить медиа и отправить')
+    def upload_media_and_submit(self, file_path: str = TEST_IMAGE_PATH) -> None:
+        """Загрузить файл в первый доступный input[type=file] и отправить шаг."""
+        file_input = self.file_inputs.first
+        expect(file_input).to_be_attached(timeout=15000)
+        file_input.set_input_files(file_path)
+
+        # Небольшая пауза для рендера превью
+        self.page.wait_for_timeout(1000)
+
+        self._click_submit_and_wait_processed()
 
     @allure.step('Загрузить медиа, заполнить сумму и отправить (шаг подтверждения выкупа)')
     def upload_media_fill_amount_and_submit(
@@ -149,23 +161,11 @@ class IntegrationPage(BasePage):
         expect(file_input).to_be_attached(timeout=15000)
         file_input.set_input_files(file_path)
 
-        self.page.wait_for_timeout(3000)
+        self.page.wait_for_timeout(1000)
 
         self.fill_amount(amount)
 
-        submit_btn = self._get_submit_button()
-        expect(submit_btn).to_be_visible(timeout=10000)
-        expect(submit_btn).to_be_enabled(timeout=10000)
-
-        inputs_before = self.file_inputs.count()
-
-        submit_btn.click()
-        self.page.wait_for_timeout(5000)
-
-        inputs_after = self.file_inputs.count()
-        assert inputs_after < inputs_before or inputs_after == 0, (
-            f"Шаг не отправлен: file inputs до={inputs_before}, после={inputs_after}"
-        )
+        self._click_submit_and_wait_processed()
 
     @allure.step('Выполнить загрузку медиа для всех 4 шагов')
     def upload_all_media_steps(self, count: int = 4, file_path: str = TEST_IMAGE_PATH) -> None:
@@ -256,4 +256,3 @@ class IntegrationPage(BasePage):
         self.advertiser_message_input.click()
         self.advertiser_message_input.fill(text)
         self.advertiser_message_input.press("Enter")
-# force rebuild
