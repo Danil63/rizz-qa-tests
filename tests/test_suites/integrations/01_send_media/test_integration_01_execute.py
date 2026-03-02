@@ -48,12 +48,22 @@ class TestIntegration01Execute:
         page.wait(2000)
         page.click_start_work()
 
-        # Загрузка медиа для первых 3 шагов
+        # Загрузка медиа для шагов 1–3
         page.upload_all_media_steps(count=3)
 
-        # Шаг 4 — Медиа-контент
-        with allure.step("Загрузка медиа-контента (шаг 4)"):
-            page.upload_media_content_step()
+    @allure.title("integration-01b: works → загрузить видео (шаг 4: Медиа-контент)")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_upload_step4_media(self, blogger_page: Page):
+        page = IntegrationPage(blogger_page)
+
+        with allure.step(f"Открыть {WORKS_URL}"):
+            blogger_page.goto(WORKS_URL, wait_until="networkidle")
+            blogger_page.wait_for_timeout(3000)
+
+        product_name = self._resolve_product_name(blogger_page)
+        page.click_product_card(product_name)
+
+        page.upload_step4_media_and_submit()
 
     @staticmethod
     def _resolve_product_name(browser_page: Page) -> str:

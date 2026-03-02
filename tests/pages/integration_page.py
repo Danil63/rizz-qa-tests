@@ -8,6 +8,7 @@ from tests.pages.base_page import BasePage
 
 WORKS_URL = "https://app.rizz.market/app/creator/works"
 TEST_IMAGE_PATH = str(Path(__file__).resolve().parents[1] / "test_data" / "product_image.jpg")
+TEST_VIDEO_PATH = str(Path(__file__).resolve().parents[1] / "test_data" / "sample_video.mp4")
 
 
 class IntegrationPage(BasePage):
@@ -164,28 +165,38 @@ class IntegrationPage(BasePage):
 
         self._click_submit_and_wait_processed()
 
-    @allure.step('Выполнить загрузку медиа для первых 3 шагов')
+    @allure.step('Выполнить загрузку медиа для шагов 1–3')
     def upload_all_media_steps(self, count: int = 3, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Последовательно загрузить медиа и отправить для каждого из первых 3 шагов.
+        """Последовательно загрузить медиа и отправить для шагов 1–3 (максимум 3).
 
         Шаг 3 (подтверждение выкупа) дополнительно требует заполнения суммы.
+        Шаг 4 (Медиа-контент, видео) выполняется отдельно через upload_step4_media_and_submit.
         """
-        for step in range(count):
-            with allure.step(f"Загрузка медиа: шаг {step + 1} из {count}"):
+        steps = min(count, 3)
+        for step in range(steps):
+            with allure.step(f"Загрузка медиа: шаг {step + 1} из {steps}"):
                 if step == 2:
                     self.upload_media_fill_amount_and_submit("100", file_path)
                 else:
                     self.upload_media_and_submit(file_path)
                 self.page.wait_for_timeout(3000)
 
-    @allure.step('Загрузить медиа-контент (шаг 4)')
-    def upload_media_content_step(self, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Шаг 4 — Медиа-контент: загрузить креатив для соц.сети и отправить."""
-        file_input = self.file_inputs.first
-        expect(file_input).to_be_attached(timeout=15000)
-        file_input.set_input_files(file_path)
+    @allure.step('Загрузить видео и отправить (шаг 4: Медиа-контент)')
+    def upload_step4_media_and_submit(self, video_path: str = TEST_VIDEO_PATH) -> None:
+        """Шаг 4: загрузить видео в блок «Медиа-контент» и отправить.
 
-        self.page.wait_for_timeout(1000)
+        Использует input[accept="video/*"] под заголовком h3 «Медиа-контент».
+        """
+        step4_title = self.page.locator('h3', has_text='Медиа-контент')
+        expect(step4_title).to_be_visible(timeout=10_000)
+
+        video_input = self.page.locator(
+            '//h3[text()="Медиа-контент"]/following::input[@accept="video/*"][1]'
+        )
+        expect(video_input).to_be_attached(timeout=15_000)
+        video_input.set_input_files(video_path)
+
+        self.page.wait_for_timeout(3000)
 
         self._click_submit_and_wait_processed()
 
@@ -210,15 +221,15 @@ class IntegrationPage(BasePage):
         nick.click()
         self.page.wait_for_timeout(3_000)
 
-    @allure.step("Принять все шаги интеграции с retry-логикой")
-    def accept_all_steps(self, steps_count: int = 4, max_retries: int = 5) -> None:
-        """Последовательно нажимает кнопку «Принять» steps_count раз.
+    @allure.step("Принять все 4 шага интеграции с retry-логикой")
+    def accept_all_steps(self, max_retries: int = 5) -> None:
+        """Последовательно нажимает кнопку «Принять» 4 раза.
 
         После каждого нажатия проверяет что кнопка исчезла.
         Если нет — повторяет (retry). Кнопки перенумеровываются
         после каждого принятия, поэтому всегда берём .first.
         """
-        for step_index in range(steps_count):
+        for step_index in range(4):
             self._accept_single_step(step_index, max_retries)
 
     def _accept_single_step(self, step_index: int, max_retries: int) -> None:

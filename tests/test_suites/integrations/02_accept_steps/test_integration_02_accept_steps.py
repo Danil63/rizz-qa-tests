@@ -2,7 +2,6 @@
 import allure
 import pytest
 from playwright.sync_api import Page
-
 from tests.pages.integration_page import IntegrationPage
 
 WORKS_URL = "https://app.rizz.market/app/advertiser/works"

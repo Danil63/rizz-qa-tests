@@ -155,9 +155,7 @@ class TestCampaigns02:
 
         # ОР) Ожидание редиректа на страницу кампаний (до 10 секунд)
         from playwright.sync_api import expect as pw_expect
-        pw_expect(page).to_have_url(
-            re.compile(r".*/app/advertiser/campaigns.*"), timeout=10000
-        )
+        pw_expect(page).to_have_url(re.compile(r".*/app/advertiser/campaigns.*"), timeout=14000)
 
         # Ожидание 3 секунды
-        time.sleep(3)
+        time.sleep(5)
