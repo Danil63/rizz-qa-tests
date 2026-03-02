@@ -48,8 +48,12 @@ class TestIntegration01Execute:
         page.wait(2000)
         page.click_start_work()
 
-        # Загрузка медиа для 4 шагов
-        page.upload_all_media_steps(count=4)
+        # Загрузка медиа для первых 3 шагов
+        page.upload_all_media_steps(count=3)
+
+        # Шаг 4 — Медиа-контент
+        with allure.step("Загрузка медиа-контента (шаг 4)"):
+            page.upload_media_content_step()
 
     @staticmethod
     def _resolve_product_name(browser_page: Page) -> str:

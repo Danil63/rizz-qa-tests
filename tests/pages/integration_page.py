@@ -164,9 +164,9 @@ class IntegrationPage(BasePage):
 
         self._click_submit_and_wait_processed()
 
-    @allure.step('Выполнить загрузку медиа для всех 4 шагов')
-    def upload_all_media_steps(self, count: int = 4, file_path: str = TEST_IMAGE_PATH) -> None:
-        """Последовательно загрузить медиа и отправить для каждого шага.
+    @allure.step('Выполнить загрузку медиа для первых 3 шагов')
+    def upload_all_media_steps(self, count: int = 3, file_path: str = TEST_IMAGE_PATH) -> None:
+        """Последовательно загрузить медиа и отправить для каждого из первых 3 шагов.
 
         Шаг 3 (подтверждение выкупа) дополнительно требует заполнения суммы.
         """
@@ -177,6 +177,17 @@ class IntegrationPage(BasePage):
                 else:
                     self.upload_media_and_submit(file_path)
                 self.page.wait_for_timeout(3000)
+
+    @allure.step('Загрузить медиа-контент (шаг 4)')
+    def upload_media_content_step(self, file_path: str = TEST_IMAGE_PATH) -> None:
+        """Шаг 4 — Медиа-контент: загрузить креатив для соц.сети и отправить."""
+        file_input = self.file_inputs.first
+        expect(file_input).to_be_attached(timeout=15000)
+        file_input.set_input_files(file_path)
+
+        self.page.wait_for_timeout(1000)
+
+        self._click_submit_and_wait_processed()
 
     # ══════════════════════════════════════════════════════════
     # Методы рекламодателя — принятие шагов интеграции
@@ -199,15 +210,15 @@ class IntegrationPage(BasePage):
         nick.click()
         self.page.wait_for_timeout(3_000)
 
-    @allure.step("Принять все 4 шага интеграции с retry-логикой")
-    def accept_all_steps(self, max_retries: int = 5) -> None:
-        """Последовательно нажимает кнопку «Принять» 4 раза.
+    @allure.step("Принять все шаги интеграции с retry-логикой")
+    def accept_all_steps(self, steps_count: int = 4, max_retries: int = 5) -> None:
+        """Последовательно нажимает кнопку «Принять» steps_count раз.
 
         После каждого нажатия проверяет что кнопка исчезла.
         Если нет — повторяет (retry). Кнопки перенумеровываются
         после каждого принятия, поэтому всегда берём .first.
         """
-        for step_index in range(4):
+        for step_index in range(steps_count):
             self._accept_single_step(step_index, max_retries)
 
     def _accept_single_step(self, step_index: int, max_retries: int) -> None:
