@@ -1,4 +1,5 @@
 """Глобальные фикстуры проекта."""
+
 import platform
 import shutil
 import sys
@@ -26,6 +27,9 @@ def ensure_page_ready_before_test(request):
         # Тесты без page пропускаем
         return
 
+    # Глобальный таймаут по умолчанию для всех expect/wait в тесте
+    page.set_default_timeout(15000)
+
     try:
         # Если страница уже открыта фикстурами — дожидаемся стабильного состояния.
         page.wait_for_load_state("domcontentloaded", timeout=15000)
@@ -36,6 +40,7 @@ def ensure_page_ready_before_test(request):
 
 
 # ── Хуки ──────────────────────────────────────────────────────
+
 
 def pytest_sessionfinish(session, exitstatus):
     """Записать environment.properties + очистить кеш после прогона."""

@@ -8,6 +8,7 @@
     5) Нажать "Создать кампанию"
     6) Проверить 5 ошибок валидации
 """
+
 import allure
 import pytest
 from playwright.sync_api import Page

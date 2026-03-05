@@ -6,6 +6,7 @@
     3) Проверить переход на /app/advertiser/campaigns
     4) Проверить что заголовок «Кампании» виден
 """
+
 import allure
 import pytest
 from playwright.sync_api import Page
@@ -30,9 +31,9 @@ class TestProducts04:
     @allure.description(
         "Шаги:\n"
         "1) Открыть страницу /app/advertiser/products\n"
-        '2) Нажать ссылку «Кампании» в навигационной панели\n'
+        "2) Нажать ссылку «Кампании» в навигационной панели\n"
         "3) Проверить URL /app/advertiser/campaigns\n"
-        '4) Проверить заголовок «Кампании» виден'
+        "4) Проверить заголовок «Кампании» виден"
     )
     def test_products_04_navigate_to_campaigns(
         self,

@@ -1,4 +1,5 @@
 """Фикстура авторизации блогера (предпочтительно через сохранённые cookies)."""
+
 import json
 from pathlib import Path
 
@@ -19,6 +20,7 @@ STORAGE_STATE_PATH = Path(__file__).parent.parent / "stage" / "blogger_state.jso
 
 # ── Фикстура ─────────────────────────────────────────────────
 
+
 @pytest.fixture()
 @allure.title("Авторизация как блогер (Данил СЗ)")
 def blogger_page(page: Page) -> Page:
@@ -27,14 +29,18 @@ def blogger_page(page: Page) -> Page:
     1) Пытается восстановить сессию из tests/stage/blogger_state.json
     2) Если state отсутствует — логинится по телефону/паролю
     """
+    session_restored = False
     if STORAGE_STATE_PATH.exists():
         state = json.loads(STORAGE_STATE_PATH.read_text(encoding="utf-8"))
         cookies = state.get("cookies", [])
         if cookies:
             page.context.add_cookies(cookies)
-        page.goto(MarketPage.URL, wait_until="networkidle")
-        MarketPage(page).expect_loaded()
-    else:
+            page.goto(MarketPage.URL, wait_until="networkidle")
+            if "creator/market" in page.url:
+                MarketPage(page).expect_loaded()
+                session_restored = True
+
+    if not session_restored:
         auth = AuthFlow(page)
         auth.login_with_phone(BLOGGER_PHONE, BLOGGER_PASSWORD)
         MarketPage(page).expect_loaded()

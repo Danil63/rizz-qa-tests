@@ -1,4 +1,5 @@
 """PCO: Компонент фильтров на странице маркета блогера."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -28,13 +29,13 @@ class FilterComponent(BaseComponent):
         self.search_input.click()
         self.search_input.fill(query)
 
-    @allure.step('Очистка поля поиска')
+    @allure.step("Очистка поля поиска")
     def clear_search(self) -> None:
         """Стереть текст в поле поиска."""
         self.search_input.click()
         self.search_input.fill("")
 
-    @allure.step('Нажать Enter в поле поиска')
+    @allure.step("Нажать Enter в поле поиска")
     def press_search_enter(self) -> None:
         """Нажать Enter в поле поиска."""
         self.search_input.press("Enter")
@@ -59,7 +60,9 @@ class FilterComponent(BaseComponent):
         # Пробуем найти по data-value, иначе — по role+name
         data_value = self.OPTION_DATA_VALUES.get(option_name)
         if data_value:
-            option = self.page.locator(f'div[role="option"][data-value="{data_value}"]').first
+            option = self.page.locator(
+                f'div[role="option"][data-value="{data_value}"]'
+            ).first
         else:
             option = self.page.get_by_role("option", name=option_name).first
 
@@ -96,7 +99,7 @@ class FilterComponent(BaseComponent):
         first_title = first_card.locator("h3")
         expect(first_title).to_contain_text(text, ignore_case=True)
 
-    @allure.step('Проверка: карточки отображаются после фильтрации')
+    @allure.step("Проверка: карточки отображаются после фильтрации")
     def check_cards_visible(self) -> None:
         """Проверить что хотя бы одна карточка видна."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
@@ -116,7 +119,7 @@ class FilterComponent(BaseComponent):
         ).first
         expect(badge).to_be_visible(timeout=10000)
 
-    @allure.step('Проверка: выдача не изменилась (карточки видны)')
+    @allure.step("Проверка: выдача не изменилась (карточки видны)")
     def check_results_unchanged(self) -> None:
         """Проверить что карточки по-прежнему видны (выдача не сбросилась)."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
@@ -151,8 +154,7 @@ class FilterComponent(BaseComponent):
                 )
                 return True
         allure.attach(
-            f"Ожидалось: «{expected_title}»\n"
-            f"Проверено карточек: {count}",
+            f"Ожидалось: «{expected_title}»\nПроверено карточек: {count}",
             name="Заголовок не найден",
             attachment_type=allure.attachment_type.TEXT,
         )

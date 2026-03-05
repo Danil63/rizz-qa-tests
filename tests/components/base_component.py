@@ -1,4 +1,5 @@
 """Базовый класс для всех компонентов (PageComponent)."""
+
 from typing import Pattern
 
 import allure
@@ -13,5 +14,5 @@ class BaseComponent:
 
     def check_current_url(self, expected_url: Pattern[str]) -> None:
         """Проверить что текущий URL соответствует паттерну."""
-        with allure.step(f'Checking URL matches pattern'):
+        with allure.step("Checking URL matches pattern"):
             expect(self.page).to_have_url(expected_url)

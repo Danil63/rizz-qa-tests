@@ -1,4 +1,5 @@
 """POM: Детали кампании — обработка откликов блогеров."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -28,7 +29,7 @@ class CampaignDetailsPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step('Открыть страницу кампаний')
+    @allure.step("Открыть страницу кампаний")
     def open(self) -> None:
         self.page.goto(self.URL, wait_until="networkidle")
 

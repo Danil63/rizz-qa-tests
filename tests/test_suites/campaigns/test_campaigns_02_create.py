@@ -10,6 +10,7 @@
     7) Редирект на /app/advertiser/campaigns
     8) Ожидание 3 секунды
 """
+
 import json
 import re
 import time
@@ -23,8 +24,15 @@ from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
-LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
-LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
+LAST_CAMPAIGN_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+)
+LAST_PRODUCT_META_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
+)
+INTEGRATIONS_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "integrations.json"
+)
 
 
 @pytest.mark.regression
@@ -35,6 +43,20 @@ LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "la
 @allure.tag("Regression", "Campaigns", "Positive")
 class TestCampaigns02:
     """campaigns-02: Создание кампании — Бартер, Ig все форматы, рандомные данные."""
+
+    @staticmethod
+    def _save_campaign_id(campaign_id: str) -> None:
+        """Сохранить campaign_id в integrations.json."""
+        data: dict = {}
+        if INTEGRATIONS_PATH.exists():
+            try:
+                data = json.loads(INTEGRATIONS_PATH.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, ValueError):
+                data = {}
+        data["campaign_id"] = campaign_id
+        INTEGRATIONS_PATH.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     @allure.title(
         "campaigns-02: Кампании → + Создать → заполнить все поля → Создать кампанию → редирект"
@@ -153,9 +175,23 @@ class TestCampaigns02:
         # 13) Создать кампанию
         create_page.click_create_campaign()
 
+        page.wait_for_timeout(5000)
+
         # ОР) Ожидание редиректа на страницу кампаний (до 10 секунд)
         from playwright.sync_api import expect as pw_expect
-        pw_expect(page).to_have_url(re.compile(r".*/app/advertiser/campaigns.*"), timeout=14000)
+
+        pw_expect(page).to_have_url(
+            re.compile(r".*/app/advertiser/campaigns.*"), timeout=14000
+        )
 
         # Ожидание 3 секунды
         time.sleep(5)
+
+        # Сохранить campaign_id в integrations.json
+        href = campaigns_page.first_campaign_link.get_attribute("href") or ""
+        match = re.search(
+            r"/campaigns/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
+            href,
+        )
+        if match:
+            self._save_campaign_id(match.group(1))

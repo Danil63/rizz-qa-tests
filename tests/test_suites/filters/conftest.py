@@ -3,6 +3,7 @@
 Cookie загружаются из tests/stage/blogger_state.json.
 Генерация: python tests/stage/generate_auth.py
 """
+
 import json
 import allure
 import pytest
@@ -13,12 +14,15 @@ from tests.pages.market_page import MarketPage
 from tests.components.market_components.filter_component import FilterComponent
 
 
-STORAGE_STATE_PATH = Path(__file__).parent.parent.parent / "stage" / "blogger_state.json"
+STORAGE_STATE_PATH = (
+    Path(__file__).parent.parent.parent / "stage" / "blogger_state.json"
+)
 
 MARKET_URL = "https://app.rizz.market/app/creator/market"
 
 
 # ── Browser config ────────────────────────────────────────────
+
 
 @pytest.fixture(scope="session")
 def browser_context_args():
@@ -37,6 +41,7 @@ def browser_type_launch_args():
 
 
 # ── Фикстуры ─────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def _load_auth(page: Page):

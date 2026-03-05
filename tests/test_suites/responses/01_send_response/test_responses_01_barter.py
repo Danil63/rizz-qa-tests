@@ -1,4 +1,5 @@
 """responses-send-01: Отправка отклика на бартер (переписан с нуля)."""
+
 import json
 from pathlib import Path
 
@@ -8,7 +9,9 @@ from playwright.sync_api import Page
 
 from tests.pages.send_response_page import SendResponsePage
 
-LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_meta.json"
+LAST_PRODUCT_META_PATH = (
+    Path(__file__).resolve().parents[3] / "test_data" / "last_product_meta.json"
+)
 
 
 @pytest.mark.regression
@@ -18,7 +21,6 @@ LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[3] / "test_data" / "la
 @allure.story("Отправка отклика на бартер")
 @allure.tag("Regression", "Responses", "Barter", "SendResponse")
 class TestResponsesSend01:
-
     @allure.title("responses-send-01: creator market → поиск → отклик на бартер")
     @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_barter(self, blogger_page: Page):

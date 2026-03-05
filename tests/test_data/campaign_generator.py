@@ -1,4 +1,5 @@
 """Генератор реалистичных тестовых данных для рекламных кампаний."""
+
 import random
 from dataclasses import dataclass
 from faker import Faker
@@ -9,6 +10,7 @@ fake = Faker("ru_RU")
 @dataclass
 class CampaignData:
     """Сгенерированные данные кампании."""
+
     name: str
     product_search: str
     utm_link: str

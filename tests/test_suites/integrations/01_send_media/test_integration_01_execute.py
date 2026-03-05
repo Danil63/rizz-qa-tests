@@ -1,4 +1,5 @@
 """integration-01: Выполнение интеграции блогером."""
+
 import json
 from pathlib import Path
 
@@ -14,7 +15,6 @@ LAST_PRODUCT_META_PATH = (
     Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
 )
 
-
 @pytest.mark.regression
 @pytest.mark.integrations
 @allure.epic("Интеграции блогера")
@@ -22,7 +22,6 @@ LAST_PRODUCT_META_PATH = (
 @allure.story("Начать работу, отправить сообщение и загрузить медиа")
 @allure.tag("Regression", "Integrations", "Execute")
 class TestIntegration01Execute:
-
     @allure.title("integration-01: works → начать работу → чат → загрузка медиа")
     @allure.severity(allure.severity_level.CRITICAL)
     def test_execute_integration(self, blogger_page: Page):

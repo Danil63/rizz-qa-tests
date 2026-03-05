@@ -1,4 +1,5 @@
 """PageFactory: Базовый элемент — общий интерфейс для всех элементов."""
+
 import allure
 from playwright.sync_api import Page, Locator, expect
 
@@ -22,6 +23,7 @@ class BaseElement:
     def click(self, nth: int = 0, **kwargs) -> None:
         with allure.step(f'Clicking {self.type_of} "{self.name}"'):
             locator = self.get_locator(nth, **kwargs)
+            locator.scroll_into_view_if_needed()
             locator.click()
 
     def check_visible(self, nth: int = 0, **kwargs) -> None:
@@ -30,6 +32,8 @@ class BaseElement:
             expect(locator).to_be_visible()
 
     def check_have_text(self, text: str, nth: int = 0, **kwargs) -> None:
-        with allure.step(f'Checking that {self.type_of} "{self.name}" has text "{text}"'):
+        with allure.step(
+            f'Checking that {self.type_of} "{self.name}" has text "{text}"'
+        ):
             locator = self.get_locator(nth, **kwargs)
             expect(locator).to_have_text(text)

@@ -1,4 +1,5 @@
 """POM: Страница списка рекламных кампаний рекламодателя."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -15,11 +16,21 @@ class CampaignsPage(BasePage):
 
         # ── Хедер (навигация рекламодателя) ───────────────────
         self.logo_link = page.get_by_role("banner").get_by_role("link").first
-        self.nav_market = page.get_by_role("navigation").get_by_role("link", name="Маркет")
-        self.nav_campaigns = page.get_by_role("navigation").get_by_role("link", name="Кампании")
-        self.nav_products = page.get_by_role("navigation").get_by_role("link", name="Продукты")
-        self.nav_integrations = page.get_by_role("navigation").get_by_role("link", name="Интеграции")
-        self.nav_statistics = page.get_by_role("navigation").get_by_role("link", name="Статистика")
+        self.nav_market = page.get_by_role("navigation").get_by_role(
+            "link", name="Маркет"
+        )
+        self.nav_campaigns = page.get_by_role("navigation").get_by_role(
+            "link", name="Кампании"
+        )
+        self.nav_products = page.get_by_role("navigation").get_by_role(
+            "link", name="Продукты"
+        )
+        self.nav_integrations = page.get_by_role("navigation").get_by_role(
+            "link", name="Интеграции"
+        )
+        self.nav_statistics = page.get_by_role("navigation").get_by_role(
+            "link", name="Статистика"
+        )
         self.nav_faq = page.get_by_role("navigation").get_by_role("link", name="FAQ")
         self.notification_bell = page.get_by_role("banner").get_by_role("button").first
         self.user_avatar_button = page.get_by_role("button", name="user avatar")
@@ -73,9 +84,15 @@ class CampaignsPage(BasePage):
         )
 
         # ── Данные первой кампании (dt/dd) ────────────────────
-        self.first_campaign_offers = self.first_campaign.locator("dt", has_text="Отклики")
-        self.first_campaign_integrations = self.first_campaign.locator("dt", has_text="Интеграции")
-        self.first_campaign_cost = self.first_campaign.locator("dt", has_text="Стоимость")
+        self.first_campaign_offers = self.first_campaign.locator(
+            "dt", has_text="Отклики"
+        )
+        self.first_campaign_integrations = self.first_campaign.locator(
+            "dt", has_text="Интеграции"
+        )
+        self.first_campaign_cost = self.first_campaign.locator(
+            "dt", has_text="Стоимость"
+        )
         self.first_campaign_reward = self.first_campaign.locator(
             "dt", has_text="Вознаграждение"
         )
@@ -159,6 +176,7 @@ class CampaignsPage(BasePage):
     def expect_loaded(self) -> None:
         """Проверить что страница кампаний рекламодателя загружена."""
         self.expect_url_contains(r".*/app/advertiser/campaigns")
+        expect(self.heading).to_be_visible(timeout=15000)
 
     @allure.step("Проверка: навигация рекламодателя видна")
     def check_navigation_visible(self) -> None:
@@ -232,7 +250,9 @@ class CampaignsPage(BasePage):
         """Проверить наличие бейджа На ведении."""
         expect(self.first_campaign_management_badge).to_be_visible()
 
-    @allure.step("Проверка: у первой кампании есть метрики (Отклики, Интеграции, Стоимость)")
+    @allure.step(
+        "Проверка: у первой кампании есть метрики (Отклики, Интеграции, Стоимость)"
+    )
     def check_first_campaign_has_metrics(self) -> None:
         """Проверить наличие dt-полей метрик."""
         expect(self.first_campaign_offers).to_be_visible()

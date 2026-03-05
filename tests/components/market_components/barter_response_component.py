@@ -1,4 +1,5 @@
 """PCO: Компонент отклика на бартер (карточка/модалка)."""
+
 import re
 
 import allure
@@ -15,7 +16,9 @@ class BarterResponseComponent(BaseComponent):
 
         self.success_banner_title = page.get_by_text("Отклик отправлен")
         self.success_banner_text = page.get_by_text("Отклик на бартер отправлен")
-        self.cancel_response_button = page.get_by_role("button", name="Отменить отклик").first
+        self.cancel_response_button = page.get_by_role(
+            "button", name="Отменить отклик"
+        ).first
 
     def _scope(self) -> Locator:
         """Контекст поиска: сначала видимый dialog, затем весь документ."""
@@ -45,17 +48,23 @@ class BarterResponseComponent(BaseComponent):
                     return btn
             except Exception:
                 continue
-        raise AssertionError("Не найдена кнопка действия по бартеру (Выполнить/Откликнуться)")
+        raise AssertionError(
+            "Не найдена кнопка действия по бартеру (Выполнить/Откликнуться)"
+        )
 
-    @allure.step('Prepare barter form (click first barter action if required)')
+    @allure.step("Prepare barter form (click first barter action if required)")
     def prepare_barter_form(self) -> None:
         scope = self._scope()
 
         # Если поле соцсети уже есть — форма уже раскрыта, клик не нужен
         social_inputs = [
             scope.get_by_role("button", name=re.compile("Социальная сеть", re.I)).first,
-            scope.get_by_role("combobox", name=re.compile("Социальная сеть", re.I)).first,
-            scope.locator("input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']").first,
+            scope.get_by_role(
+                "combobox", name=re.compile("Социальная сеть", re.I)
+            ).first,
+            scope.locator(
+                "input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']"
+            ).first,
             scope.get_by_text("Социальная сеть", exact=False).first,
         ]
         for el in social_inputs:
@@ -78,8 +87,12 @@ class BarterResponseComponent(BaseComponent):
 
         trigger_candidates = [
             scope.get_by_role("button", name=re.compile("Социальная сеть", re.I)).first,
-            scope.get_by_role("combobox", name=re.compile("Социальная сеть", re.I)).first,
-            scope.locator("input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']").first,
+            scope.get_by_role(
+                "combobox", name=re.compile("Социальная сеть", re.I)
+            ).first,
+            scope.locator(
+                "input[placeholder*='Социальная сеть'], input[aria-label*='Социальная сеть']"
+            ).first,
             scope.get_by_text("Социальная сеть", exact=False).first,
         ]
 
@@ -112,7 +125,9 @@ class BarterResponseComponent(BaseComponent):
             except Exception:
                 continue
 
-        raise AssertionError(f"Не найден аккаунт '{account_name}' в dropdown 'Социальная сеть'")
+        raise AssertionError(
+            f"Не найден аккаунт '{account_name}' в dropdown 'Социальная сеть'"
+        )
 
     @allure.step('Clicking "Откликнуться на бартер"')
     def click_respond_barter(self) -> None:

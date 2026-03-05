@@ -1,4 +1,5 @@
 """auth-01: Авторизация пользователя по валидным данным."""
+
 import allure
 import pytest
 

@@ -1,4 +1,5 @@
 """Фикстура авторизации рекламодателя (предпочтительно через сохранённые cookies)."""
+
 import json
 from pathlib import Path
 
@@ -23,14 +24,18 @@ def advertiser_page(page: Page) -> Page:
     1) Пытается восстановить сессию из tests/stage/advertiser_state.json
     2) Если state отсутствует/пустой — логинится по телефону/паролю
     """
+    session_restored = False
     if STORAGE_STATE_PATH.exists():
         state = json.loads(STORAGE_STATE_PATH.read_text(encoding="utf-8"))
         cookies = state.get("cookies", [])
         if cookies:
             page.context.add_cookies(cookies)
-        page.goto(CampaignsPage.URL, wait_until="networkidle")
-        CampaignsPage(page).expect_loaded()
-    else:
+            page.goto(CampaignsPage.URL, wait_until="networkidle")
+            if CampaignsPage.URL.split("/app/")[1] in page.url:
+                CampaignsPage(page).expect_loaded()
+                session_restored = True
+
+    if not session_restored:
         auth = AuthFlow(page)
         auth.login_with_phone(ADVERTISER_PHONE, ADVERTISER_PASSWORD)
         CampaignsPage(page).expect_loaded()

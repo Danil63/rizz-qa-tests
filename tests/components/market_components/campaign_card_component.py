@@ -1,6 +1,7 @@
 """PCO: Компонент карточки кампании на маркете блогера."""
+
 import allure
-from playwright.sync_api import Page, Locator, expect
+from playwright.sync_api import Page, expect
 
 from tests.components.base_component import BaseComponent
 

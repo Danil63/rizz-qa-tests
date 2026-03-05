@@ -3,6 +3,7 @@
 Cookie загружаются из tests/stage/advertiser_state.json.
 Генерация: python tests/stage/generate_auth.py
 """
+
 import json
 import allure
 import pytest
@@ -13,10 +14,13 @@ from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 
 
-STORAGE_STATE_PATH = Path(__file__).parent.parent.parent / "stage" / "advertiser_state.json"
+STORAGE_STATE_PATH = (
+    Path(__file__).parent.parent.parent / "stage" / "advertiser_state.json"
+)
 
 
 # ── Browser config ────────────────────────────────────────────
+
 
 @pytest.fixture(scope="session")
 def browser_context_args():
@@ -35,6 +39,7 @@ def browser_type_launch_args():
 
 
 # ── Фикстуры ─────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def _load_auth(page: Page):

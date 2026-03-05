@@ -1,4 +1,5 @@
 """filters-01: Поиск по input (с актуальными данными из test_data)."""
+
 import json
 from pathlib import Path
 
@@ -20,7 +21,9 @@ LAST_PRODUCT_META_PATH = TEST_DATA_DIR / "last_product_meta.json"
 class TestFilters01:
     """filters-01: Поиск товара с использованием input."""
 
-    @allure.title("filters-01: Поиск товара → проверка заголовков → очистка → повторный Enter")
+    @allure.title(
+        "filters-01: Поиск товара → проверка заголовков → очистка → повторный Enter"
+    )
     @allure.severity(allure.severity_level.NORMAL)
     @allure.description(
         "Шаги:\n"
@@ -64,9 +67,7 @@ class TestFilters01:
 
         # 4) Перебрать заголовки карточек и проверить совпадение
         found = filters.find_card_with_title(search_query)
-        assert found, (
-            f"Ни одна карточка не содержит заголовок «{search_query}»"
-        )
+        assert found, f"Ни одна карточка не содержит заголовок «{search_query}»"
 
         # 5) Очистить поисковый запрос
         filters.clear_search()

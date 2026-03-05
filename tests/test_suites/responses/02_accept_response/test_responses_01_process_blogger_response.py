@@ -1,4 +1,5 @@
 """responses-accept-01: Обработка отклика блогера со стороны рекламодателя."""
+
 import json
 from pathlib import Path
 
@@ -21,8 +22,9 @@ LAST_CAMPAIGN_CONTEXT_PATH = (
 @allure.story("Принятие отклика блогера в деталях кампании")
 @allure.tag("Regression", "Responses", "AcceptResponse")
 class TestResponsesAccept01:
-
-    @allure.title("responses-accept-01: campaigns → детали кампании → принять отклик danil23319")
+    @allure.title(
+        "responses-accept-01: campaigns → детали кампании → принять отклик danil23319"
+    )
     @allure.severity(allure.severity_level.CRITICAL)
     def test_process_blogger_response(self, advertiser_page: Page):
         assert LAST_CAMPAIGN_CONTEXT_PATH.exists(), (

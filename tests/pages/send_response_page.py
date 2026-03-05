@@ -1,4 +1,5 @@
 """POM: Отправка отклика на бартер со страницы creator market."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -18,12 +19,24 @@ class SendResponsePage(BasePage):
 
         # Элементы сценария
         self.barter_button = page.get_by_role("button", name="Бартер").first
-        self.execute_barter_button = page.get_by_role("button", name="Выполнить за бартер").first
-        self.social_network_dropdown = page.locator("span", has_text="Социальная сеть").first
-        self.social_network_danil_button = page.get_by_role("button", name="danil23319").first
-        self.social_network_danil_option = page.get_by_role("option", name="danil23319").first
-        self.social_network_danil_text = page.get_by_text("danil23319", exact=False).first
-        self.respond_barter_button = page.get_by_role("button", name="Откликнуться на бартер").first
+        self.execute_barter_button = page.get_by_role(
+            "button", name="Выполнить за бартер"
+        ).first
+        self.social_network_dropdown = page.locator(
+            "span", has_text="Социальная сеть"
+        ).first
+        self.social_network_danil_button = page.get_by_role(
+            "button", name="danil23319"
+        ).first
+        self.social_network_danil_option = page.get_by_role(
+            "option", name="danil23319"
+        ).first
+        self.social_network_danil_text = page.get_by_text(
+            "danil23319", exact=False
+        ).first
+        self.respond_barter_button = page.get_by_role(
+            "button", name="Откликнуться на бартер"
+        ).first
 
         # Финальные проверки
         self.processing_banner = page.get_by_text(
@@ -31,7 +44,7 @@ class SendResponsePage(BasePage):
         ).first
         self.sent_barter_badge = page.get_by_text("Отклик на бартер отправлен").first
 
-    @allure.step('Открыть страницу creator market')
+    @allure.step("Открыть страницу creator market")
     def open(self) -> None:
         self.page.goto(self.URL, wait_until="networkidle")
 
@@ -86,7 +99,9 @@ class SendResponsePage(BasePage):
             except Exception:
                 continue
 
-        raise AssertionError('Не найден элемент выбора соцсети "danil23319" (option/button/text)')
+        raise AssertionError(
+            'Не найден элемент выбора соцсети "danil23319" (option/button/text)'
+        )
 
     @allure.step('Подождать 5 секунд и нажать "Откликнуться на бартер"')
     def wait_and_click_respond_barter(self) -> None:
@@ -95,7 +110,7 @@ class SendResponsePage(BasePage):
         expect(self.respond_barter_button).to_be_enabled(timeout=10000)
         self.respond_barter_button.click()
 
-    @allure.step('Подождать 5 секунд и проверить баннер обработки')
+    @allure.step("Подождать 5 секунд и проверить баннер обработки")
     def wait_and_check_processing_banner(self) -> None:
         self.page.wait_for_timeout(5000)
         expect(self.processing_banner).to_be_visible(timeout=10000)

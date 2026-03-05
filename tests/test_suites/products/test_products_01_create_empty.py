@@ -1,4 +1,5 @@
 """products-01: Создание продукта с пустыми полями (негативный)."""
+
 import allure
 import pytest
 

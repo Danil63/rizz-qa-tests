@@ -1,5 +1,4 @@
 """POM: Страница авторизации (sign-in)."""
-import re
 
 import allure
 from playwright.sync_api import Page
@@ -22,7 +21,9 @@ class SignInPage(BasePage):
         self.notification = NotificationComponent(page)
 
         # Локаторы элементов страницы
-        self.other_methods_button = page.get_by_role("button", name="Другие способы входа")
+        self.other_methods_button = page.get_by_role(
+            "button", name="Другие способы входа"
+        )
         self.login_button = page.get_by_role("button", name="Войти", exact=True)
         self.create_account_link = page.get_by_role("link", name="Создать аккаунт")
         self.forgot_password_link = page.get_by_role("link", name="Забыли пароль?")
@@ -52,18 +53,18 @@ class SignInPage(BasePage):
 
     # ── Методы проверок ───────────────────────────────────────
 
-    @allure.step('Checking sign-in page is displayed')
+    @allure.step("Checking sign-in page is displayed")
     def check_visible_sign_in_page(self) -> None:
         """Проверить что мы на странице входа."""
         self.expect_url_contains(r".*/auth/sign-in")
         self.expect_heading("Вход")
 
-    @allure.step('Checking redirect to sign-up page')
+    @allure.step("Checking redirect to sign-up page")
     def check_visible_sign_up_page(self) -> None:
         """Проверить переход на регистрацию."""
         self.expect_url_contains(r".*/auth/sign-up")
 
-    @allure.step('Checking redirect to recover-password page')
+    @allure.step("Checking redirect to recover-password page")
     def check_visible_recover_password_page(self) -> None:
         """Проверить переход на восстановление пароля."""
         self.expect_url_contains(r".*/auth/recover-password")
@@ -76,4 +77,6 @@ class SignInPage(BasePage):
     @allure.step('Checking "Неверный пароль или пользователь не найден" error')
     def check_visible_wrong_password_or_user_not_found_alert(self) -> None:
         """Проверить ошибку 'Неверный пароль или пользователь не найден'."""
-        self.notification.check_visible_error("Неверный пароль или пользователь не найден")
+        self.notification.check_visible_error(
+            "Неверный пароль или пользователь не найден"
+        )

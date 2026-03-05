@@ -1,4 +1,5 @@
 """products-02: Успешное создание услуги с рандомными данными."""
+
 import json
 import random
 from pathlib import Path
@@ -9,7 +10,9 @@ from tests.pages.create_product_page import CreateProductPage
 from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
 
-LAST_SERVICE_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_service_meta.json"
+LAST_SERVICE_META_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_service_meta.json"
+)
 
 
 @pytest.mark.regression
@@ -51,7 +54,11 @@ class TestProducts02:
         # Сохраняем метаданные созданной услуги для следующих тестов
         LAST_SERVICE_META_PATH.parent.mkdir(parents=True, exist_ok=True)
         LAST_SERVICE_META_PATH.write_text(
-            json.dumps({"name": name, "category": "Бытовая химия"}, ensure_ascii=False, indent=2),
+            json.dumps(
+                {"name": name, "category": "Бытовая химия"},
+                ensure_ascii=False,
+                indent=2,
+            ),
             encoding="utf-8",
         )
 
@@ -63,17 +70,20 @@ class TestProducts02:
 
         # Категория: открыть dropdown -> скролл вниз -> выбрать "Бытовая химия"
         create_page.select_category.click()
-        category_option = create_page.page.get_by_role("option", name="Бытовая химия", exact=True)
+        category_option = create_page.page.get_by_role(
+            "option", name="Бытовая химия", exact=True
+        )
         category_option.scroll_into_view_if_needed()
         category_option.click()
 
-        # 6) Явное ожидание перед нажатием Создать
-        create_page.page.wait_for_timeout(3000)
+        # 6) Дождаться готовности формы и нажать Создать
+        create_page.wait_for_load("networkidle")
         create_page.click_submit()
 
-        # Важно для prod: дать бэкенду зафиксировать создание сущности
-        create_page.page.wait_for_timeout(2000)
+        self.wait(2000)
 
         # 7) Пользователь на экране списка продуктов
         result_products_page = ProductsPage(create_page.page)
-        result_products_page.expect_url_contains(r".*/app/advertiser/products", timeout=15000)
+        result_products_page.expect_url_contains(
+            r".*/app/advertiser/products", timeout=15000
+        )

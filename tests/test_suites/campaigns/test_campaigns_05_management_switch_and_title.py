@@ -7,6 +7,7 @@
     4) Затем выбрать «Самостоятельно»
     5) Проверить, что в списке есть кампания с заголовком из отдельного файла
 """
+
 import json
 from pathlib import Path
 
@@ -16,7 +17,9 @@ from playwright.sync_api import Page, expect
 
 from tests.pages.campaigns_page import CampaignsPage
 
-LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+LAST_CAMPAIGN_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+)
 
 
 @pytest.mark.regression
@@ -26,10 +29,14 @@ LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" /
 @allure.story("Переключение фильтра ведения и проверка заголовка")
 @allure.tag("Regression", "Campaigns", "Filters")
 class TestCampaigns04:
-    @allure.title("campaigns-04: На ведении → Самостоятельно → проверка заголовка кампании")
+    @allure.title(
+        "campaigns-04: На ведении → Самостоятельно → проверка заголовка кампании"
+    )
     @allure.severity(allure.severity_level.CRITICAL)
     def test_campaigns_04_management_switch_and_title(
-        self, campaigns_page: CampaignsPage, page: Page,
+        self,
+        campaigns_page: CampaignsPage,
+        page: Page,
     ):
         assert LAST_CAMPAIGN_CONTEXT_PATH.exists(), (
             f"Файл с контекстом кампании не найден: {LAST_CAMPAIGN_CONTEXT_PATH}. "
@@ -45,12 +52,12 @@ class TestCampaigns04:
         # 3) Выбрать «На ведении»
         campaigns_page.select_management_filter("На ведении")
         expect(campaigns_page.filter_management).to_contain_text("На ведении")
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(2200)
 
         # 4) Выбрать «Самостоятельно»
         campaigns_page.select_management_filter("Самостоятельно")
         expect(campaigns_page.filter_management).to_contain_text("Самостоятельно")
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(2200)
 
         # 5) Проверить кампанию по заголовку (ищем по тексту, не только по role=link)
         campaign_element = page.locator(f"text='{expected_title}'").first

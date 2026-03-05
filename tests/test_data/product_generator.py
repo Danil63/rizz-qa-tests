@@ -1,4 +1,5 @@
 """Генератор реалистичных тестовых данных для продуктов."""
+
 import random
 import string
 from dataclasses import dataclass
@@ -7,6 +8,7 @@ from dataclasses import dataclass
 @dataclass
 class ProductData:
     """Сгенерированные данные продукта."""
+
     article: str
     name: str
     description: str
@@ -64,7 +66,13 @@ PRODUCT_TEMPLATES = [
     },
     {
         "category": "Красота и уход",
-        "brands": ["SHENY Professional", "Luna mea", "YourDoc", "Holly Polly", "White Wolsy"],
+        "brands": [
+            "SHENY Professional",
+            "Luna mea",
+            "YourDoc",
+            "Holly Polly",
+            "White Wolsy",
+        ],
         "marketplace": "Wildberries",
         "names": [
             "Шампунь восстанавливающий {brand} {volume} мл",

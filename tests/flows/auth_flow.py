@@ -1,4 +1,5 @@
 """PFA: Флоу авторизации."""
+
 import allure
 from playwright.sync_api import Page
 
@@ -28,7 +29,7 @@ class AuthFlow:
         self.login_with_phone(phone, password)
         self.sign_in.notification.check_visible_error(error_text)
 
-    @allure.step('Submit empty login form')
+    @allure.step("Submit empty login form")
     def login_empty_submit(self) -> None:
         """Сабмит пустой формы."""
         self.sign_in.visit()
@@ -43,7 +44,7 @@ class AuthFlow:
         self.sign_in.login_form.fill_phone(phone)
         self.sign_in.click_login_button()
 
-    @allure.step('Submit with password only')
+    @allure.step("Submit with password only")
     def login_password_only(self, password: str) -> None:
         """Сабмит только с паролем."""
         self.sign_in.visit()

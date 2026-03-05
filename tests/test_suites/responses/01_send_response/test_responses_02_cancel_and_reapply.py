@@ -1,4 +1,5 @@
 """responses-send-02: Отмена и повторная отправка отклика на бартер."""
+
 import json
 from pathlib import Path
 
@@ -8,7 +9,9 @@ from playwright.sync_api import Page
 
 from tests.pages.cancel_and_reapply_page import CancelAndReapplyPage
 
-LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[3] / "test_data" / "last_product_meta.json"
+LAST_PRODUCT_META_PATH = (
+    Path(__file__).resolve().parents[3] / "test_data" / "last_product_meta.json"
+)
 
 
 @pytest.mark.regression
@@ -18,8 +21,9 @@ LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[3] / "test_data" / "la
 @allure.story("Повторная отправка отклика на бартер")
 @allure.tag("Regression", "Responses", "Barter", "SendResponse")
 class TestResponsesSend02:
-
-    @allure.title("responses-send-02: creator market → cancel → reapply barter response")
+    @allure.title(
+        "responses-send-02: creator market → cancel → reapply barter response"
+    )
     @allure.severity(allure.severity_level.CRITICAL)
     def test_cancel_and_reapply_response_barter(self, blogger_page: Page):
         assert LAST_PRODUCT_META_PATH.exists(), (

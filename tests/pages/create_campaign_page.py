@@ -1,4 +1,5 @@
 """POM: Страница создания рекламной кампании."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -28,7 +29,9 @@ class CreateCampaignPage(BasePage):
         )
 
         # ── Поле: Предмет рекламы (combobox → dialog) ────────
-        self.select_product = page.get_by_role("combobox", name="Выберите предмет рекламы")
+        self.select_product = page.get_by_role(
+            "combobox", name="Выберите предмет рекламы"
+        )
         self.product_search_input = page.get_by_role("textbox", name="Поиск")
         self.product_suggestions = page.get_by_role("listbox", name="Suggestions")
 
@@ -92,12 +95,22 @@ class CreateCampaignPage(BasePage):
         )
 
         # Switch: Автоодобрение откликов
-        self.switch_auto_approve = page.get_by_role("switch", name="Автоодобрение откликов")
+        self.switch_auto_approve = page.get_by_role(
+            "switch", name="Автоодобрение откликов"
+        )
 
         # Минимальный охват блогера
         self.input_min_coverage = page.get_by_role(
             "textbox", name="Минимальный охват блогера"
         )
+
+        # Поля За просмотры
+        self.input_max_payout = page.get_by_role(
+            "textbox", name="Максимальная выплата блогеру"
+        )
+
+        # Таб "Услуги" в диалоге выбора предмета рекламы (доступен только при типе "За просмотры")
+        self.btn_services_tab = page.get_by_role("tab", name="Услуги")
 
         # Детализация стоимости
         self.btn_cost_details = page.get_by_role(
@@ -134,9 +147,7 @@ class CreateCampaignPage(BasePage):
         )
 
         # Тематика → "Нужно выбрать хотя бы одну тематику."
-        self.error_thematic = page.locator(
-            "text=Тематика >> .. >> p.text-red-700"
-        )
+        self.error_thematic = page.locator("text=Тематика >> .. >> p.text-red-700")
 
         # Задание → "Значение слишком маленькое. Минимум: 5"
         self.error_task = page.get_by_role("textbox", name="Задание").locator(
@@ -174,9 +185,11 @@ class CreateCampaignPage(BasePage):
         self.product_search_input.fill(search_text)
         self.page.wait_for_timeout(1500)
         # Ищем option, содержащий точное название продукта
-        target_option = self.product_suggestions.get_by_role("option").filter(
-            has_text=search_text
-        ).first
+        target_option = (
+            self.product_suggestions.get_by_role("option")
+            .filter(has_text=search_text)
+            .first
+        )
         target_option.click()
 
     @allure.step('Ввод ссылки с UTM: "{value}"')
@@ -212,7 +225,7 @@ class CreateCampaignPage(BasePage):
         self.page.get_by_role("option", name=option_name, exact=True).click()
         self.page.keyboard.press("Escape")
 
-    @allure.step('Ввод задания')
+    @allure.step("Ввод задания")
     def fill_task(self, value: str) -> None:
         """Заполнить поле Задание."""
         self.input_task.click()
@@ -236,6 +249,42 @@ class CreateCampaignPage(BasePage):
         """Включить switch Автоодобрение откликов."""
         if not self.switch_auto_approve.is_checked():
             self.switch_auto_approve.click()
+
+    @allure.step("Выбрать тип оплаты: За просмотры")
+    def select_per_views_tab(self) -> None:
+        """Кликнуть таб 'За просмотры' и проверить что он выбран."""
+        self.tab_per_views.click()
+        expect(self.tab_per_views).to_have_attribute("aria-selected", "true")
+
+    @allure.step('Выбор услуги по поиску: "{search_text}"')
+    def select_service_by_search(self, search_text: str) -> None:
+        """Открыть combobox предмета рекламы → переключиться на Услуги → найти и выбрать услугу."""
+        self.select_product.click()
+        self.page.wait_for_timeout(500)
+        self.btn_services_tab.click()
+        self.page.wait_for_timeout(300)
+        self.product_search_input.fill(search_text)
+        self.page.wait_for_timeout(1500)
+        target_option = (
+            self.product_suggestions.get_by_role("option")
+            .filter(has_text=search_text)
+            .first
+        )
+        target_option.click()
+
+    @allure.step('Ввод минимального охвата блогера: "{value}"')
+    def fill_min_coverage(self, value: str) -> None:
+        """Заполнить поле Минимальный охват блогера."""
+        self.input_min_coverage.click()
+        self.input_min_coverage.clear()
+        self.input_min_coverage.fill(value)
+
+    @allure.step('Ввод максимальной выплаты блогеру: "{value}"')
+    def fill_max_payout(self, value: str) -> None:
+        """Заполнить поле Максимальная выплата блогеру."""
+        self.input_max_payout.click()
+        self.input_max_payout.clear()
+        self.input_max_payout.fill(value)
 
     @allure.step('Нажатие кнопки "Создать кампанию"')
     def click_create_campaign(self) -> None:
@@ -287,6 +336,7 @@ class CreateCampaignPage(BasePage):
         expect(self.input_task).to_be_visible()
         expect(self.heading_payment).to_be_visible()
         expect(self.tab_barter).to_be_visible()
+        expect(self.tab_fixed).to_be_visible()
         expect(self.input_max_compensation).to_be_visible()
         expect(self.switch_auto_approve).to_be_visible()
         expect(self.btn_create_campaign).to_be_visible()
@@ -295,6 +345,9 @@ class CreateCampaignPage(BasePage):
     def check_barter_tab_selected(self) -> None:
         """Проверить что таб Бартер выбран по умолчанию."""
         expect(self.tab_barter).to_have_attribute("aria-selected", "true")
+
+    def check_fixded_tab_selected(self) -> None:
+        self.tab_fixed.click()
 
     @allure.step("Проверка: Автоодобрение включено по умолчанию")
     def check_auto_approve_checked(self) -> None:
@@ -324,15 +377,21 @@ class CreateCampaignPage(BasePage):
         """Проверить ошибку поля Предмет рекламы."""
         expect(self.error_product).to_contain_text("Обязательное поле")
 
-    @allure.step('Проверка: ошибка формата контента — "Необходимо выбрать социальную сеть"')
+    @allure.step(
+        'Проверка: ошибка формата контента — "Необходимо выбрать социальную сеть"'
+    )
     def check_error_content_format(self) -> None:
         """Проверить ошибку поля Формат контента."""
-        expect(self.error_content_format).to_contain_text("Необходимо выбрать социальную сеть")
+        expect(self.error_content_format).to_contain_text(
+            "Необходимо выбрать социальную сеть"
+        )
 
     @allure.step('Проверка: ошибка тематики — "Нужно выбрать хотя бы одну тематику."')
     def check_error_thematic(self) -> None:
         """Проверить ошибку поля Тематика."""
-        expect(self.error_thematic).to_contain_text("Нужно выбрать хотя бы одну тематику")
+        expect(self.error_thematic).to_contain_text(
+            "Нужно выбрать хотя бы одну тематику"
+        )
 
     @allure.step('Проверка: ошибка задания — "Значение слишком маленькое. Минимум: 5"')
     def check_error_task(self) -> None:

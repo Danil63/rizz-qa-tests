@@ -1,4 +1,5 @@
 """filters-03: Поиск товара с использованием всех dropdown."""
+
 import json
 from pathlib import Path
 
@@ -7,7 +8,9 @@ import pytest
 
 from tests.components.market_components.filter_component import FilterComponent
 
-LAST_CAMPAIGN_CONTEXT_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+LAST_CAMPAIGN_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+)
 
 
 @pytest.mark.regression

@@ -1,4 +1,5 @@
 """POM: Страница редактирования рекламной кампании."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -12,14 +13,20 @@ class EditCampaignPage(BasePage):
         super().__init__(page)
 
         # ── Заголовок ─────────────────────────────────────────
-        self.heading = page.get_by_role("heading", name="Редактировать рекламную кампанию")
+        self.heading = page.get_by_role(
+            "heading", name="Редактировать рекламную кампанию"
+        )
 
         # ── Поля формы ────────────────────────────────────────
         self.input_name = page.get_by_role("textbox", name="Название")
         self.input_task = page.get_by_role("textbox", name="Задание")
         self.input_link = page.get_by_role("textbox", name="Cсылка на товар")
-        self.input_integrations = page.get_by_role("textbox", name="Количество интеграций")
-        self.input_max_reward = page.get_by_role("textbox", name="Максимальное вознаграждение")
+        self.input_integrations = page.get_by_role(
+            "textbox", name="Количество интеграций"
+        )
+        self.input_max_reward = page.get_by_role(
+            "textbox", name="Максимальное вознаграждение"
+        )
 
         # ── Кнопка сохранения ─────────────────────────────────
         self.btn_save = page.get_by_role("button", name="Сохранить")
@@ -46,7 +53,7 @@ class EditCampaignPage(BasePage):
         self.input_task.clear()
         self.input_task.fill(value)
 
-    @allure.step('Увеличение вознаграждения на {delta} ₽')
+    @allure.step("Увеличение вознаграждения на {delta} ₽")
     def increase_reward(self, delta: int) -> None:
         """Прочитать текущее вознаграждение, увеличить на delta."""
         current = self.input_max_reward.input_value().strip().replace(" ", "")

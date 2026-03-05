@@ -1,4 +1,5 @@
 """auth-05: Отображение ошибки по невалидному телефону."""
+
 import allure
 import pytest
 

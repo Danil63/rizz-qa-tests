@@ -1,4 +1,5 @@
 """POM: Лендинг rizz.market."""
+
 import allure
 from playwright.sync_api import Page
 
@@ -19,7 +20,7 @@ class LandingPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step('Opening landing page rizz.market')
+    @allure.step("Opening landing page rizz.market")
     def open(self) -> None:
         """Открыть лендинг (тяжёлая страница)."""
         self.page.goto(self.URL, wait_until="commit", timeout=60000)

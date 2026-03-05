@@ -1,16 +1,19 @@
 """products-03: Успешное создание продукта с рандомными данными."""
+
 import json
 from pathlib import Path
 
 import allure
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from tests.pages.create_product_page import CreateProductPage
 from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
 
-LAST_PRODUCT_META_PATH = Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
+LAST_PRODUCT_META_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "last_product_meta.json"
+)
 
 
 @pytest.mark.regression
@@ -74,7 +77,7 @@ class TestProducts03:
         create_product_page.click_submit()
 
         # Важно для prod: дать бэкенду зафиксировать создание сущности
-        create_product_page.page.wait_for_timeout(2000)
+        create_product_page.page.wait_for_timeout(3000)
 
         # Сохраняем данные созданного продукта для использования в campaign/filters tests
         LAST_PRODUCT_META_PATH.parent.mkdir(parents=True, exist_ok=True)

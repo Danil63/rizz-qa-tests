@@ -1,4 +1,5 @@
 """POM: Страница списка продуктов рекламодателя."""
+
 import allure
 from playwright.sync_api import Page, expect
 
@@ -32,7 +33,9 @@ class ProductsPage(BasePage):
         # ── Заголовок и описание ──────────────────────────────
         self.heading = page.get_by_role("heading", name="Список продуктов")
         self.archive_heading = page.get_by_role("heading", name="Aрхив продуктов")
-        self.description = page.get_by_text("Список добавленных вручную продуктов и по API.")
+        self.description = page.get_by_text(
+            "Список добавленных вручную продуктов и по API."
+        )
         self.how_it_works_button = page.get_by_role("button", name="Как это работает?")
 
         # ── Кнопки действий ───────────────────────────────────
@@ -46,7 +49,9 @@ class ProductsPage(BasePage):
 
         # ── Список продуктов/услуг ───────────────────────────
         self.product_items = page.get_by_role("listitem")
-        self.service_cards = page.locator("li:has(a[href*='/app/advertiser/products/']):has(button)")
+        self.service_cards = page.locator(
+            "li:has(a[href*='/app/advertiser/products/']):has(button)"
+        )
         self.product_titles = page.locator("li a img[alt]")
         self.first_product = page.get_by_role("listitem").first
         self.first_product_link = self.first_product.get_by_role("link")
@@ -139,7 +144,9 @@ class ProductsPage(BasePage):
 
         # Подтверждение в модалке: сначала пробуем внутри dialog,
         # затем fallback глобально (последняя кнопка).
-        dialog_confirm = self.page.get_by_role("dialog").get_by_role("button", name="Разархивировать")
+        dialog_confirm = self.page.get_by_role("dialog").get_by_role(
+            "button", name="Разархивировать"
+        )
         if dialog_confirm.count() > 0:
             expect(dialog_confirm.first).to_be_visible(timeout=10000)
             dialog_confirm.first.click()

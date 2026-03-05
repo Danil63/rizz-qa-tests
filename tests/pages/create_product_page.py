@@ -1,4 +1,5 @@
 """POM: Страница создания продукта рекламодателя."""
+
 import allure
 from pathlib import Path
 from playwright.sync_api import Page, expect
@@ -27,12 +28,15 @@ class CreateProductPage(BasePage):
         self.description = page.get_by_text("Заполните поля формы и нажмите «Создать».")
 
         # ── Загрузка изображения ──────────────────────────────
-        self.upload_area = page.get_by_text("Перетащите изображение для загрузки или нажмите")
-        self.upload_button = page.get_by_role(
-            "button",
-            name="Перетащите изображение для загрузки"
+        self.upload_area = page.get_by_text(
+            "Перетащите изображение для загрузки или нажмите"
         )
-        self.file_input = page.locator("input[type='file'][accept='image/jpeg,image/png']")
+        self.upload_button = page.get_by_role(
+            "button", name="Перетащите изображение для загрузки"
+        )
+        self.file_input = page.locator(
+            "input[type='file'][accept='image/jpeg,image/png']"
+        )
 
         # ── Тип задания (табы) ────────────────────────────────
         self.tab_product = page.get_by_role("tab", name="Товар")
@@ -62,9 +66,7 @@ class CreateProductPage(BasePage):
 
         # ── Ошибки валидации (p.text-red-700) ─────────────────
         self.all_errors = page.locator("p.text-red-700")
-        self.error_image = page.locator(
-            "button:has(img) + p.text-red-700"
-        )
+        self.error_image = page.locator("button:has(img) + p.text-red-700")
         self.error_article = page.get_by_role("textbox", name="Артикул").locator(
             ".. >> p.text-red-700"
         )
@@ -74,9 +76,7 @@ class CreateProductPage(BasePage):
         self.error_description = page.get_by_role("textbox", name="Описание").locator(
             ".. >> p.text-red-700"
         )
-        self.error_category = page.locator(
-            "text=Категория >> .. >> p.text-red-700"
-        )
+        self.error_category = page.locator("text=Категория >> .. >> p.text-red-700")
         self.error_brand = page.get_by_role("textbox", name="Бренд").locator(
             ".. >> p.text-red-700"
         )
@@ -86,9 +86,9 @@ class CreateProductPage(BasePage):
         self.error_price = page.get_by_role("textbox", name="Цена").locator(
             ".. >> p.text-red-700"
         )
-        self.error_product_link = page.get_by_role("textbox", name="Ссылка на товар").locator(
-            ".. >> p.text-red-700"
-        )
+        self.error_product_link = page.get_by_role(
+            "textbox", name="Ссылка на товар"
+        ).locator(".. >> p.text-red-700")
 
         # ── Cookie-диалог ─────────────────────────────────────
         self.cookie_accept = page.get_by_role("button", name="Принять cookie")
@@ -253,7 +253,9 @@ class CreateProductPage(BasePage):
         assert count >= 9, f"Ожидалось ≥9 ошибок валидации, получено {count}"
 
     @allure.step('Проверка: ошибка артикула — "{expected_text}"')
-    def check_error_article(self, expected_text: str = "Значение слишком маленькое") -> None:
+    def check_error_article(
+        self, expected_text: str = "Значение слишком маленькое"
+    ) -> None:
         """Проверить ошибку поля Артикул."""
         expect(self.error_article).to_contain_text(expected_text)
 

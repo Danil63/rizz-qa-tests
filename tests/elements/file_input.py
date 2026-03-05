@@ -1,11 +1,11 @@
 """PageFactory: Элемент загрузки файла."""
+
 import allure
 
 from tests.elements.base_element import BaseElement
 
 
 class FileInput(BaseElement):
-
     @property
     def type_of(self) -> str:
         return "file input"
