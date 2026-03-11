@@ -80,7 +80,7 @@ class TestProducts02:
         create_page.wait_for_load("networkidle")
         create_page.click_submit()
 
-        self.wait(2000)
+        create_page.page.wait_for_timeout(2000)
 
         # 7) Пользователь на экране списка продуктов
         result_products_page = ProductsPage(create_page.page)

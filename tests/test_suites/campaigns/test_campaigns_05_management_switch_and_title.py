@@ -18,7 +18,7 @@ from playwright.sync_api import Page, expect
 from tests.pages.campaigns_page import CampaignsPage
 
 LAST_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+    Path(__file__).resolve().parents[2] / "test_data" / "barter_campaign_context.json"
 )
 
 
@@ -44,7 +44,7 @@ class TestCampaigns04:
         )
         ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
         expected_title = (ctx.get("campaign_title") or "").strip()
-        assert expected_title, "Поле campaign_title в last_campaign_context.json пустое"
+        assert expected_title, "Поле campaign_title в barter_campaign_context.json пустое"
 
         # 1-2) Страница открыта, таб «Активные» выбран
         campaigns_page.check_active_tab_selected()

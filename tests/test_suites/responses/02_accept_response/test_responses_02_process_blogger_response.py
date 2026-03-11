@@ -10,8 +10,8 @@ from playwright.sync_api import Page
 from tests.pages.campaign_details_page import CampaignDetailsPage
 
 BLOGGER_USERNAME = "danil23319"
-LAST_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[3] / "test_data" / "barter_campaign_context.json"
+FIX_CAMPAING_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[3] / "test_data" / "fix_campaing_context.json"
 )
 
 
@@ -27,14 +27,14 @@ class TestResponsesAccept01:
     )
     @allure.severity(allure.severity_level.CRITICAL)
     def test_process_blogger_response(self, advertiser_page: Page):
-        assert LAST_CAMPAIGN_CONTEXT_PATH.exists(), (
-            f"Файл {LAST_CAMPAIGN_CONTEXT_PATH} не найден. "
+        assert FIX_CAMPAING_CONTEXT_PATH.exists(), (
+            f"Файл {FIX_CAMPAING_CONTEXT_PATH} не найден. "
             "Сначала запусти тест создания кампании."
         )
 
-        ctx = json.loads(LAST_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
+        ctx = json.loads(FIX_CAMPAING_CONTEXT_PATH.read_text(encoding="utf-8"))
         campaign_title = (ctx.get("campaign_title") or "").strip()
-        assert campaign_title, "Поле campaign_title в barter_campaign_context.json пустое"
+        assert campaign_title, "Поле campaign_title в fix_campaing_context.json пустое"
 
         page = CampaignDetailsPage(advertiser_page)
         page.open()

@@ -24,14 +24,11 @@ from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
-LAST_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+FIX_CAMPAIGN_CONTEXT_PATH = (
+    Path(__file__).resolve().parents[2] / "test_data" / "fix_campaing_context.json"
 )
 LAST_PRODUCT_TWO_META_PATH = (
     Path(__file__).resolve().parents[2] / "test_data" / "last_product_two_meta.json"
-)
-INTEGRATIONS_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "integrations.json"
 )
 
 
@@ -46,15 +43,15 @@ class TestCampaigns02:
 
     @staticmethod
     def _save_campaign_id(campaign_id: str) -> None:
-        """Сохранить campaign_id в integrations.json."""
+        """Добавить campaign_id в fix_campaing_context.json."""
         data: dict = {}
-        if INTEGRATIONS_PATH.exists():
+        if FIX_CAMPAIGN_CONTEXT_PATH.exists():
             try:
-                data = json.loads(INTEGRATIONS_PATH.read_text(encoding="utf-8"))
+                data = json.loads(FIX_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, ValueError):
                 data = {}
         data["campaign_id"] = campaign_id
-        INTEGRATIONS_PATH.write_text(
+        FIX_CAMPAIGN_CONTEXT_PATH.write_text(
             json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
@@ -97,19 +94,29 @@ class TestCampaigns02:
         data = generate_campaign_data(product_name=product_name, product_price=75)
 
         # Сохраняем контекст кампании в JSON для последующих проверок
-        LAST_CAMPAIGN_CONTEXT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        FIX_CAMPAIGN_CONTEXT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
         marketplace = product_meta.get("marketplace") or "Ozon"
         category = product_meta.get("category") or "Спорт и отдых"
 
-        LAST_CAMPAIGN_CONTEXT_PATH.write_text(
+        existing: dict = {}
+        if FIX_CAMPAIGN_CONTEXT_PATH.exists():
+            try:
+                existing = json.loads(FIX_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, ValueError):
+                existing = {}
+        price_list = existing.get("price", [])
+        price_list.append(data.max_compensation)
+        FIX_CAMPAIGN_CONTEXT_PATH.write_text(
             json.dumps(
                 {
+                    **existing,
                     "campaign_title": data.name,
                     "marketplace": marketplace,
                     "category": category,
-                    "reward": "Бартер",
+                    "reward": "Фиксированная",
                     "social_network": "Ig",
+                    "price": price_list,
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -160,8 +167,8 @@ class TestCampaigns02:
         # 10) Тип оплаты — Фиксированная 
         create_page.check_fixded_tab_selected()
 
-        # 11) Максимальная компенсация
-        create_page.fill_max_compensation(data.max_compensation)
+        # 11) Вознаграждение
+        create_page.input_reward(data.max_compensation)
 
         # 12) Автоодобрение — выключить
         create_page.toggle_auto_approve_off()
@@ -181,11 +188,20 @@ class TestCampaigns02:
         # Ожидание 3 секунды
         time.sleep(5)
 
-        # Сохранить campaign_id в integrations.json
-        href = campaigns_page.first_campaign_link.get_attribute("href") or ""
-        match = re.search(
-            r"/campaigns/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
-            href,
+        # Сохранить campaign_id в fix_campaing_context.json
+        uuid_pattern = re.compile(
+            r"/campaigns/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"
         )
-        if match:
-            self._save_campaign_id(match.group(1))
+        campaign_id_found = None
+        deadline = time.time() + 20
+        while time.time() < deadline and campaign_id_found is None:
+            for link in page.locator('a[href*="/campaigns/"]').all():
+                href = link.get_attribute("href") or ""
+                m = uuid_pattern.search(href)
+                if m:
+                    campaign_id_found = m.group(1)
+                    break
+            if campaign_id_found is None:
+                time.sleep(0.5)
+        if campaign_id_found:
+            self._save_campaign_id(campaign_id_found)

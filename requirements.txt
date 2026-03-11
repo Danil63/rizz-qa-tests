@@ -1,6 +1,0 @@
-pytest
-pytest-playwright
-playwright
-allure-pytest
-faker
-pytest-rerunfailures

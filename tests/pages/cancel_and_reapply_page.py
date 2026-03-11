@@ -130,3 +130,130 @@ class CancelAndReapplyPage(BasePage):
     def wait_and_check_sent_badge(self) -> None:
         self.page.wait_for_timeout(5000)
         expect(self.sent_barter_badge).to_be_visible(timeout=10000)
+
+    # ── Методы для фиксированной выплаты ─────────────────────────────
+
+    @allure.step('Подождать 5 секунд и нажать кнопку с суммой "{price} ₽" на карточке')
+    def wait_and_click_fix_price_button(self, price: str) -> None:
+        """Нажать кнопку с суммой вознаграждения на карточке кампании (вместо 'Бартер')."""
+        self.page.wait_for_timeout(5000)
+        btn = self.page.get_by_role("button", name=f"{price} ₽").first
+        btn.scroll_into_view_if_needed()
+        expect(btn).to_be_visible(timeout=10000)
+        expect(btn).to_be_enabled(timeout=10000)
+        btn.click()
+
+    @allure.step('Нажать кнопку "Выполнить за {price} ₽"')
+    def click_execute_fix(self, price: str) -> None:
+        """Нажать кнопку 'Выполнить за {price} ₽' и дождаться открытия модалки."""
+        self.page.wait_for_timeout(5000)
+        btn = self.page.get_by_role("button", name=f"Выполнить за {price}")
+        expect(btn).to_be_visible(timeout=10000)
+        expect(btn).to_be_enabled(timeout=10000)
+        btn.click()
+        self.page.wait_for_timeout(2000)
+
+    @allure.step('Открыть dropdown "Социальная сеть" (зафиксировать DOM до и после)')
+    def open_social_dropdown_with_dom_check(self) -> None:
+        """Открыть combobox 'Социальная сеть', прикрепить DOM до и после к Allure."""
+        combobox = self.page.get_by_role("combobox")
+        expect(combobox).to_be_visible(timeout=10000)
+
+        dom_before = combobox.evaluate("el => el.outerHTML")
+        allure.attach(
+            dom_before,
+            name="DOM combobox BEFORE click (data-state=closed)",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+        assert 'data-state="closed"' in dom_before, (
+            "Ожидался закрытый combobox (data-state=closed) до клика"
+        )
+
+        combobox.click()
+        self.page.wait_for_timeout(1500)
+
+        listbox = self.page.get_by_role("listbox")
+        expect(listbox).to_be_visible(timeout=5000)
+        dom_after = listbox.evaluate("el => el.outerHTML")
+        allure.attach(
+            dom_after,
+            name="DOM listbox AFTER click (options visible)",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+
+    @allure.step('Выбрать соцсеть "crazy.6.3" и зафиксировать DOM после выбора')
+    def select_crazy_account(self) -> None:
+        """Выбрать option 'crazy.6.3' из listbox и проверить выбор через DOM."""
+        option = self.page.get_by_role("option", name="crazy.6.3")
+        expect(option).to_be_visible(timeout=5000)
+        option.click()
+        self.page.wait_for_timeout(1500)
+
+        combobox = self.page.get_by_role("combobox")
+        dom_after_select = combobox.evaluate("el => el.outerHTML")
+        allure.attach(
+            dom_after_select,
+            name="DOM combobox AFTER selecting crazy.6.3",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+        assert "crazy.6.3" in dom_after_select, (
+            "Ожидалось, что combobox покажет 'crazy.6.3' после выбора"
+        )
+
+    @allure.step('Нажать "Начать сразу за ..." и проверить закрытие модалки через 3 сек')
+    def click_respond_cpm_and_check_modal_closed(self) -> None:
+        """Нажать 'Начать сразу за ...' (CPM: цена в кнопке рассчитывается динамически)
+        и убедиться, что модалка закрылась."""
+        import re
+        btn = self.page.get_by_role("button", name=re.compile(r"Начать сразу за"))
+        expect(btn).to_be_visible(timeout=10000)
+        expect(btn).to_be_enabled(timeout=10000)
+
+        dom_btn = btn.evaluate("el => el.outerHTML")
+        allure.attach(
+            dom_btn,
+            name="DOM кнопки 'Начать сразу за' BEFORE click",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+
+        btn.click()
+        self.page.wait_for_timeout(3000)
+
+        dialogs = self.page.locator("[role=dialog]").all()
+        for dialog in dialogs:
+            assert not dialog.is_visible(), (
+                "Модальное окно не закрылось спустя 3 секунды после нажатия 'Начать сразу за'"
+            )
+        allure.attach(
+            f"Dialogs visible after 3s: {len([d for d in dialogs if d.is_visible()])}",
+            name="Состояние диалогов через 3 сек",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+
+    @allure.step('Нажать "Откликнуться за {price} ₽" и проверить закрытие модалки через 3 сек')
+    def click_respond_fix_and_check_modal_closed(self, price: str) -> None:
+        """Нажать 'Откликнуться за {price} ₽' и убедиться, что модалка закрылась."""
+        btn = self.page.get_by_role("button", name=f"Откликнуться за {price}")
+        expect(btn).to_be_visible(timeout=10000)
+        expect(btn).to_be_enabled(timeout=10000)
+
+        dom_btn = btn.evaluate("el => el.outerHTML")
+        allure.attach(
+            dom_btn,
+            name="DOM кнопки 'Откликнуться за' BEFORE click",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+
+        btn.click()
+        self.page.wait_for_timeout(3000)
+
+        dialogs = self.page.locator("[role=dialog]").all()
+        for dialog in dialogs:
+            assert not dialog.is_visible(), (
+                "Модальное окно не закрылось спустя 3 секунды после нажатия 'Откликнуться'"
+            )
+        allure.attach(
+            f"Dialogs visible after 3s: {len([d for d in dialogs if d.is_visible()])}",
+            name="Состояние диалогов через 3 сек",
+            attachment_type=allure.attachment_type.TEXT,
+        )

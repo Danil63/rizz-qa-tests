@@ -9,7 +9,7 @@ import pytest
 from tests.components.market_components.filter_component import FilterComponent
 
 LAST_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "last_campaign_context.json"
+    Path(__file__).resolve().parents[2] / "test_data" / "barter_campaign_context.json"
 )
 
 

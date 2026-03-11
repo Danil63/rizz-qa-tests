@@ -170,8 +170,8 @@ def generate_campaign_data(
         review_text=review_text,
     )
 
-    # Максимальная компенсация: цена + 20% + рандом до 200
-    compensation = int(product_price * 1.2) + random.randint(10, 200)
+    # Максимальная компенсация: цена + 20% + рандом до 200, минимум 201
+    compensation = max(int(product_price * 1.2) + random.randint(10, 200), 201)
     max_compensation = str(compensation)
 
     return CampaignData(

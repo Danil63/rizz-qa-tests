@@ -90,6 +90,10 @@ class CreateCampaignPage(BasePage):
         self.input_max_compensation = page.get_by_role(
             "textbox", name="Максимальная компенсация за товар"
         )
+
+        self.reward_input = page.get_by_role(
+            "textbox", name="Вознаграждение"
+        )
         self.input_integrations_count = page.get_by_role(
             "textbox", name="Кол-во интеграций"
         )
@@ -237,6 +241,19 @@ class CreateCampaignPage(BasePage):
         self.input_max_compensation.click()
         self.input_max_compensation.clear()
         self.input_max_compensation.fill(value)
+
+    @allure.step('Ввод вознаграждения (Фиксированная): "{value}"')
+    def input_reward(self, value: str) -> None:
+        """Заполнить поле Вознаграждение (таб Фиксированная)."""
+        self.reward_input.click()
+        self.reward_input.clear()
+        self.reward_input.fill(value)
+
+    def fill_reward(self, value: str) -> None:
+        """Заполнить поле Вознаграждение (таб Фиксированная)."""
+        self.reward_input.click()
+        self.reward_input.clear()
+        self.reward_input.fill(value)
 
     @allure.step("Переключить Автоодобрение откликов (выключить)")
     def toggle_auto_approve_off(self) -> None:
