@@ -3,9 +3,9 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
+
 from tests.pages.integration_page import IntegrationPage
 
 EXPECTED_MESSAGE = "Приступаю к выполнению работы"
@@ -17,23 +17,14 @@ INTEGRATIONS_PATH = (
 
 @pytest.mark.regression
 @pytest.mark.integrations
-@allure.epic("Интеграции рекламодателя")
-@allure.feature("Принятие шагов интеграции")
-@allure.story("Принять 4 шага, проверить чат, отправить сообщение")
-@allure.tag("Regression", "Integrations", "AcceptSteps")
 class TestIntegration02AcceptSteps:
-    @allure.title(
-        "integration-02: интеграция рекламодателя → принять 4 шага → чат → сообщение"
-    )
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_accept_steps_and_chat(self, advertiser_page: Page):
         page = IntegrationPage(advertiser_page)
 
         # Открыть сохранённую страницу интеграции рекламодателя напрямую
         advertiser_url = self._get_advertiser_url()
-        with allure.step(f"Открыть страницу интеграции: {advertiser_url}"):
-            advertiser_page.goto(advertiser_url, wait_until="networkidle")
-            advertiser_page.wait_for_timeout(2_000)
+        advertiser_page.goto(advertiser_url, wait_until="networkidle")
+        advertiser_page.wait_for_timeout(2_000)
 
         # Шаг 1: принять все 4 шага (retry если кнопка не исчезла)
         page.accept_all_steps(max_retries=5)

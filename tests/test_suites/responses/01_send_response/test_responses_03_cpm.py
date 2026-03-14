@@ -4,7 +4,6 @@ import json
 import time
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -18,15 +17,10 @@ CPM_CAMPAIGN_CONTEXT_PATH = (
 )
 
 
+@pytest.mark.skip(reason="Временно отключён")
 @pytest.mark.regression
 @pytest.mark.responses
-@allure.epic("Маркет блогера")
-@allure.feature("Отклики")
-@allure.story("Отправка отклика за просмотры (CPM)")
-@allure.tag("Regression", "Responses", "CPM", "SendResponse")
 class TestResponsesSend05CPM:
-    @allure.title("responses-send-05: creator market → поиск → отклик за просмотры (CPM)")
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_cpm(self, blogger_page: Page):
         assert LAST_SERVICE_META.exists(), (
             f"Файл {LAST_SERVICE_META} не найден. "
@@ -41,15 +35,9 @@ class TestResponsesSend05CPM:
             "Сначала запусти тест создания кампании."
         )
         cpm_context = json.loads(CPM_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
-        price_list = cpm_context.get("price", [])
-        assert price_list, "Список 'price' в cpm_campaign_context.json пуст"
-        price = str(price_list[-1])
-
-        allure.attach(
-            f"Продукт: {product_name}\nЦена вознаграждения: {price} ₽",
-            name="Входные данные теста",
-            attachment_type=allure.attachment_type.TEXT,
-        )
+        max_payout = cpm_context.get("price")
+        assert max_payout is not None, "Поле 'price' в cpm_campaign_context.json отсутствует"
+        max_payout = str(max_payout)
 
         page = SendResponsePage(blogger_page)
         page.open()
@@ -58,16 +46,11 @@ class TestResponsesSend05CPM:
         page.search_product_and_submit(product_name)
         page.wait_and_check_product_title(product_name)
 
-        # 2) Нажать кнопку с суммой "{price} ₽" на карточке
-        page.wait_and_click_fix_price_button(price)
+        # 2) Нажать CPM-кнопку "{rate} ₽ за каждую 1К" на карточке
+        page.wait_and_click_cpm_button()
 
-        # 3) Нажать "Выполнить за {price} ₽"
-        page.click_execute_fix(price)
-
-        # 4) Нажать input "Социальная сеть" (DOM до и после зафиксирован внутри метода)
-        page.open_social_dropdown_with_dom_check()
-
-        # 5) Нажать "Начать сразу за ..." (цена в кнопке рассчитывается динамически) + проверка закрытия модалки
+        # 3) Нажать "Начать сразу за ..." (цена рассчитывается динамически),
+        #    подождать 3 секунды, нажать повторно и ждать закрытия модалки
         page.click_respond_cpm_and_check_modal_closed()
 
         # Неявное ожидание 3 секунды

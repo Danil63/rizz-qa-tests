@@ -4,7 +4,6 @@ import json
 import time
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -20,13 +19,7 @@ FIX_CAMPAIGN_CONTEXT_PATH = (
 
 @pytest.mark.regression
 @pytest.mark.responses
-@allure.epic("Маркет блогера")
-@allure.feature("Отклики")
-@allure.story("Отправка отклика на фиксированную выплату")
-@allure.tag("Regression", "Responses", "Fix", "SendResponse")
 class TestResponsesSend01:
-    @allure.title("responses-send-01: creator market → поиск → отклик на бартер")
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_barter(self, blogger_page: Page):
         assert LAST_PRODUCT_TWO_META.exists(), (
             f"Файл {LAST_PRODUCT_TWO_META} не найден. "
@@ -41,15 +34,9 @@ class TestResponsesSend01:
             "Сначала запусти тест создания кампании."
         )
         fix_context = json.loads(FIX_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
-        price_list = fix_context.get("price", [])
-        assert price_list, "Список 'price' в fix_campaing_context.json пуст"
-        price = str(price_list[-1])
-
-        allure.attach(
-            f"Продукт: {product_name}\nЦена вознаграждения: {price} ₽",
-            name="Входные данные теста",
-            attachment_type=allure.attachment_type.TEXT,
-        )
+        price_raw = fix_context.get("price")
+        assert price_raw is not None, "Поле 'price' в fix_campaing_context.json отсутствует"
+        price = str(price_raw)
 
         page = SendResponsePage(blogger_page)
         page.open()

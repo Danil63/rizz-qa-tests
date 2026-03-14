@@ -1,10 +1,8 @@
 {
-  "campaign_title": "Тестовая кампания — Универсальный и радикальный фреймворк",
+  "campaign_title": "Тестовая кампания — Клиент-ориентированный и модульный интерфейс",
   "category": "Бытовая химия",
   "reward": "За просмотры",
-  "social_network": "Ig",
-  "campaign_id": "04eeb260-2543-457c-ba8d-ba6f2a9dc1ba",
-  "price": [
-    "201"
-  ]
+  "social_network": "TikTok",
+  "campaign_id": "696ccf71-d371-4ec6-bc92-93b9021c1919",
+  "price": 216
 }

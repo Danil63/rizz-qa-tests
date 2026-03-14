@@ -2,6 +2,7 @@
 
 import random
 from dataclasses import dataclass
+
 from faker import Faker
 
 fake = Faker("ru_RU")
@@ -160,7 +161,7 @@ def generate_campaign_data(
     # Задание — по шаблону
     keyword = random.choice(KEYWORDS)
     price_from = random.randint(200, 500)
-    price_to = price_from + random.randint(100, 400)
+    price_to = price_from + random.randint(200, 400)
     review_text = random.choice(REVIEW_TEMPLATES)
     task_template = random.choice(TASK_TEMPLATES)
     task = task_template.format(

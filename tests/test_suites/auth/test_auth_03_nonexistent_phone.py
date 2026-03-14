@@ -1,6 +1,5 @@
 """auth-03: Отображение ошибки при авторизации по несуществующему номеру телефона."""
 
-import allure
 import pytest
 
 from tests.pages.sign_in_page import SignInPage
@@ -8,10 +7,6 @@ from tests.pages.sign_in_page import SignInPage
 
 @pytest.mark.regression
 @pytest.mark.authorization
-@allure.epic("Авторизация")
-@allure.feature("Вход по телефону")
-@allure.story("Невалидные данные")
-@allure.tag("Regression", "Authorization")
 class TestAuth03:
     """auth-03: Отображение ошибки при авторизации по несуществующему номеру телефона.
 
@@ -20,17 +15,6 @@ class TestAuth03:
         Пароль: Gub89087814701
     """
 
-    @allure.title("auth-03: Ошибка при авторизации по несуществующему номеру телефона")
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Ввести телефон в поле 'Телефон' данные '+7 908 777 0000'\n"
-        "2) Ввести пароль в поле 'Пароль' данные 'паролькин9876'\n"
-        "3) Нажать на кнопку 'Войти'\n\n"
-        "Ожидаемый результат:\n"
-        "1) Отображается ошибка 'Пользователь не найден'\n"
-        "2) Пользователь не авторизован"
-    )
     def test_auth_03_nonexistent_phone(self, sign_in_page: SignInPage):
         # Предусловие: открыть страницу авторизации и форму
         sign_in_page.visit()

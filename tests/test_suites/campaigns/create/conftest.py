@@ -5,17 +5,16 @@ Cookie загружаются из tests/stage/advertiser_state.json.
 """
 
 import json
-import allure
-import pytest
 from pathlib import Path
+
+import pytest
 from playwright.sync_api import Page
 
 from tests.pages.campaigns_page import CampaignsPage
 from tests.pages.create_campaign_page import CreateCampaignPage
 
-
 STORAGE_STATE_PATH = (
-    Path(__file__).parent.parent.parent / "stage" / "advertiser_state.json"
+    Path(__file__).parent.parent.parent.parent / "stage" / "advertiser_state.json"
 )
 
 
@@ -54,7 +53,6 @@ def _load_auth(page: Page):
 
 
 @pytest.fixture()
-@allure.title("Открытие страницы создания кампании (через сохранённые cookie)")
 def create_campaign_page(_load_auth, page: Page) -> CreateCampaignPage:
     """Открыть страницу создания кампании напрямую."""
     cp = CreateCampaignPage(page)
@@ -65,7 +63,6 @@ def create_campaign_page(_load_auth, page: Page) -> CreateCampaignPage:
 
 
 @pytest.fixture()
-@allure.title("Открытие страницы списка кампаний (через сохранённые cookie)")
 def campaigns_page(_load_auth, page: Page) -> CampaignsPage:
     """Открыть страницу списка кампаний напрямую."""
     cp = CampaignsPage(page)

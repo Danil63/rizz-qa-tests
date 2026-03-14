@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -17,15 +16,7 @@ LAST_CAMPAIGN_CONTEXT_PATH = (
 
 @pytest.mark.regression
 @pytest.mark.responses
-@allure.epic("Отклики рекламодателя")
-@allure.feature("Обработка откликов")
-@allure.story("Принятие отклика блогера в деталях кампании")
-@allure.tag("Regression", "Responses", "AcceptResponse")
 class TestResponsesAccept01:
-    @allure.title(
-        "responses-accept-01: campaigns → детали кампании → принять отклик danil23319"
-    )
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_process_blogger_response(self, advertiser_page: Page):
         assert LAST_CAMPAIGN_CONTEXT_PATH.exists(), (
             f"Файл {LAST_CAMPAIGN_CONTEXT_PATH} не найден. "

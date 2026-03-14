@@ -8,14 +8,14 @@ dependencies = [
     "pytest",
     "pytest-playwright",
     "playwright",
-    "allure-pytest",
     "faker",
     "pytest-rerunfailures",
     "more-itertools>=10.8.0",
 ]
 
+
 [tool.pytest.ini_options]
-addopts = "-s -v --tb=short --alluredir=allure-results --headed --reruns=2 --reruns-delay=1 --only-rerun=TimeoutError --only-rerun=Error"
+addopts = "-s -v --tb=short --headed --reruns=2 --reruns-delay=1 --only-rerun=TimeoutError --only-rerun=Error"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -30,4 +30,9 @@ markers = [
     "campaigns: Тесты кампаний рекламодателя.",
     "responses: Тесты откликов блогера.",
     "integrations: Тесты выполнения интеграций блогера.",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.5",
 ]

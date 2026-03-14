@@ -3,13 +3,11 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
 from tests.flows.auth_flow import AuthFlow
 from tests.pages.campaigns_page import CampaignsPage
-
 
 ADVERTISER_PHONE = "79087814701"
 ADVERTISER_PASSWORD = "89087814701"
@@ -17,7 +15,6 @@ STORAGE_STATE_PATH = Path(__file__).parent.parent / "stage" / "advertiser_state.
 
 
 @pytest.fixture()
-@allure.title("Авторизация как рекламодатель")
 def advertiser_page(page: Page) -> Page:
     """Авторизоваться как рекламодатель и вернуть page.
 
@@ -30,7 +27,10 @@ def advertiser_page(page: Page) -> Page:
         cookies = state.get("cookies", [])
         if cookies:
             page.context.add_cookies(cookies)
-            page.goto(CampaignsPage.URL, wait_until="networkidle")
+            try:
+                page.goto(CampaignsPage.URL, wait_until="networkidle")
+            except Exception:
+                pass
             if CampaignsPage.URL.split("/app/")[1] in page.url:
                 CampaignsPage(page).expect_loaded()
                 session_restored = True

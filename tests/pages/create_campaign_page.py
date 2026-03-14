@@ -1,6 +1,5 @@
 """POM: Страница создания рекламной кампании."""
 
-import allure
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
@@ -109,6 +108,7 @@ class CreateCampaignPage(BasePage):
         )
 
         # Поля За просмотры
+        self.input_cpm_price = page.get_by_label("Цена за 1000 просмотров")
         self.input_max_payout = page.get_by_role(
             "textbox", name="Максимальная выплата блогеру"
         )
@@ -160,13 +160,11 @@ class CreateCampaignPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step("Принять cookie")
     def accept_cookies(self) -> None:
         """Принять cookie, если диалог отображается."""
         if self.cookie_accept.is_visible(timeout=3000):
             self.cookie_accept.click()
 
-    @allure.step("Закрыть уведомление Telegram")
     def close_telegram_notification(self) -> None:
         """Закрыть баннер Telegram-уведомлений, если виден."""
         close_btn = self.page.locator(
@@ -175,13 +173,11 @@ class CreateCampaignPage(BasePage):
         if self.telegram_notification.is_visible(timeout=2000):
             close_btn.click()
 
-    @allure.step('Ввод названия кампании: "{value}"')
     def fill_name(self, value: str) -> None:
         """Заполнить поле Название."""
         self.input_name.click()
         self.input_name.fill(value)
 
-    @allure.step('Выбор предмета рекламы по поиску: "{search_text}"')
     def select_product_by_search(self, search_text: str) -> None:
         """Открыть combobox, ввести поиск, выбрать option с точным названием."""
         self.select_product.click()
@@ -196,19 +192,16 @@ class CreateCampaignPage(BasePage):
         )
         target_option.click()
 
-    @allure.step('Ввод ссылки с UTM: "{value}"')
     def fill_utm_link(self, value: str) -> None:
         """Заполнить поле Ссылка с UTM."""
         self.input_utm_link.click()
         self.input_utm_link.fill(value)
 
-    @allure.step("Открыть диалог формата контента")
     def open_content_format_dialog(self) -> None:
         """Нажать кнопку Добавить для формата контента."""
         self._btn_format_add.click()
         self.page.wait_for_timeout(300)
 
-    @allure.step("Выбрать все 3 формата Ig (История, Пост, Reels)")
     def select_ig_all_formats(self) -> None:
         """Отметить все 3 чекбокса Ig: История, Пост, Reels."""
         self.open_content_format_dialog()
@@ -221,7 +214,14 @@ class CreateCampaignPage(BasePage):
         # Закрыть диалог кликом вне
         self.page.keyboard.press("Escape")
 
-    @allure.step('Выбор тематики: "{option_name}"')
+    def select_tiktok_video_format(self) -> None:
+        """Отметить чекбокс TikTok: Видео."""
+        self.open_content_format_dialog()
+        if not self.checkbox_tt_video.is_checked():
+            self.checkbox_tt_video.click()
+        # Закрыть диалог кликом вне
+        self.page.keyboard.press("Escape")
+
     def select_thematic(self, option_name: str) -> None:
         """Открыть диалог тематики и выбрать опцию."""
         self.btn_thematic_add.click()
@@ -229,20 +229,17 @@ class CreateCampaignPage(BasePage):
         self.page.get_by_role("option", name=option_name, exact=True).click()
         self.page.keyboard.press("Escape")
 
-    @allure.step("Ввод задания")
     def fill_task(self, value: str) -> None:
         """Заполнить поле Задание."""
         self.input_task.click()
         self.input_task.fill(value)
 
-    @allure.step('Ввод максимальной компенсации: "{value}"')
     def fill_max_compensation(self, value: str) -> None:
         """Заполнить поле Максимальная компенсация за товар."""
         self.input_max_compensation.click()
         self.input_max_compensation.clear()
         self.input_max_compensation.fill(value)
 
-    @allure.step('Ввод вознаграждения (Фиксированная): "{value}"')
     def input_reward(self, value: str) -> None:
         """Заполнить поле Вознаграждение (таб Фиксированная)."""
         self.reward_input.click()
@@ -255,25 +252,21 @@ class CreateCampaignPage(BasePage):
         self.reward_input.clear()
         self.reward_input.fill(value)
 
-    @allure.step("Переключить Автоодобрение откликов (выключить)")
     def toggle_auto_approve_off(self) -> None:
         """Выключить switch Автоодобрение откликов (из checked → unchecked)."""
         if self.switch_auto_approve.is_checked():
             self.switch_auto_approve.click()
 
-    @allure.step("Переключить Автоодобрение откликов (включить)")
     def toggle_auto_approve_on(self) -> None:
         """Включить switch Автоодобрение откликов."""
         if not self.switch_auto_approve.is_checked():
             self.switch_auto_approve.click()
 
-    @allure.step("Выбрать тип оплаты: За просмотры")
     def select_per_views_tab(self) -> None:
         """Кликнуть таб 'За просмотры' и проверить что он выбран."""
         self.tab_per_views.click()
         expect(self.tab_per_views).to_have_attribute("aria-selected", "true")
 
-    @allure.step('Выбор услуги по поиску: "{search_text}"')
     def select_service_by_search(self, search_text: str) -> None:
         """Открыть combobox предмета рекламы → переключиться на Услуги → найти и выбрать услугу."""
         self.select_product.click()
@@ -289,26 +282,28 @@ class CreateCampaignPage(BasePage):
         )
         target_option.click()
 
-    @allure.step('Ввод минимального охвата блогера: "{value}"')
     def fill_min_coverage(self, value: str) -> None:
         """Заполнить поле Минимальный охват блогера."""
         self.input_min_coverage.click()
         self.input_min_coverage.clear()
         self.input_min_coverage.fill(value)
 
-    @allure.step('Ввод максимальной выплаты блогеру: "{value}"')
+    def fill_cpm_price(self, value: str) -> None:
+        """Заполнить поле Цена за 1000 просмотров."""
+        self.input_cpm_price.click()
+        self.input_cpm_price.clear()
+        self.input_cpm_price.fill(value)
+
     def fill_max_payout(self, value: str) -> None:
         """Заполнить поле Максимальная выплата блогеру."""
         self.input_max_payout.click()
         self.input_max_payout.clear()
         self.input_max_payout.fill(value)
 
-    @allure.step('Нажатие кнопки "Создать кампанию"')
     def click_create_campaign(self) -> None:
         """Нажать кнопку Создать кампанию."""
         self.btn_create_campaign.click()
 
-    @allure.step("Заполнение всех полей формы создания кампании")
     def fill_all_fields(
         self,
         name: str,
@@ -330,19 +325,16 @@ class CreateCampaignPage(BasePage):
 
     # ── Методы проверок ───────────────────────────────────────
 
-    @allure.step("Проверка: страница создания кампании загружена")
     def expect_loaded(self) -> None:
         """Проверить что страница создания кампании загружена."""
         self.expect_url_contains(r".*/app/advertiser/campaigns/create")
         expect(self.heading).to_be_visible()
 
-    @allure.step("Проверка: хлебные крошки видны")
     def check_breadcrumb_visible(self) -> None:
         """Проверить видимость хлебных крошек."""
         expect(self.breadcrumb_campaigns).to_be_visible()
         expect(self.breadcrumb_create).to_be_visible()
 
-    @allure.step("Проверка: все поля формы видны")
     def check_form_fields_visible(self) -> None:
         """Проверить видимость всех полей формы."""
         expect(self.input_name).to_be_visible()
@@ -358,7 +350,6 @@ class CreateCampaignPage(BasePage):
         expect(self.switch_auto_approve).to_be_visible()
         expect(self.btn_create_campaign).to_be_visible()
 
-    @allure.step("Проверка: таб Бартер выбран по умолчанию")
     def check_barter_tab_selected(self) -> None:
         """Проверить что таб Бартер выбран по умолчанию."""
         expect(self.tab_barter).to_have_attribute("aria-selected", "true")
@@ -366,61 +357,49 @@ class CreateCampaignPage(BasePage):
     def check_fixded_tab_selected(self) -> None:
         self.tab_fixed.click()
 
-    @allure.step("Проверка: Автоодобрение включено по умолчанию")
     def check_auto_approve_checked(self) -> None:
         """Проверить что switch Автоодобрение включен."""
         expect(self.switch_auto_approve).to_be_checked()
 
-    @allure.step("Проверка: Автоодобрение выключено")
     def check_auto_approve_unchecked(self) -> None:
         """Проверить что switch Автоодобрение выключен."""
         expect(self.switch_auto_approve).not_to_be_checked()
 
     # ── Проверки ошибок валидации ──────────────────────────────
 
-    @allure.step("Проверка: все ошибки валидации отображаются при пустой отправке")
     def check_all_validation_errors_visible(self) -> None:
         """Проверить что все 5 ошибок валидации отображаются."""
         count = self.all_errors.count()
         assert count >= 5, f"Ожидалось ≥5 ошибок валидации, получено {count}"
 
-    @allure.step('Проверка: ошибка названия — "Обязательное поле"')
     def check_error_name(self) -> None:
         """Проверить ошибку поля Название."""
         expect(self.error_name).to_contain_text("Обязательное поле")
 
-    @allure.step('Проверка: ошибка предмета рекламы — "Обязательное поле"')
     def check_error_product(self) -> None:
         """Проверить ошибку поля Предмет рекламы."""
         expect(self.error_product).to_contain_text("Обязательное поле")
 
-    @allure.step(
-        'Проверка: ошибка формата контента — "Необходимо выбрать социальную сеть"'
-    )
     def check_error_content_format(self) -> None:
         """Проверить ошибку поля Формат контента."""
         expect(self.error_content_format).to_contain_text(
             "Необходимо выбрать социальную сеть"
         )
 
-    @allure.step('Проверка: ошибка тематики — "Нужно выбрать хотя бы одну тематику."')
     def check_error_thematic(self) -> None:
         """Проверить ошибку поля Тематика."""
         expect(self.error_thematic).to_contain_text(
             "Нужно выбрать хотя бы одну тематику"
         )
 
-    @allure.step('Проверка: ошибка задания — "Значение слишком маленькое. Минимум: 5"')
     def check_error_task(self) -> None:
         """Проверить ошибку поля Задание."""
         expect(self.error_task).to_contain_text("Значение слишком маленькое")
 
-    @allure.step("Проверка: URL остаётся на странице создания (нет редиректа)")
     def check_still_on_create_page(self) -> None:
         """Проверить что после ошибки валидации остаёмся на странице создания."""
         self.expect_url_contains(r".*/app/advertiser/campaigns/create")
 
-    @allure.step("Проверка: ошибки валидации отсутствуют")
     def check_no_errors(self) -> None:
         """Проверить что ошибок валидации нет."""
         count = self.all_errors.count()

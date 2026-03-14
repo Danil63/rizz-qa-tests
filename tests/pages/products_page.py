@@ -1,6 +1,5 @@
 """POM: Страница списка продуктов рекламодателя."""
 
-import allure
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
@@ -71,13 +70,11 @@ class ProductsPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step("Принять cookie")
     def accept_cookies(self) -> None:
         """Принять cookie, если диалог отображается."""
         if self.cookie_accept.is_visible(timeout=3000):
             self.cookie_accept.click()
 
-    @allure.step('Выбор типа продукта: "{option}"')
     def select_product_type(self, option: str) -> None:
         """Открыть dropdown Товар/Услуга и выбрать опцию."""
         if self.filter_type_button.is_visible():
@@ -86,19 +83,16 @@ class ProductsPage(BasePage):
             self.filter_service_button.click()
         self.page.get_by_role("option", name=option).click()
 
-    @allure.step("Получить количество карточек услуг")
     def get_service_cards_count(self) -> int:
         """Вернуть количество карточек в текущем списке услуг."""
         return self.service_cards.count()
 
-    @allure.step("Получить заголовок услуги по индексу")
     def get_service_title_by_index(self, index: int) -> str:
         """Достаёт заголовок услуги из карточки (устойчиво, без img[alt])."""
         card = self.service_cards.nth(index)
         text = card.get_by_role("link").first.inner_text().strip()
         return text.splitlines()[0].strip() if text else ""
 
-    @allure.step("Найти услугу по названию циклом while")
     def find_service_index_by_title_while(self, target_title: str) -> int:
         """Найти услугу по точному названию с прокруткой вниз, если карточки не в зоне видимости."""
         scroll_attempt = 0
@@ -122,7 +116,6 @@ class ProductsPage(BasePage):
             f"Услуга с названием '{target_title}' не найдена после скролла."
         )
 
-    @allure.step("Архивировать услугу по индексу")
     def archive_service_by_index(self, index: int) -> None:
         """Открыть меню троеточия, нажать Архивировать и подтвердить в модальном окне."""
         card = self.service_cards.nth(index)
@@ -135,7 +128,6 @@ class ProductsPage(BasePage):
         expect(confirm_button).to_be_visible(timeout=10000)
         confirm_button.click()
 
-    @allure.step("Разархивировать услугу по индексу")
     def unarchive_service_by_index(self, index: int) -> None:
         """Открыть меню троеточия, нажать Разархивировать и подтвердить в модальном окне."""
         card = self.service_cards.nth(index)
@@ -155,29 +147,24 @@ class ProductsPage(BasePage):
             expect(confirm_unarchive.last).to_be_visible(timeout=10000)
             confirm_unarchive.last.click()
 
-    @allure.step("Клик по первому продукту")
     def click_first_product(self) -> None:
         """Перейти в первый продукт из списка."""
         self.first_product_link.click()
 
-    @allure.step("Клик по кнопке Создать")
     def click_create(self) -> None:
         """Нажать кнопку Создать."""
         self.create_link.click()
 
-    @allure.step("Клик по кнопке Архив продуктов")
     def click_archive(self) -> None:
         """Нажать кнопку Архив продуктов."""
         self.archive_link.click()
 
     # ── Методы получения данных ────────────────────────────────
 
-    @allure.step("Получение названия первого продукта")
     def get_first_product_name(self) -> str:
         """Вернуть alt-текст картинки первого продукта (название)."""
         return self.first_product_image.get_attribute("alt") or ""
 
-    @allure.step("Получение данных первого продукта")
     def get_first_product_details(self) -> dict:
         """Вернуть словарь dt→dd из первого продукта."""
         terms = self.first_product.locator("dt").all_text_contents()
@@ -186,7 +173,6 @@ class ProductsPage(BasePage):
 
     # ── Методы проверок ───────────────────────────────────────
 
-    @allure.step("Проверка: страница продуктов загружена")
     def expect_loaded(self) -> None:
         """Проверить что страница продуктов рекламодателя загружена."""
         self.expect_url_contains(r".*/app/advertiser/products")
@@ -210,13 +196,11 @@ class ProductsPage(BasePage):
             # fallback-проверка: активен раздел Продукты в навигации
             expect(self.nav_products).to_be_visible(timeout=5000)
 
-    @allure.step("Проверка: страница архива продуктов загружена")
     def expect_archive_loaded(self) -> None:
         """Проверить что страница архива продуктов загружена."""
         self.expect_url_contains(r".*/app/advertiser/products/archive")
         expect(self.archive_heading).to_be_visible()
 
-    @allure.step("Проверка: навигация рекламодателя видна")
     def check_navigation_visible(self) -> None:
         """Проверить видимость навигации."""
         expect(self.nav_market).to_be_visible()
@@ -226,53 +210,44 @@ class ProductsPage(BasePage):
         expect(self.nav_statistics).to_be_visible()
         expect(self.nav_faq).to_be_visible()
 
-    @allure.step("Проверка: заголовок и описание видны")
     def check_heading_visible(self) -> None:
         """Проверить видимость заголовка и описания."""
         expect(self.heading).to_be_visible()
         expect(self.description).to_be_visible()
 
-    @allure.step("Проверка: кнопки действий видны")
     def check_action_buttons_visible(self) -> None:
         """Проверить видимость кнопок Создать, Синхронизация, Архив."""
         expect(self.create_link).to_be_visible()
         expect(self.sync_api_link).to_be_visible()
         expect(self.archive_link).to_be_visible()
 
-    @allure.step("Проверка: фильтр Товар/Услуга виден")
     def check_filter_type_visible(self) -> None:
         """Проверить видимость dropdown фильтра типа."""
         expect(self.filter_type_button).to_be_visible()
 
-    @allure.step("Проверка: первый продукт отображается")
     def check_first_product_visible(self) -> None:
         """Проверить что первый продукт в списке виден."""
         expect(self.first_product).to_be_visible()
         expect(self.first_product_image).to_be_visible()
 
-    @allure.step("Проверка: список продуктов не пуст")
     def check_products_list_not_empty(self) -> None:
         """Проверить что в списке есть хотя бы один продукт."""
         count = self.product_items.count()
         assert count > 0, f"Список продуктов пуст (count={count})"
 
-    @allure.step("Проверка: у первого продукта есть бейдж «На ведении»")
     def check_first_product_has_status_badge(self) -> None:
         """Проверить наличие бейджа статуса у первого продукта."""
         badge = self.first_product.locator(".rounded-full.border")
         expect(badge).to_be_visible()
 
-    @allure.step("Проверка: у первого продукта есть кнопка меню (три точки)")
     def check_first_product_has_menu(self) -> None:
         """Проверить что у первого продукта есть кнопка меню."""
         expect(self.first_product_menu_button).to_be_visible()
 
-    @allure.step("Проверка: ссылка Как это работает? видна")
     def check_how_it_works_visible(self) -> None:
         """Проверить видимость кнопки Как это работает?"""
         expect(self.how_it_works_button).to_be_visible()
 
-    @allure.step("Проверка: футер виден")
     def check_footer_visible(self) -> None:
         """Проверить видимость футера."""
         expect(self.footer_copyright).to_be_visible()

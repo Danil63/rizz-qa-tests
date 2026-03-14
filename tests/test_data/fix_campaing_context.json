@@ -1,11 +1,9 @@
 {
-  "campaign_title": "Тестовая кампания — Сетевой и промежуточный массив",
+  "campaign_title": "Тестовая кампания — Инновационный и контекстуальный архив",
   "marketplace": "Wildberries",
-  "category": "Спорт и отдых",
+  "category": "Красота и уход",
   "reward": "Фиксированная",
-  "social_network": "Ig",
-  "campaign_id": "018dcced-03c5-4368-9db3-8e47d6686e67",
-  "price": [
-    "201"
-  ]
+  "social_network": "TikTok",
+  "campaign_id": "3ebed094-dfc0-40c6-ac15-1fa0de3a4a33",
+  "price": "201"
 }

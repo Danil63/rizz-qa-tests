@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -16,13 +15,7 @@ LAST_PRODUCT_META_PATH = (
 
 @pytest.mark.regression
 @pytest.mark.responses
-@allure.epic("Маркет блогера")
-@allure.feature("Отклики")
-@allure.story("Отправка отклика на бартер")
-@allure.tag("Regression", "Responses", "Barter", "SendResponse")
 class TestResponsesSend01:
-    @allure.title("responses-send-01: creator market → поиск → отклик на бартер")
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_send_response_barter(self, blogger_page: Page):
         assert LAST_PRODUCT_META_PATH.exists(), (
             f"Файл {LAST_PRODUCT_META_PATH} не найден. "

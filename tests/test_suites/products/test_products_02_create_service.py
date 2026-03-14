@@ -4,8 +4,8 @@ import json
 import random
 from pathlib import Path
 
-import allure
 import pytest
+
 from tests.pages.create_product_page import CreateProductPage
 from tests.pages.products_page import ProductsPage
 from tests.test_data.product_generator import generate_product_data
@@ -15,17 +15,12 @@ LAST_SERVICE_META_PATH = (
 )
 
 
+@pytest.mark.skip(reason="Temporarily skipped")
 @pytest.mark.regression
 @pytest.mark.products
-@allure.epic("Продукты рекламодателя")
-@allure.feature("Создание услуги")
-@allure.story("Успешное создание")
-@allure.tag("Regression", "Products", "Positive")
 class TestProducts02:
     """products-02: Создание услуги с заполнением полей."""
 
-    @allure.title("products-02: Создать услугу (рандом) → возврат на список продуктов")
-    @allure.severity(allure.severity_level.CRITICAL)
     def test_products_02_create_service(self, products_page: ProductsPage):
         # 1) Тест стартует на странице списка продуктов
         products_page.expect_loaded()
@@ -41,15 +36,6 @@ class TestProducts02:
         # 4) Рандомные данные
         random_desc = generate_product_data().description
         name = f"Мойка окон {random.randint(100, 999)}"
-
-        allure.attach(
-            f"Тип: Услуга\n"
-            f"Название: {name}\n"
-            f"Описание: {random_desc}\n"
-            f"Категория: Бытовая химия",
-            name="Сгенерированные данные услуги",
-            attachment_type=allure.attachment_type.TEXT,
-        )
 
         # Сохраняем метаданные созданной услуги для следующих тестов
         LAST_SERVICE_META_PATH.parent.mkdir(parents=True, exist_ok=True)

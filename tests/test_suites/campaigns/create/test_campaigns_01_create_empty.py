@@ -9,7 +9,6 @@
     6) Проверить 5 ошибок валидации
 """
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -19,33 +18,9 @@ from tests.pages.create_campaign_page import CreateCampaignPage
 
 @pytest.mark.regression
 @pytest.mark.campaigns
-@allure.epic("Кампании рекламодателя")
-@allure.feature("Создание кампании")
-@allure.story("Валидация обязательных полей при пустой отправке")
-@allure.tag("Regression", "Campaigns", "Negative", "Validation")
 class TestCampaigns01:
     """campaigns-01: Нажатие «Создать кампанию» без заполнения полей."""
 
-    @allure.title(
-        "campaigns-01: Кампании → + Создать → пустая форма → Создать кампанию → 5 ошибок"
-    )
-    @allure.severity(allure.severity_level.CRITICAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Открыть страницу списка кампаний\n"
-        '2) Нажать кнопку "+ Создать"\n'
-        "3) Перейти на страницу создания кампании\n"
-        "4) Не заполнять ни одно поле\n"
-        '5) Нажать "Создать кампанию"\n\n'
-        "Ожидаемый результат:\n"
-        "1) Остаёмся на странице /app/advertiser/campaigns/create\n"
-        "2) Отображаются 5 ошибок валидации:\n"
-        '   — Название: "Обязательное поле"\n'
-        '   — Предмет рекламы: "Обязательное поле"\n'
-        '   — Формат контента: "Необходимо выбрать социальную сеть"\n'
-        '   — Тематика: "Нужно выбрать хотя бы одну тематику."\n'
-        '   — Задание: "Значение слишком маленькое. Минимум: 5"'
-    )
     def test_campaigns_01_create_empty(
         self,
         campaigns_page: CampaignsPage,

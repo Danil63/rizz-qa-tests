@@ -1,17 +1,15 @@
 """Глобальные фикстуры проекта."""
 
-import platform
 import shutil
-import sys
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
+from tests.fixtures.advertiser_fixture import advertiser_page  # noqa: F401
+
 # Импорт фикстур из fixtures/
 from tests.fixtures.blogger_fixture import blogger_page  # noqa: F401
-from tests.fixtures.advertiser_fixture import advertiser_page  # noqa: F401
 
 
 @pytest.fixture(autouse=True)
@@ -43,21 +41,8 @@ def ensure_page_ready_before_test(request):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Записать environment.properties + очистить кеш после прогона."""
+    """Очистить кеш после прогона."""
     root = Path(session.config.rootpath)
-
-    # ── Allure environment ────────────────────────────────────
-    allure_dir = session.config.getoption("--alluredir", default=None)
-    if allure_dir:
-        env_file = Path(allure_dir) / "environment.properties"
-        env_file.parent.mkdir(parents=True, exist_ok=True)
-        env_file.write_text(
-            f"URL=https://app.rizz.market\n"
-            f"Browser=Chromium\n"
-            f"Python={sys.version.split()[0]}\n"
-            f"OS={platform.system()} {platform.release()}\n"
-            f"Pytest={pytest.__version__}\n"
-        )
 
     # ── Очистка кеша ──────────────────────────────────────────
     for cache_dir in root.rglob("__pycache__"):
@@ -73,7 +58,7 @@ def pytest_sessionfinish(session, exitstatus):
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """Прикрепить скриншот к Allure-отчёту при падении теста."""
+    """Хук для обработки результатов теста."""
     outcome = yield
     report = outcome.get_result()
 
@@ -81,10 +66,6 @@ def pytest_runtest_makereport(item, call):
         try:
             page: Page | None = item.funcargs.get("page")
             if page is not None and not page.is_closed():
-                allure.attach(
-                    page.screenshot(),
-                    name="screenshot_on_failure",
-                    attachment_type=allure.attachment_type.PNG,
-                )
+                pass
         except Exception:
             pass

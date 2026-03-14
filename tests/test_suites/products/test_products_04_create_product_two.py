@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -18,24 +17,9 @@ LAST_PRODUCT_TWO_META_PATH = (
 
 @pytest.mark.regression
 @pytest.mark.products
-@allure.epic("Продукты рекламодателя")
-@allure.feature("Создание продукта")
-@allure.story("Успешное создание")
-@allure.tag("Regression", "Products", "Positive")
 class TestProducts04:
     """products-04: Создание второго продукта с заполнением всех полей."""
 
-    @allure.title("products-04: Заполнение всех полей (рандом) → второй продукт создан")
-    @allure.severity(allure.severity_level.CRITICAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Открыть страницу создания продукта\n"
-        "2) Загрузить изображение\n"
-        "3) Заполнить все поля рандомными реалистичными данными\n"
-        '4) Нажать "Создать"\n\n'
-        "Ожидаемый результат:\n"
-        "1) Пользователь переходит на /app/advertiser/products"
-    )
     def test_products_04_create_product_two(
         self,
         create_product_page: CreateProductPage,
@@ -45,18 +29,6 @@ class TestProducts04:
         data = generate_product_data()
 
         # Логируем в Allure что именно сгенерировали
-        allure.attach(
-            f"Название: {data.name}\n"
-            f"Артикул: {data.article}\n"
-            f"Категория: {data.category}\n"
-            f"Бренд: {data.brand}\n"
-            f"Маркетплейс: {data.marketplace}\n"
-            f"Цена: {data.price} ₽\n"
-            f"Ссылка: {data.product_link}\n"
-            f"Описание: {data.description}",
-            name="Сгенерированные данные продукта",
-            attachment_type=allure.attachment_type.TEXT,
-        )
 
         # 1) Страница уже открыта через фикстуру
 

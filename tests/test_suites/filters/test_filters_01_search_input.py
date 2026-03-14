@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 
 from tests.components.market_components.filter_component import FilterComponent
@@ -14,28 +13,9 @@ LAST_PRODUCT_META_PATH = TEST_DATA_DIR / "last_product_meta.json"
 
 @pytest.mark.regression
 @pytest.mark.filters
-@allure.epic("Маркет блогера")
-@allure.feature("Фильтрация")
-@allure.story("Поиск по тексту")
-@allure.tag("Regression", "Filters")
 class TestFilters01:
     """filters-01: Поиск товара с использованием input."""
 
-    @allure.title(
-        "filters-01: Поиск товара → проверка заголовков → очистка → повторный Enter"
-    )
-    @allure.severity(allure.severity_level.NORMAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Ввести в input название продукта из last_product_meta.json\n"
-        "2) Нажать Enter\n"
-        "3) Перебрать заголовки карточек и найти совпадение\n"
-        "4) Очистить поисковый запрос\n"
-        "5) Нажать Enter повторно\n\n"
-        "Ожидаемый результат:\n"
-        "1) В выдаче найдена карточка с названием продукта\n"
-        "2) После очистки выдача сбрасывается (карточки видны)"
-    )
     def test_filters_01_search_input(self, filters: FilterComponent):
         search_query = ""
 

@@ -7,7 +7,6 @@ from playwright.sync_api import Page
 
 from tests.pages.market_page import MarketPage
 
-
 MARKET_URL = "https://app.rizz.market/app/creator/market"
 
 

@@ -2,8 +2,7 @@
 
 import re
 
-import allure
-from playwright.sync_api import Page, Locator, expect
+from playwright.sync_api import Locator, Page, expect
 
 from tests.components.base_component import BaseComponent
 
@@ -52,7 +51,6 @@ class BarterResponseComponent(BaseComponent):
             "Не найдена кнопка действия по бартеру (Выполнить/Откликнуться)"
         )
 
-    @allure.step("Prepare barter form (click first barter action if required)")
     def prepare_barter_form(self) -> None:
         scope = self._scope()
 
@@ -77,11 +75,9 @@ class BarterResponseComponent(BaseComponent):
         btn = self._find_barter_action_button(scope)
         btn.click()
 
-    @allure.step('Clicking "Выполнить за бартер" (compat)')
     def click_execute_barter(self) -> None:
         self.prepare_barter_form()
 
-    @allure.step('Selecting social network account "{account_name}"')
     def select_social_network(self, account_name: str) -> None:
         scope = self._scope()
 
@@ -129,7 +125,6 @@ class BarterResponseComponent(BaseComponent):
             f"Не найден аккаунт '{account_name}' в dropdown 'Социальная сеть'"
         )
 
-    @allure.step('Clicking "Откликнуться на бартер"')
     def click_respond_barter(self) -> None:
         scope = self._scope()
         btn_candidates = [
@@ -146,14 +141,11 @@ class BarterResponseComponent(BaseComponent):
                 continue
         raise AssertionError("Не найдена кнопка 'Откликнуться на бартер'")
 
-    @allure.step('Checking success banner "Отклик отправлен" is visible')
     def check_success_banner_visible(self) -> None:
         expect(self.success_banner_title).to_be_visible(timeout=10000)
 
-    @allure.step('Checking text "Отклик на бартер отправлен" is visible')
     def check_success_text_visible(self) -> None:
         expect(self.success_banner_text).to_be_visible(timeout=10000)
 
-    @allure.step('Checking "Отменить отклик" button is visible')
     def check_cancel_button_visible(self) -> None:
         expect(self.cancel_response_button).to_be_visible(timeout=10000)

@@ -2,20 +2,15 @@
 
 import re
 
-import allure
 import pytest
 from playwright.sync_api import expect
 
-from tests.pages.sign_in_page import SignInPage
 from tests.pages.market_page import MarketPage
+from tests.pages.sign_in_page import SignInPage
 
 
 @pytest.mark.regression
 @pytest.mark.authorization
-@allure.epic("Авторизация")
-@allure.feature("Вход по телефону")
-@allure.story("Успешная авторизация")
-@allure.tag("Regression", "Authorization")
 class TestAuth02:
     """auth-02: Повторная авторизация по валидным данным.
 
@@ -24,19 +19,6 @@ class TestAuth02:
         Пароль: 89087814701
     """
 
-    @allure.title("auth-02: Повторная авторизация по валидным данным")
-    @allure.severity(allure.severity_level.CRITICAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Перейти на страницу авторизации\n"
-        "2) Нажать на кнопку 'Другие способы входа'\n"
-        "3) В поле Телефон посимвольно ввести данные: +7 993 885 4791\n"
-        "4) В поле пароль посимвольно ввести данные: 89087814701\n"
-        "5) Нажать на кнопку войти\n\n"
-        "Ожидаемый результат:\n"
-        "1) Пользователь авторизован и переходит в личный кабинет (creator/market или advertiser/campaigns)\n"
-        "2) Пользователь авторизован"
-    )
     def test_auth_02_repeat_login(
         self,
         sign_in_page: SignInPage,

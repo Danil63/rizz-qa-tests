@@ -5,14 +5,13 @@ Cookie загружаются из tests/stage/blogger_state.json.
 """
 
 import json
-import allure
-import pytest
 from pathlib import Path
+
+import pytest
 from playwright.sync_api import Page
 
-from tests.pages.market_page import MarketPage
 from tests.components.market_components.filter_component import FilterComponent
-
+from tests.pages.market_page import MarketPage
 
 STORAGE_STATE_PATH = (
     Path(__file__).parent.parent.parent / "stage" / "blogger_state.json"
@@ -56,7 +55,6 @@ def _load_auth(page: Page):
 
 
 @pytest.fixture()
-@allure.title("Открытие маркета блогера (через cookie)")
 def blogger_market(_load_auth, page: Page) -> Page:
     """Загрузить cookie блогера и открыть маркет."""
     page.goto(MARKET_URL)

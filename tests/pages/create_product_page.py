@@ -1,7 +1,7 @@
 """POM: Страница создания продукта рекламодателя."""
 
-import allure
 from pathlib import Path
+
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
@@ -95,19 +95,16 @@ class CreateProductPage(BasePage):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step("Принять cookie")
     def accept_cookies(self) -> None:
         """Принять cookie, если диалог отображается."""
         if self.cookie_accept.is_visible(timeout=3000):
             self.cookie_accept.click()
 
-    @allure.step("Загрузка изображения продукта")
     def upload_image(self, file_path: str | Path | None = None) -> None:
         """Загрузить изображение через скрытый input[type=file]."""
         path = str(file_path or self.DEFAULT_IMAGE)
         self.file_input.set_input_files(path)
 
-    @allure.step('Выбор типа задания: "{task_type}"')
     def select_task_type(self, task_type: str) -> None:
         """Выбрать тип задания: Товар или Услуга."""
         if task_type == "Товар":
@@ -115,54 +112,44 @@ class CreateProductPage(BasePage):
         elif task_type == "Услуга":
             self.tab_service.click()
 
-    @allure.step('Ввод артикула: "{value}"')
     def fill_article(self, value: str) -> None:
         """Заполнить поле Артикул."""
         self.input_article.fill(value)
 
-    @allure.step('Ввод названия: "{value}"')
     def fill_name(self, value: str) -> None:
         """Заполнить поле Название."""
         self.input_name.fill(value)
 
-    @allure.step('Ввод описания: "{value}"')
     def fill_description(self, value: str) -> None:
         """Заполнить поле Описание."""
         self.input_description.fill(value)
 
-    @allure.step('Ввод бренда: "{value}"')
     def fill_brand(self, value: str) -> None:
         """Заполнить поле Бренд."""
         self.input_brand.fill(value)
 
-    @allure.step('Ввод цены: "{value}"')
     def fill_price(self, value: str) -> None:
         """Заполнить поле Цена."""
         self.input_price.fill(value)
 
-    @allure.step('Ввод ссылки на товар: "{value}"')
     def fill_product_link(self, value: str) -> None:
         """Заполнить поле Ссылка на товар."""
         self.input_product_link.fill(value)
 
-    @allure.step('Выбор категории: "{option}"')
     def select_category_option(self, option: str) -> None:
         """Выбрать категорию из dropdown."""
         self.select_category.click()
         self.page.get_by_role("option", name=option, exact=True).click()
 
-    @allure.step('Выбор маркетплейса: "{option}"')
     def select_marketplace_option(self, option: str) -> None:
         """Выбрать маркетплейс из dropdown."""
         self.select_marketplace.click()
         self.page.get_by_role("option", name=option, exact=True).click()
 
-    @allure.step('Нажатие кнопки "Создать"')
     def click_submit(self) -> None:
         """Нажать кнопку Создать."""
         self.submit_button.click()
 
-    @allure.step("Заполнение всех полей формы")
     def fill_all_fields(
         self,
         article: str,
@@ -188,7 +175,6 @@ class CreateProductPage(BasePage):
         self.fill_price(price)
         self.fill_product_link(product_link)
 
-    @allure.step("Заполнение полей формы для типа 'Услуга'")
     def fill_service_fields(self, name: str, description: str, category: str) -> None:
         """Заполнить поля для режима Услуга: Название, Описание, Категория."""
         self.select_task_type("Услуга")
@@ -198,19 +184,16 @@ class CreateProductPage(BasePage):
 
     # ── Методы проверок ───────────────────────────────────────
 
-    @allure.step("Проверка: страница создания продукта загружена")
     def expect_loaded(self) -> None:
         """Проверить что страница создания продукта загружена."""
         self.expect_url_contains(r".*/app/advertiser/products/create")
         expect(self.heading).to_be_visible()
 
-    @allure.step("Проверка: хлебные крошки видны")
     def check_breadcrumb_visible(self) -> None:
         """Проверить видимость хлебных крошек."""
         expect(self.breadcrumb_products).to_be_visible()
         expect(self.breadcrumb_create).to_be_visible()
 
-    @allure.step("Проверка: все поля формы видны")
     def check_form_fields_visible(self) -> None:
         """Проверить видимость всех полей формы."""
         expect(self.upload_area).to_be_visible()
@@ -226,12 +209,10 @@ class CreateProductPage(BasePage):
         expect(self.input_product_link).to_be_visible()
         expect(self.submit_button).to_be_visible()
 
-    @allure.step("Проверка: таб Товар выбран по умолчанию")
     def check_product_tab_selected(self) -> None:
         """Проверить что таб Товар выбран по умолчанию."""
         expect(self.tab_product).to_have_attribute("aria-selected", "true")
 
-    @allure.step("Проверка: в режиме 'Услуга' доступны только service-поля")
     def check_service_mode_fields_visible(self) -> None:
         """Проверить поля в режиме Услуга (по текущему UI)."""
         expect(self.tab_service).to_have_attribute("aria-selected", "true")
@@ -239,62 +220,51 @@ class CreateProductPage(BasePage):
         expect(self.service_description).to_be_visible()
         expect(self.service_category).to_be_visible()
 
-    @allure.step("Проверка: placeholder цены корректный")
     def check_price_placeholder(self) -> None:
         """Проверить placeholder поля Цена."""
         expect(self.input_price).to_have_attribute("placeholder", "Цена в рублях")
 
     # ── Проверки ошибок валидации ──────────────────────────────
 
-    @allure.step("Проверка: все ошибки валидации отображаются при пустой отправке")
     def check_all_validation_errors_visible(self) -> None:
         """Проверить что все 9 ошибок валидации отображаются."""
         count = self.all_errors.count()
         assert count >= 9, f"Ожидалось ≥9 ошибок валидации, получено {count}"
 
-    @allure.step('Проверка: ошибка артикула — "{expected_text}"')
     def check_error_article(
         self, expected_text: str = "Значение слишком маленькое"
     ) -> None:
         """Проверить ошибку поля Артикул."""
         expect(self.error_article).to_contain_text(expected_text)
 
-    @allure.step("Проверка: ошибка названия — Обязательное поле")
     def check_error_name(self) -> None:
         """Проверить ошибку поля Название."""
         expect(self.error_name).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка описания — Обязательное поле")
     def check_error_description(self) -> None:
         """Проверить ошибку поля Описание."""
         expect(self.error_description).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка категории — Обязательное поле")
     def check_error_category(self) -> None:
         """Проверить ошибку поля Категория."""
         expect(self.error_category).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка бренда — Обязательное поле")
     def check_error_brand(self) -> None:
         """Проверить ошибку поля Бренд."""
         expect(self.error_brand).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка маркетплейса — Обязательное поле")
     def check_error_marketplace(self) -> None:
         """Проверить ошибку поля Маркетплейс."""
         expect(self.error_marketplace).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка цены — Обязательное поле")
     def check_error_price(self) -> None:
         """Проверить ошибку поля Цена."""
         expect(self.error_price).to_contain_text("Обязательное поле")
 
-    @allure.step("Проверка: ошибка ссылки — Неверный формат ссылки")
     def check_error_product_link(self) -> None:
         """Проверить ошибку поля Ссылка на товар."""
         expect(self.error_product_link).to_contain_text("Неверный формат ссылки")
 
-    @allure.step("Проверка: ошибки отсутствуют")
     def check_no_errors(self) -> None:
         """Проверить что ошибок валидации нет."""
         count = self.all_errors.count()

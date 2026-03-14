@@ -3,13 +3,11 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
 from tests.flows.auth_flow import AuthFlow
 from tests.pages.market_page import MarketPage
-
 
 # ── Учётные данные блогера ────────────────────────────────────
 
@@ -22,7 +20,6 @@ STORAGE_STATE_PATH = Path(__file__).parent.parent / "stage" / "blogger_state.jso
 
 
 @pytest.fixture()
-@allure.title("Авторизация как блогер (Данил СЗ)")
 def blogger_page(page: Page) -> Page:
     """Авторизоваться как блогер и вернуть page.
 

@@ -1,6 +1,5 @@
 """PCO: Компонент фильтров на странице маркета блогера."""
 
-import allure
 from playwright.sync_api import Page, expect
 
 from tests.components.base_component import BaseComponent
@@ -23,19 +22,16 @@ class FilterComponent(BaseComponent):
 
     # ── Методы действий ───────────────────────────────────────
 
-    @allure.step('Ввод "{query}" в поле поиска')
     def fill_search(self, query: str) -> None:
         """Ввести текст в поле поиска."""
         self.search_input.click()
         self.search_input.fill(query)
 
-    @allure.step("Очистка поля поиска")
     def clear_search(self) -> None:
         """Стереть текст в поле поиска."""
         self.search_input.click()
         self.search_input.fill("")
 
-    @allure.step("Нажать Enter в поле поиска")
     def press_search_enter(self) -> None:
         """Нажать Enter в поле поиска."""
         self.search_input.press("Enter")
@@ -50,7 +46,6 @@ class FilterComponent(BaseComponent):
         "Золотое яблоко": "zolotoeaybloko",
     }
 
-    @allure.step('Выбор в dropdown "{dropdown_name}" значение "{option_name}"')
     def select_dropdown_option(self, dropdown_name: str, option_name: str) -> None:
         """Открыть dropdown по имени кнопки и выбрать опцию."""
         btn = self._get_dropdown_button(dropdown_name)
@@ -70,7 +65,6 @@ class FilterComponent(BaseComponent):
         option.click()
         self.page.wait_for_timeout(500)
 
-    @allure.step('Закрытие dropdown "{dropdown_name}"')
     def close_dropdown(self, dropdown_name: str) -> None:
         """Закрыть dropdown повторным кликом."""
         btn = self._get_dropdown_button(dropdown_name)
@@ -92,20 +86,17 @@ class FilterComponent(BaseComponent):
 
     # ── Методы проверок ───────────────────────────────────────
 
-    @allure.step('Проверка: первая карточка содержит текст "{text}"')
     def check_first_card_contains(self, text: str) -> None:
         """Проверить что заголовок первой карточки содержит текст."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
         first_title = first_card.locator("h3")
         expect(first_title).to_contain_text(text, ignore_case=True)
 
-    @allure.step("Проверка: карточки отображаются после фильтрации")
     def check_cards_visible(self) -> None:
         """Проверить что хотя бы одна карточка видна."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
         expect(first_card).to_be_visible(timeout=10000)
 
-    @allure.step('Проверка: в карточках отображается плашка "{badge_text}"')
     def check_badge_visible_in_cards(self, badge_text: str) -> None:
         """Проверить что хотя бы одна карточка содержит указанный бейдж."""
         badge_map = {
@@ -119,20 +110,17 @@ class FilterComponent(BaseComponent):
         ).first
         expect(badge).to_be_visible(timeout=10000)
 
-    @allure.step("Проверка: выдача не изменилась (карточки видны)")
     def check_results_unchanged(self) -> None:
         """Проверить что карточки по-прежнему видны (выдача не сбросилась)."""
         first_card = self.page.locator(".rounded-xl.bg-white.p-1").first
         expect(first_card).to_be_visible(timeout=10000)
 
-    @allure.step('Скролл до заголовка карточки "{title}"')
     def scroll_to_card_title(self, title: str) -> None:
         """Проскроллить до заголовка h3, содержащего указанный текст."""
         heading = self.page.locator("h3", has_text=title).first
         expect(heading).to_be_visible(timeout=10000)
         heading.scroll_into_view_if_needed()
 
-    @allure.step('Поиск карточки с заголовком, содержащим "{expected_title}"')
     def find_card_with_title(self, expected_title: str) -> bool:
         """Перебрать все карточки и найти ту, заголовок которой совпадает с ожидаемым.
 
@@ -147,15 +135,5 @@ class FilterComponent(BaseComponent):
                 continue
             title_text = title_el.first.text_content() or ""
             if expected_title.lower() in title_text.lower():
-                allure.attach(
-                    f"Найдена карточка #{i + 1}: «{title_text}»",
-                    name="Совпадение заголовка",
-                    attachment_type=allure.attachment_type.TEXT,
-                )
                 return True
-        allure.attach(
-            f"Ожидалось: «{expected_title}»\nПроверено карточек: {count}",
-            name="Заголовок не найден",
-            attachment_type=allure.attachment_type.TEXT,
-        )
         return False

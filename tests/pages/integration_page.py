@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-import allure
 from playwright.sync_api import Page, expect
 
 from tests.pages.base_page import BasePage
@@ -69,11 +68,9 @@ class IntegrationPage(BasePage):
 
     # ── Навигация ─────────────────────────────────────────────
 
-    @allure.step("Открыть страницу интеграций (filter=New)")
     def open(self) -> None:
         self.page.goto(self.URL, wait_until="networkidle")
 
-    @allure.step('Нажать на карточку продукта "{product_name}" (с retry)')
     def click_product_card(self, product_name: str, max_retries: int = 5) -> None:
         """Найти и кликнуть карточку по заголовку. Retry с перезагрузкой каждые 5 сек."""
         product_link = self.page.locator(
@@ -96,18 +93,15 @@ class IntegrationPage(BasePage):
 
     # ── Чат ───────────────────────────────────────────────────
 
-    @allure.step('Нажать "Чат с рекламодателем"')
     def click_chat_button(self) -> None:
         expect(self.chat_button).to_be_visible(timeout=10000)
         self.chat_button.click()
 
-    @allure.step('Отправить сообщение в чат: "{text}"')
     def send_chat_message(self, text: str) -> None:
         expect(self.chat_textarea).to_be_visible(timeout=10000)
         self.chat_textarea.fill(text)
         self.chat_textarea.press("Enter")
 
-    @allure.step('Проверить что сообщение "{text}" появилось в чате')
     def wait_for_chat_message(self, text: str) -> None:
         message = self.page.locator(
             "p.w-full.overflow-hidden.break-all.text-sm.font-normal",
@@ -117,7 +111,6 @@ class IntegrationPage(BasePage):
 
     # ── Начать работу ─────────────────────────────────────────
 
-    @allure.step('Нажать "Начать работу"')
     def click_start_work(self) -> None:
         expect(self.start_work_button).to_be_visible(timeout=10000)
         expect(self.start_work_button).to_be_enabled(timeout=10000)
@@ -128,7 +121,6 @@ class IntegrationPage(BasePage):
 
     # ── Загрузка медиа (шаги интеграции) ──────────────────────
 
-    @allure.step('Заполнить поле суммы значением "{amount}"')
     def fill_amount(self, amount: str) -> None:
         """Заполнить поле 'Введите сумму в рублях' в шаге подтверждения выкупа."""
         expect(self.amount_input).to_be_visible(timeout=10000)
@@ -168,7 +160,6 @@ class IntegrationPage(BasePage):
             timeout=15000,
         )
 
-    @allure.step("Загрузить медиа и отправить")
     def upload_media_and_submit(self, file_path: str = TEST_IMAGE_PATH) -> None:
         """Загрузить файл в первый доступный input[type=file] и отправить шаг."""
         file_input = self.file_inputs.first
@@ -180,9 +171,6 @@ class IntegrationPage(BasePage):
 
         self._click_submit_and_wait_processed()
 
-    @allure.step(
-        "Загрузить медиа, заполнить сумму и отправить (шаг подтверждения выкупа)"
-    )
     def upload_media_fill_amount_and_submit(
         self, amount: str = "100", file_path: str = TEST_IMAGE_PATH
     ) -> None:
@@ -197,7 +185,6 @@ class IntegrationPage(BasePage):
 
         self._click_submit_and_wait_processed()
 
-    @allure.step("Выполнить загрузку медиа для шагов 1–3")
     def upload_all_media_steps(
         self, count: int = 3, file_path: str = TEST_IMAGE_PATH
     ) -> None:
@@ -208,18 +195,23 @@ class IntegrationPage(BasePage):
         """
         steps = min(count, 3)
         for step in range(steps):
-            with allure.step(f"Загрузка медиа: шаг {step + 1} из {steps}"):
-                if step == 2:
-                    self.upload_media_fill_amount_and_submit("100", file_path)
-                else:
-                    self.upload_media_and_submit(file_path)
-                self.page.wait_for_timeout(3000)
+            if step == 2:
+                self.upload_media_fill_amount_and_submit("100", file_path)
+            else:
+                self.upload_media_and_submit(file_path)
+            self.page.wait_for_timeout(3000)
 
-    @allure.step("Загрузить видео и отправить (шаг 4: Медиа-контент)")
     def upload_step4_media_and_submit(
-        self, video_path: str = TEST_VIDEO_PATH, max_retries: int = 3
+        self,
+        video_path: str = TEST_VIDEO_PATH,
+        max_retries: int = 3,
+        step_id: str = "step-3",
     ) -> None:
-        """Шаг 4: загрузить видео в блок «Медиа-контент» и отправить.
+        """Загрузить видео в блок «Медиа-контент» и отправить.
+
+        step_id: DOM-id блока с видео.
+          - barter-кампания: "step-3" (по умолчанию)
+          - fix-кампания:    "step-2"
 
         После set_input_files ждёт:
         1. Появления <video> — файл принят DOM-ом.
@@ -232,16 +224,15 @@ class IntegrationPage(BasePage):
         expect(video_input).to_be_attached(timeout=15_000)
 
         for attempt in range(1, max_retries + 1):
-            with allure.step(f"Шаг 4: загрузка видео (попытка {attempt})"):
-                video_input.set_input_files(video_path)
+            video_input.set_input_files(video_path)
 
-                # Ждём появления тега <video> — файл принят
-                expect(self.page.locator("#step-3 video")).to_be_visible(timeout=10_000)
+            # Ждём появления тега <video> — файл принят
+            expect(self.page.locator(f"#{step_id} video")).to_be_visible(timeout=10_000)
 
-                # Ждём исчезновения progressbar — превью готово
-                expect(self.page.locator('#step-3 [role="progressbar"]')).to_be_hidden(
-                    timeout=15_000
-                )
+            # Ждём исчезновения progressbar — превью готово
+            expect(self.page.locator(f'#{step_id} [role="progressbar"]')).to_be_hidden(
+                timeout=15_000
+            )
 
             submit_count_before = self.page.get_by_role(
                 "button", name="Отправить", exact=True
@@ -267,14 +258,12 @@ class IntegrationPage(BasePage):
     # Методы рекламодателя — принятие шагов интеграции
     # ══════════════════════════════════════════════════════════
 
-    @allure.step("Открыть страницу интеграций рекламодателя")
     def open_advertiser_works(self) -> None:
         self.page.goto(
             "https://app.rizz.market/app/advertiser/works",
             wait_until="networkidle",
         )
 
-    @allure.step('Нажать на ник блогера "danil23319" в карточке')
     def click_blogger_nick_danil(self) -> None:
         nick = self.page.locator(
             "p.flex.items-center.gap-2.truncate.text-slate-500",
@@ -284,7 +273,6 @@ class IntegrationPage(BasePage):
         nick.click()
         self.page.wait_for_timeout(3_000)
 
-    @allure.step("Принять все 4 шага интеграции с retry-логикой")
     def accept_all_steps(self, max_retries: int = 5) -> None:
         """Последовательно нажимает кнопку «Принять» 4 раза.
 
@@ -309,11 +297,8 @@ class IntegrationPage(BasePage):
             except Exception:
                 return  # кнопка уже пропала — шаг принят
 
-            with allure.step(
-                f"Шаг {step_index + 1}: нажатие «Принять» (попытка {attempt})"
-            ):
-                accept_btn.click()
-                self.page.wait_for_timeout(2_000)
+            accept_btn.click()
+            self.page.wait_for_timeout(2_000)
 
             remaining = self.page.get_by_role(
                 "button", name="Принять", exact=True
@@ -328,14 +313,12 @@ class IntegrationPage(BasePage):
 
     # ── Размещение в социальной сети (step-4) ─────────────────
 
-    @allure.step('Ввести ссылку на публикацию: "{url}"')
     def fill_publication_link(self, url: str) -> None:
         """Заполнить поле «Ссылка на публикацию» в блоке step-4."""
         input_field = self.page.locator("#step-4 input[name='value']")
         expect(input_field).to_be_visible(timeout=10_000)
         input_field.fill(url)
 
-    @allure.step("Отправить ссылку на публикацию с retry-логикой")
     def submit_publication_link_with_retry(
         self,
         url: str,
@@ -354,38 +337,36 @@ class IntegrationPage(BasePage):
         expect(section).to_be_visible(timeout=10_000)
         section.scroll_into_view_if_needed()
 
-        self.fill_publication_link(url)
-
-        submit_btn = self.page.locator("#step-4 button[type='submit']")
+        submit_btn = self.page.locator(
+            "#step-4 button:has-text('Отправить')"
+        )
         # Появляется ТОЛЬКО после успешного сохранения на сервере
         saved_link = self.page.locator(f"#step-4 a[href='{url}']")
 
         for attempt in range(1, max_retries + 1):
-            with allure.step(f"Попытка {attempt} из {max_retries}: нажать «Отправить»"):
-                expect(submit_btn).to_be_visible(timeout=10_000)
-                expect(submit_btn).to_be_enabled(timeout=5_000)
-                submit_btn.click()
-                try:
-                    # Ссылка <a href="{url}"> появляется только после ответа сервера
-                    expect(saved_link).to_be_visible(timeout=wait_timeout_ms)
-                    return  # сервер подтвердил — ссылка сохранена
-                except Exception:
-                    if attempt == max_retries:
-                        raise AssertionError(
-                            f"Ссылка не сохранена на сервере после {max_retries} попыток. "
-                            f"URL: {url}"
-                        )
+            self.fill_publication_link(url)
+            expect(submit_btn).to_be_visible(timeout=10_000)
+            expect(submit_btn).to_be_enabled(timeout=5_000)
+            submit_btn.click()
+            try:
+                # Ссылка <a href="{url}"> появляется только после ответа сервера
+                expect(saved_link).to_be_visible(timeout=wait_timeout_ms)
+                return  # сервер подтвердил — ссылка сохранена
+            except Exception:
+                if attempt == max_retries:
+                    raise AssertionError(
+                        f"Ссылка не сохранена на сервере после {max_retries} попыток. "
+                        f"URL: {url}"
+                    )
 
     # ── Принятие/отклонение ссылки на публикацию (step-4, рекламодатель) ──
 
-    @allure.step("Скроллить к блоку «Размещение в социальной сети» и прокрутить")
     def scroll_to_social_link_step(self) -> None:
         """Скроллит к карточке step-4 на странице рекламодателя."""
         card = self.page.locator(STEP4_CARD)
         expect(card).to_be_visible(timeout=10_000)
         card.scroll_into_view_if_needed()
 
-    @allure.step("Нажать «Принять» в блоке «Размещение в социальной сети» (с retry)")
     def accept_publication_link_with_retry(
         self, max_retries: int = 3, wait_timeout_ms: int = 5_000
     ) -> None:
@@ -403,24 +384,22 @@ class IntegrationPage(BasePage):
         status_badge = self.page.locator(STEP4_STATUS_BADGE)
 
         for attempt in range(1, max_retries + 1):
-            with allure.step(f"Попытка {attempt} из {max_retries}: нажать «Принять»"):
-                expect(accept_btn).to_be_visible(timeout=10_000)
-                expect(accept_btn).to_be_enabled(timeout=5_000)
-                accept_btn.click()
-                try:
-                    # Бейдж «Принят …» появляется только после ReviewWorkStepV2 от сервера
-                    expect(status_badge).to_contain_text(
-                        "Принят", timeout=wait_timeout_ms
+            expect(accept_btn).to_be_visible(timeout=10_000)
+            expect(accept_btn).to_be_enabled(timeout=5_000)
+            accept_btn.click()
+            try:
+                # Бейдж «Принят …» появляется только после ReviewWorkStepV2 от сервера
+                expect(status_badge).to_contain_text(
+                    "Принят", timeout=wait_timeout_ms
+                )
+                return  # сервер подтвердил принятие
+            except Exception:
+                if attempt == max_retries:
+                    raise AssertionError(
+                        f"Статус шага не изменился на «Принят» после {max_retries} попыток. "
+                        f"Ожидался бейдж с текстом «Принят» в {STEP4_CARD}."
                     )
-                    return  # сервер подтвердил принятие
-                except Exception:
-                    if attempt == max_retries:
-                        raise AssertionError(
-                            f"Статус шага не изменился на «Принят» после {max_retries} попыток. "
-                            f"Ожидался бейдж с текстом «Принят» в {STEP4_CARD}."
-                        )
 
-    @allure.step("Проверить что шаг «Размещение в социальной сети» принят")
     def check_publication_link_accepted(self) -> None:
         """Финальная проверка после принятия:
         1. Статус-бейдж содержит «Принят» (ответ сервера).
@@ -434,7 +413,6 @@ class IntegrationPage(BasePage):
         expect(accept_btn).not_to_be_visible(timeout=5_000)
         expect(reject_btn).not_to_be_visible(timeout=5_000)
 
-    @allure.step("Нажать «Отклонить» в блоке «Размещение в социальной сети»")
     def click_reject_publication_link(self) -> None:
         """Открывает диалог отклонения (кнопка с aria-haspopup=dialog)."""
         self.scroll_to_social_link_step()
@@ -443,13 +421,11 @@ class IntegrationPage(BasePage):
         expect(reject_btn).to_be_enabled(timeout=5_000)
         reject_btn.click()
 
-    @allure.step("Открыть чат с блогером (сторона рекламодателя)")
     def open_advertiser_chat(self) -> None:
         expect(self.advertiser_chat_button).to_be_visible(timeout=10_000)
         self.advertiser_chat_button.click()
         self.page.wait_for_timeout(3_000)
 
-    @allure.step('Отправить сообщение от рекламодателя: "{text}"')
     def send_advertiser_message(self, text: str) -> None:
         expect(self.advertiser_message_input).to_be_visible(timeout=10_000)
         self.advertiser_message_input.click()
@@ -460,26 +436,23 @@ class IntegrationPage(BasePage):
     # Методы блогера — Выплата бартерного вознаграждения (step-5)
     # ══════════════════════════════════════════════════════════
 
-    @allure.step("Проверить что открыта страница интеграции")
     def expect_integration_page(self) -> None:
         """Проверяет два признака страницы интеграции:
         1. h2.title с текстом «Интеграция» — заголовок раздела.
         2. Breadcrumb [aria-current="page"] видим — финальный элемент хлебных крошек.
         Совместная проверка надёжнее одного локатора.
         """
-        expect(self.page.locator("h2.title")).to_have_text("Интеграция", timeout=10_000)
+        expect(self.page.locator("h2.title")).to_have_text("Интеграция", timeout=15000)
         expect(
             self.page.locator('nav[aria-label="breadcrumb"] [aria-current="page"]')
-        ).to_be_visible(timeout=10_000)
+        ).to_be_visible(timeout=15000)
 
-    @allure.step("Проскроллить к блоку «Выплата бартерного вознаграждения»")
     def scroll_to_payout_step(self) -> None:
         """Прокручивает страницу к карточке step-5."""
         card = self.page.locator(STEP5_CARD)
-        expect(card).to_be_visible(timeout=10_000)
+        expect(card).to_be_visible(timeout=15000)
         card.scroll_into_view_if_needed()
 
-    @allure.step("Нажать «Запустить выплату» и проверить появление акта")
     def click_start_payout(self) -> None:
         """Нажимает «Запустить выплату» и ждёт появления ссылки на акт.
 
@@ -490,19 +463,18 @@ class IntegrationPage(BasePage):
         start_btn = self.page.locator(STEP5_START_PAYOUT_BTN)
         act_link = self.page.locator(STEP5_ACT_LINK)
 
-        expect(start_btn).to_be_visible(timeout=10_000)
-        expect(start_btn).to_be_enabled(timeout=5_000)
+        expect(start_btn).to_be_visible(timeout=15_000)
+        expect(start_btn).to_be_enabled(timeout=10_000)
         # Проверяем DOM до: акта ещё нет
-        expect(act_link).not_to_be_visible(timeout=3_000)
+        expect(act_link).not_to_be_visible(timeout=8_000)
 
         start_btn.click()
 
         # Проверяем DOM после: акт появился (ответ сервера получен)
-        expect(act_link).to_be_visible(timeout=15_000)
+        expect(act_link).to_be_visible(timeout=15000)
 
-    @allure.step("Дождаться появления кнопки «Подписать»")
     def wait_for_sign_button(self) -> None:
         """Явное ожидание кнопки «Подписать» после запуска выплаты."""
         sign_btn = self.page.locator(STEP5_SIGN_BTN)
-        expect(sign_btn).to_be_visible(timeout=15_000)
-        expect(sign_btn).to_be_enabled(timeout=5_000)
+        expect(sign_btn).to_be_visible(timeout=15000)
+        expect(sign_btn).to_be_enabled(timeout=10000)

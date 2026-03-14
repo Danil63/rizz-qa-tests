@@ -11,28 +11,19 @@
 import json
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page, expect
 
 from tests.pages.campaigns_page import CampaignsPage
 
 LAST_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "barter_campaign_context.json"
+    Path(__file__).resolve().parents[3] / "test_data" / "barter_campaign_context.json"
 )
 
 
 @pytest.mark.regression
 @pytest.mark.campaigns
-@allure.epic("Кампании рекламодателя")
-@allure.feature("Фильтрация кампаний")
-@allure.story("Переключение фильтра ведения и проверка заголовка")
-@allure.tag("Regression", "Campaigns", "Filters")
-class TestCampaigns04:
-    @allure.title(
-        "campaigns-04: На ведении → Самостоятельно → проверка заголовка кампании"
-    )
-    @allure.severity(allure.severity_level.CRITICAL)
+class TestCampaigns05:
     def test_campaigns_04_management_switch_and_title(
         self,
         campaigns_page: CampaignsPage,

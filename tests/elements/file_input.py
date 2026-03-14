@@ -1,7 +1,5 @@
 """PageFactory: Элемент загрузки файла."""
 
-import allure
-
 from tests.elements.base_element import BaseElement
 
 
@@ -11,6 +9,5 @@ class FileInput(BaseElement):
         return "file input"
 
     def set_input_files(self, file: str, nth: int = 0, **kwargs):
-        with allure.step(f'Upload file "{file}" to {self.type_of} "{self.name}"'):
-            locator = self.get_locator(nth, **kwargs)
-            locator.set_input_files(file)
+        locator = self.get_locator(nth, **kwargs)
+        locator.set_input_files(file)

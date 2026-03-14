@@ -1,10 +1,10 @@
 import pytest
 from playwright.sync_api import Page
 
-from tests.pages.landing_page import LandingPage
-from tests.pages.sign_in_page import SignInPage
 from tests.pages.campaigns_page import CampaignsPage
+from tests.pages.landing_page import LandingPage
 from tests.pages.market_page import MarketPage
+from tests.pages.sign_in_page import SignInPage
 
 
 @pytest.fixture(scope="session")

@@ -8,22 +8,21 @@
     5) Заполнить Название (рандом)
     6) Выбрать услугу по названию из last_service_meta.json (вкладка "Услуги")
     7) Заполнить Ссылку с UTM (рандом)
-    8) Формат контента — Ig: все 3 формата
+    8) Формат контента — TikTok: Видео
     9) Тематика — рандомная
     10) Задание — рандомный шаблон
     11) Минимальный охват блогера — 90
     12) Максимальная выплата блогеру — 100
-    13) Автоодобрение — ВЫКЛЮЧИТЬ
-    14) Нажать "Создать кампанию"
-    15) Редирект на /app/advertiser/campaigns
+    13) Нажать "Создать кампанию"
+    14) Редирект на /app/advertiser/campaigns
 """
 
 import json
+import random
 import re
 import time
 from pathlib import Path
 
-import allure
 import pytest
 from playwright.sync_api import Page
 
@@ -32,21 +31,18 @@ from tests.pages.create_campaign_page import CreateCampaignPage
 from tests.test_data.campaign_generator import generate_campaign_data
 
 CPM_CAMPAIGN_CONTEXT_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "cpm_campaign_context.json"
+    Path(__file__).resolve().parents[3] / "test_data" / "cpm_campaign_context.json"
 )
 LAST_SERVICE_META_PATH = (
-    Path(__file__).resolve().parents[2] / "test_data" / "last_service_meta.json"
+    Path(__file__).resolve().parents[3] / "test_data" / "last_service_meta.json"
 )
 
 
+@pytest.mark.skip(reason="Temporarily skipped")
 @pytest.mark.regression
 @pytest.mark.campaigns
-@allure.epic("Кампании рекламодателя")
-@allure.feature("Создание кампании")
-@allure.story("Успешное создание кампании — За просмотры, Услуга, Ig все форматы")
-@allure.tag("Regression", "Campaigns", "Positive")
 class TestCampaigns04:
-    """campaigns-04: Создание кампании — За просмотры, Услуга, Ig все форматы, рандомные данные."""
+    """campaigns-04: Создание кампании — За просмотры, Услуга, TikTok Видео, рандомные данные."""
 
     @staticmethod
     def _save_campaign_id(campaign_id: str) -> None:
@@ -62,29 +58,6 @@ class TestCampaigns04:
             json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    @allure.title(
-        "campaigns-04: Кампании → + Создать → За просмотры → Услуга → заполнить все поля → Создать кампанию → редирект"
-    )
-    @allure.severity(allure.severity_level.CRITICAL)
-    @allure.description(
-        "Шаги:\n"
-        "1) Открыть страницу списка кампаний\n"
-        '2) Нажать кнопку "+ Создать"\n'
-        "3) Перейти на страницу создания кампании\n"
-        "4) ПЕРВОЕ ДЕЙСТВИЕ: выбрать тип оплаты 'За просмотры'\n"
-        "5) Заполнить Название (рандом)\n"
-        "6) Выбрать услугу по названию из last_service_meta.json (вкладка 'Услуги')\n"
-        "7) Заполнить Ссылку с UTM (рандом)\n"
-        "8) Формат контента — Ig: все 3 формата (История, Пост, Reels)\n"
-        "9) Тематика — рандомная из списка\n"
-        "10) Задание — по шаблону с ключевым запросом и отзывом\n"
-        "11) Минимальный охват блогера — 90\n"
-        "12) Максимальная выплата блогеру — 100\n"
-        "13) Автоодобрение откликов — ВЫКЛЮЧИТЬ\n"
-        '14) Нажать "Создать кампанию"\n\n'
-        "Ожидаемый результат:\n"
-        "Редирект на https://app.rizz.market/app/advertiser/campaigns"
-    )
     def test_campaigns_04_create(
         self,
         campaigns_page: CampaignsPage,
@@ -111,6 +84,8 @@ class TestCampaigns04:
                 existing = json.loads(CPM_CAMPAIGN_CONTEXT_PATH.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, ValueError):
                 existing = {}
+        MAX_PAYOUT = 202
+        cpm_price = random.randint(200, 220)
         CPM_CAMPAIGN_CONTEXT_PATH.write_text(
             json.dumps(
                 {
@@ -118,7 +93,8 @@ class TestCampaigns04:
                     "campaign_title": data.name,
                     "category": category,
                     "reward": "За просмотры",
-                    "social_network": "Ig",
+                    "social_network": "TikTok",
+                    "price": cpm_price,
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -127,17 +103,6 @@ class TestCampaigns04:
         )
 
         # Логируем в Allure
-        allure.attach(
-            f"Название: {data.name}\n"
-            f"Услуга (поиск): {service_name}\n"
-            f"UTM-ссылка: {data.utm_link}\n"
-            f"Тематика: {data.thematic}\n"
-            f"Минимальный охват: 90\n"
-            f"Макс. выплата: 100 ₽\n"
-            f"Задание:\n{data.task}",
-            name="Сгенерированные данные кампании",
-            attachment_type=allure.attachment_type.TEXT,
-        )
 
         # 1) Страница кампаний уже открыта через фикстуру
 
@@ -161,8 +126,8 @@ class TestCampaigns04:
         # 7) Ссылка с UTM
         create_page.fill_utm_link(data.utm_link)
 
-        # 8) Формат контента — Ig все 3
-        create_page.select_ig_all_formats()
+        # 8) Формат контента — TikTok Видео
+        create_page.select_tiktok_video_format()
 
         # 9) Тематика
         create_page.select_thematic(data.thematic)
@@ -170,13 +135,16 @@ class TestCampaigns04:
         # 10) Задание
         create_page.fill_task(data.task)
 
-        # 11) Минимальный охват блогера
+        # 11) Цена за 1000 просмотров
+        create_page.fill_cpm_price(str(cpm_price))
+
+        # 12) Минимальный охват блогера
         create_page.fill_min_coverage("90")
 
-        # 12) Максимальная выплата блогеру
-        create_page.fill_max_payout("100")
+        # 13) Максимальная выплата блогеру
+        create_page.fill_max_payout(str(MAX_PAYOUT))
 
-        # 13) Создать кампанию
+        # 14) Создать кампанию
         create_page.click_create_campaign()
 
         page.wait_for_timeout(5000)

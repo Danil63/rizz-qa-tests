@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 allure-results/
 allure-report/
+.venv/
 .openclaw/
 AGENTS.md
 HEARTBEAT.md
@@ -14,3 +15,4 @@ skills/
 .auth_state.json
 .auth_state_advertiser.json
 tests/stage/*_state.json
+.vscode/

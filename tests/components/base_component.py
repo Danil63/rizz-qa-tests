@@ -2,7 +2,6 @@
 
 from typing import Pattern
 
-import allure
 from playwright.sync_api import Page, expect
 
 
@@ -14,5 +13,4 @@ class BaseComponent:
 
     def check_current_url(self, expected_url: Pattern[str]) -> None:
         """Проверить что текущий URL соответствует паттерну."""
-        with allure.step("Checking URL matches pattern"):
-            expect(self.page).to_have_url(expected_url)
+        expect(self.page).to_have_url(expected_url)
